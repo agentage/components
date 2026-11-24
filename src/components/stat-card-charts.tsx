@@ -1,7 +1,7 @@
 import { cn } from '../lib/utils';
 
 /* ============================================================================
- * Inline mini-charts for StatCard (split out of stat-card-extensions.tsx).
+ * Inline mini-charts for StatCard.
  * ========================================================================= */
 
 export interface SparklineProps extends React.SVGAttributes<SVGSVGElement> {
@@ -18,6 +18,27 @@ export interface SparklineProps extends React.SVGAttributes<SVGSVGElement> {
   /** Overrides the accessible name derived from the data series. */
   chartLabel?: string;
 }
+
+// A zero-length round-capped stroke in screen units stays a circle under preserveAspectRatio="none".
+const Dot = ({
+  at,
+  className,
+  size = 3,
+}: {
+  at: { x: number; y: number };
+  className: string;
+  size?: number;
+}) => (
+  <path
+    d={`M ${at.x.toFixed(2)},${at.y.toFixed(2)} h 0`}
+    fill="none"
+    strokeWidth={size}
+    strokeLinecap="round"
+    vectorEffect="non-scaling-stroke"
+    className={className}
+    data-slot="sparkline-dot"
+  />
+);
 
 export const Sparkline = ({
   data,
@@ -60,41 +81,43 @@ export const Sparkline = ({
       {...props}
     >
       <path d={area} className={fill} />
-      <polyline points={pts} fill="none" strokeWidth="1.5" className={stroke} />
+      <polyline
+        points={pts}
+        fill="none"
+        strokeWidth="1.5"
+        vectorEffect="non-scaling-stroke"
+        className={stroke}
+      />
       {showMinMax && (
         <>
-          <circle
-            cx={coords[maxIdx].x}
-            cy={coords[maxIdx].y}
-            r="1.5"
-            className="fill-success"
-            vectorEffect="non-scaling-stroke"
-          />
-          <circle
-            cx={coords[minIdx].x}
-            cy={coords[minIdx].y}
-            r="1.5"
-            className="fill-destructive"
-            vectorEffect="non-scaling-stroke"
-          />
+          <Dot at={coords[maxIdx]} className="stroke-success" />
+          <Dot at={coords[minIdx]} className="stroke-destructive" />
         </>
       )}
-      {showLastDot && (
-        <circle
-          cx={lastP.x}
-          cy={lastP.y}
-          r="1.8"
-          className={cn(stroke.replace('stroke-', 'fill-'))}
-          vectorEffect="non-scaling-stroke"
-        />
-      )}
+      {showLastDot && <Dot at={lastP} className={stroke} size={3.6} />}
     </svg>
   );
 };
 
+export type MiniBarsTone = 'primary' | 'success' | 'warning' | 'destructive' | 'info' | 'muted';
+
+const TONE_FILL: Record<MiniBarsTone, string> = {
+  primary: 'fill-primary',
+  success: 'fill-success',
+  warning: 'fill-warning',
+  destructive: 'fill-destructive',
+  info: 'fill-info',
+  muted: 'fill-muted-foreground',
+};
+
 export interface MiniBarsProps extends React.SVGAttributes<SVGSVGElement> {
   data: number[];
-  /** Tailwind fill class for the bars. */
+  /** Colour meaning of the bars. Default `primary`. */
+  tone?: MiniBarsTone;
+  /**
+   * Deprecated: use `tone`. A Tailwind fill class for the bars.
+   * @deprecated Use `tone`.
+   */
   color?: string;
   height?: number;
   /** Overrides the accessible name derived from the data series. */
@@ -104,12 +127,13 @@ export interface MiniBarsProps extends React.SVGAttributes<SVGSVGElement> {
 export const MiniBars = ({
   data,
   className,
-  color = 'fill-primary',
+  tone,
+  color,
   height = 32,
   chartLabel,
   ...props
 }: MiniBarsProps): React.JSX.Element => {
-  const max = Math.max(...data) || 1;
+  const max = Math.max(...data, 0) || 1;
   const bw = 100 / data.length;
   const gap = bw * 0.2;
   const label =
@@ -128,16 +152,16 @@ export const MiniBars = ({
       {...props}
     >
       {data.map((v, i) => {
-        const h = (v / max) * (height - 2);
+        const h = v > 0 ? (v / max) * (height - 2) : 0;
         return (
           <rect
             key={i}
             x={i * bw + gap / 2}
             y={height - h}
             width={bw - gap}
-            height={Math.max(h, 1)}
+            height={v < 0 ? 0 : Math.max(h, 1)}
             rx="0.5"
-            className={cn(color, 'opacity-85')}
+            className={cn(tone ? TONE_FILL[tone] : (color ?? 'fill-primary'), 'opacity-85')}
           />
         );
       })}

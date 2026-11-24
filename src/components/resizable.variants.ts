@@ -16,8 +16,7 @@ export const resizableHandleVariants = cva(
   [
     'group relative shrink-0 bg-border transition-colors touch-none select-none',
     'hover:bg-primary/60 data-[dragging=true]:bg-primary',
-    'outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-1',
-    'focus-visible:ring-offset-background focus-visible:z-10',
+    'focus-ring focus-visible:z-10',
   ],
   {
     variants: {

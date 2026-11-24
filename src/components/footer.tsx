@@ -59,7 +59,7 @@ export const FooterSection = React.forwardRef<HTMLDivElement, FooterSectionProps
       <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </div>
-      <ul className="space-y-2 text-sm">{children}</ul>
+      <ul className="space-y-2 text-ui">{children}</ul>
     </div>
   )
 );
@@ -74,7 +74,7 @@ export const FooterLink = React.forwardRef<
       ref={ref}
       className={cn(
         'text-foreground/70 transition-colors hover:text-foreground',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        'focus-ring',
         className
       )}
       data-slot="footer-link"

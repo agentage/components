@@ -1,30 +1,30 @@
 import { cva } from 'class-variance-authority';
+import { fieldVariants } from './control.variants';
 
 export const comboboxTriggerVariants = cva(
-  [
-    'flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors',
-    'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-  ],
+  [fieldVariants({ size: null }), 'flex items-center justify-between'],
   {
     variants: {
+      /** md 30 px (default), sm 26 px. */
+      size: { sm: fieldVariants({ size: 'sm' }), md: fieldVariants({ size: 'md' }) },
       disabled: { true: 'opacity-50 cursor-not-allowed', false: '' },
       placeholder: { true: 'text-muted-foreground', false: '' },
       error: { true: 'border-destructive', false: '' },
     },
-    defaultVariants: { disabled: false, placeholder: false, error: false },
+    defaultVariants: { size: 'md', disabled: false, placeholder: false, error: false },
   }
 );
 
 export const comboboxOptionVariants = cva(
   [
-    'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors',
+    'flex min-h-7 w-full items-center gap-2 rounded-md px-2 py-1 text-ui transition-colors duration-fast',
     'hover:bg-accent hover:text-accent-foreground',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'focus-ring',
   ],
   {
     variants: {
       active: { true: 'bg-accent text-accent-foreground', false: '' },
-      selected: { true: 'bg-accent/50', false: '' },
+      selected: { true: 'font-medium', false: '' },
     },
     defaultVariants: { active: false, selected: false },
   }

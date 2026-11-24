@@ -31,4 +31,18 @@ describe('useScrollLock', () => {
     expect(document.body.style.paddingRight).toBe('12px');
     document.body.style.paddingRight = '';
   });
+
+  it('applies nested locks once and releases them in any order', () => {
+    document.body.style.paddingRight = '3px';
+    const a = render(<Lock active />);
+    const padding = document.body.style.paddingRight;
+    const b = render(<Lock active />);
+    expect(document.body.style.paddingRight).toBe(padding);
+    a.unmount();
+    expect(document.body.style.overflow).toBe('hidden');
+    b.unmount();
+    expect(document.body.style.overflow).toBe('');
+    expect(document.body.style.paddingRight).toBe('3px');
+    document.body.style.paddingRight = '';
+  });
 });

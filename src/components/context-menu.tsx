@@ -1,7 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
+import { OverlayLayerProvider, useOverlayLayer } from '../lib/overlay-layer';
 import { useAnchorPosition } from '../lib/use-anchor-position';
 import { useFocusRestore } from '../lib/use-focus-restore';
 import { useMounted } from '../lib/use-mounted';
@@ -16,6 +25,7 @@ import {
   type MenuItemProps,
   type MenuLabelProps,
   type MenuSeparatorProps,
+  type MenuSize,
 } from './menu.parts';
 import { menuContentVariants } from './menu.variants';
 
@@ -30,21 +40,27 @@ interface Point {
 export interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The right-clickable target. */
   trigger: ReactNode;
-  /** Menu items — `ContextMenuItem`, `ContextMenuSeparator`, `ContextMenuLabel`. */
+  /** Menu items - `ContextMenuItem`, `ContextMenuSeparator`, `ContextMenuLabel`. */
   children: ReactNode;
   disabled?: boolean;
+  /** Controlled open state; `false` closes the menu, `true` keeps an open menu open. */
+  open?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Class for the element wrapping the target (the surface takes `className`). */
   triggerClassName?: string;
+  /** `sm` (default): 28 px items, 13 px text, like DropdownMenu. `md` is deprecated. */
+  size?: MenuSize;
 }
 
 export const ContextMenu = ({
   trigger,
   children,
   disabled = false,
+  open: openProp,
   onOpenChange,
   className,
   triggerClassName,
+  size = 'sm',
   ...props
 }: ContextMenuProps): React.JSX.Element => {
   const [point, setPoint] = useState<Point | null>(null);
@@ -53,7 +69,12 @@ export const ContextMenu = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const mounted = useMounted();
   const menuId = `${useId()}-context-menu`;
-  const showing = point !== null && mounted;
+  // Opening needs a pointer position, so `open` can only close or hold a menu the user opened.
+  const showing = point !== null && mounted && openProp !== false;
+  const changeRef = useRef(onOpenChange);
+  useLayoutEffect(() => {
+    changeRef.current = onOpenChange;
+  });
 
   // A zero-size fixed anchor at the cursor lets the shared positioner do the viewport clamping.
   const { top, left } = useAnchorPosition(anchorRef, menuRef, showing, {
@@ -66,8 +87,11 @@ export const ContextMenu = ({
 
   const close = useCallback(() => {
     setPoint(null);
-    onOpenChange?.(false);
-  }, [onOpenChange]);
+    changeRef.current?.(false);
+  }, []);
+  const layer = useOverlayLayer(showing, { refs: [menuRef], onEscape: close, onOutside: close });
+
+  if (openProp === false && point !== null) setPoint(null);
 
   useEffect(() => {
     const node = wrapperRef.current;
@@ -75,7 +99,7 @@ export const ContextMenu = ({
 
     const openAt = (next: Point): void => {
       setPoint(next);
-      onOpenChange?.(true);
+      changeRef.current?.(true);
     };
     const handleContextMenu = (e: MouseEvent): void => {
       e.preventDefault();
@@ -96,25 +120,14 @@ export const ContextMenu = ({
       node.removeEventListener('contextmenu', handleContextMenu);
       node.removeEventListener('keydown', handleKeyDown);
     };
-  }, [disabled, onOpenChange]);
+  }, [disabled]);
 
   useEffect(() => {
-    if (!showing) return;
-    focusMenuItem(menuRef.current, 0);
-
-    const handleOutside = (e: MouseEvent): void => {
-      if (menuRef.current?.contains(e.target as Node)) return;
-      setPoint(null);
-      onOpenChange?.(false);
-    };
-    document.addEventListener('mousedown', handleOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleOutside);
-    };
-  }, [showing, onOpenChange]);
+    if (showing) focusMenuItem(menuRef.current, 0);
+  }, [showing]);
 
   return (
-    <MenuCloseContext.Provider value={{ close }}>
+    <MenuCloseContext.Provider value={{ close, size }}>
       <div
         ref={wrapperRef}
         className={triggerClassName}
@@ -125,7 +138,7 @@ export const ContextMenu = ({
       </div>
       {showing &&
         createPortal(
-          <>
+          <OverlayLayerProvider layer={layer}>
             <div
               ref={anchorRef}
               aria-hidden="true"
@@ -137,15 +150,15 @@ export const ContextMenu = ({
               id={menuId}
               role="menu"
               tabIndex={-1}
-              onKeyDown={(e) => handleMenuKeyDown(e, close)}
+              onKeyDown={(e) => handleMenuKeyDown(e, close, layer)}
               style={{ position: 'fixed', top, left }}
-              className={cn(menuContentVariants(), className)}
+              className={cn(menuContentVariants({ size }), className)}
               data-slot="context-menu-content"
               {...props}
             >
               {children}
             </div>
-          </>,
+          </OverlayLayerProvider>,
           document.body
         )}
     </MenuCloseContext.Provider>

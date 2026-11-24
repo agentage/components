@@ -8,7 +8,7 @@ import { cn } from '../lib/utils';
 const GROUP_SELECTOR = '[data-slot="radio-group"]';
 const ITEM_SELECTOR = '[data-slot="radio-group-item"]';
 
-export const radioGroupItemVariants = cva('flex items-center gap-2 text-sm', {
+export const radioGroupItemVariants = cva('flex items-center gap-2 text-ui', {
   variants: {
     disabled: { true: 'opacity-50 cursor-not-allowed', false: 'cursor-pointer' },
   },
@@ -18,7 +18,7 @@ export const radioGroupItemVariants = cva('flex items-center gap-2 text-sm', {
 export const radioGroupIndicatorVariants = cva(
   [
     'flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'focus-ring',
   ],
   {
     variants: {

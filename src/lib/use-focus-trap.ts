@@ -3,7 +3,7 @@
 import { useEffect, type RefObject } from 'react';
 import { useFocusRestore } from './use-focus-restore';
 
-const FOCUSABLE_SELECTOR = [
+export const FOCUSABLE_SELECTOR = [
   'a[href]',
   'button:not(:disabled)',
   'input:not(:disabled)',

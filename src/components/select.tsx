@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { cva } from 'class-variance-authority';
+import { useOverlayLayer } from '../lib/overlay-layer';
+import { useControlled } from '../lib/use-controlled';
 import { cn } from '../lib/utils';
+import { selectTriggerVariants } from './select.variants';
 
 const POINTS = { down: '6 9 12 15 18 9', up: '18 15 12 9 6 15', check: '20 6 9 17 4 12' };
 
@@ -26,49 +28,47 @@ const SelectIcon = ({ points, className }: SelectIconProps): React.JSX.Element =
   </svg>
 );
 
-export const selectTriggerVariants = cva(
-  [
-    'inline-flex w-full items-center justify-between gap-2 rounded-md border border-border',
-    'bg-background text-foreground transition-colors',
-    'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-    'data-[placeholder]:text-muted-foreground',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
-    '[&>span:first-child]:min-w-0 [&>span:first-child]:flex-1 [&>span:first-child]:truncate [&>span:first-child]:text-left',
-  ],
-  {
-    variants: {
-      compact: {
-        true: 'h-7 px-2 text-xs',
-        false: 'h-9 px-3 text-sm bg-muted/30 focus:bg-background',
-      },
-      error: { true: 'border-destructive', false: '' },
-    },
-    defaultVariants: { compact: false, error: false },
-  }
-);
+export { selectTriggerVariants } from './select.variants';
 
-export const Select = SelectPrimitive.Root;
+const SelectOpenContext = React.createContext(false);
+
+/** Radix Root that also tells SelectContent when it is open, for the shared layer stack. */
+export const Select = ({
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Root>): React.JSX.Element => {
+  const [open, setOpen] = useControlled(openProp, defaultOpen, onOpenChange);
+  return (
+    <SelectOpenContext.Provider value={open}>
+      <SelectPrimitive.Root {...props} open={open} onOpenChange={setOpen} />
+    </SelectOpenContext.Provider>
+  );
+};
 export const SelectGroup = SelectPrimitive.Group;
 export const SelectValue = SelectPrimitive.Value;
 
 export interface SelectTriggerProps extends React.ComponentPropsWithoutRef<
   typeof SelectPrimitive.Trigger
 > {
-  /** Compact height (h-7, text-xs) - for filter rows. Default false renders the form-input height. */
+  /** @deprecated Use `size="sm"`. */
   compact?: boolean;
+  /** Form-input height: md 30 px (default), sm 26 px. */
+  size?: 'sm' | 'md';
   error?: boolean;
 }
 
 export const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   SelectTriggerProps
->(({ className, children, compact = false, error = false, ...props }, ref) => (
+>(({ className, children, compact = false, size, error = false, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     data-slot="select-trigger"
     data-compact={compact || undefined}
     aria-invalid={error || undefined}
-    className={cn(selectTriggerVariants({ compact, error, className }))}
+    className={cn(selectTriggerVariants({ size, compact, error, className }))}
     {...props}
   >
     {children}
@@ -113,36 +113,49 @@ export const SelectScrollDownButton = React.forwardRef<
 ));
 SelectScrollDownButton.displayName = 'SelectScrollDownButton';
 
+// Radix can miss the ref reset on close, so the Root's open state drives the layer.
+const useSelectLayer = (ref: React.ForwardedRef<HTMLDivElement>) => {
+  const node = React.useRef<HTMLDivElement>(null);
+  React.useImperativeHandle(ref, () => node.current as HTMLDivElement);
+  useOverlayLayer(React.useContext(SelectOpenContext), { refs: [node], modal: true });
+  return node;
+};
+
+// axe aria-hidden-focus on #root while open is an artefact: Radix traps focus in the listbox.
 export const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = 'popper', ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      position={position}
-      className={cn(
-        'relative z-50 max-h-96 min-w-[var(--radix-select-trigger-width)] overflow-hidden',
-        'rounded-md border border-border bg-popover text-popover-foreground shadow-lg',
-        position === 'popper' && 'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
-        className
-      )}
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
+>(({ className, children, position = 'popper', ...props }, ref) => {
+  const layerRef = useSelectLayer(ref);
+  return (
+    <SelectPrimitive.Portal>
+      <SelectPrimitive.Content
+        ref={layerRef}
+        position={position}
         className={cn(
-          'p-1',
+          'relative z-[var(--z-dropdown,100)] max-h-96 min-w-[var(--radix-select-trigger-width)] overflow-hidden',
+          'rounded-lg border border-border bg-popover text-popover-foreground shadow-[var(--shadow-popover)]',
           position === 'popper' &&
-            'min-w-[var(--radix-select-trigger-width)] max-h-[var(--radix-select-content-available-height)]'
+            'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
+          className
         )}
+        {...props}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-));
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport
+          className={cn(
+            'p-1',
+            position === 'popper' &&
+              'min-w-[var(--radix-select-trigger-width)] max-h-[var(--radix-select-content-available-height)]'
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  );
+});
 SelectContent.displayName = 'SelectContent';
 
 export const SelectLabel = React.forwardRef<
@@ -165,7 +178,7 @@ export const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       'relative flex w-full cursor-pointer select-none items-center justify-start gap-2',
-      'rounded-sm px-2 py-1 text-left text-sm text-popover-foreground transition-colors outline-none',
+      'h-7 rounded-md px-2 text-left text-ui text-popover-foreground transition-colors outline-none',
       'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
       'data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:font-medium',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',

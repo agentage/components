@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { withDescribedBy } from '../lib/aria';
+import { useOverlayLayer } from '../lib/overlay-layer';
 import { useAnchorPosition, type AnchorAlign } from '../lib/use-anchor-position';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
@@ -58,16 +59,7 @@ export const HoverCard = ({
     []
   );
 
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') hide(0);
-    };
-    document.addEventListener('keydown', handleEscape);
-    return (): void => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [open, hide]);
+  useOverlayLayer(showing, { refs: [anchorRef, surfaceRef], onEscape: () => hide(0) });
 
   const hoverProps = {
     onPointerEnter: (event: React.PointerEvent): void => {
@@ -95,7 +87,7 @@ export const HoverCard = ({
             aria-label={label}
             style={{ position: 'fixed', top, left }}
             className={cn(
-              'z-[var(--z-overlay,50)] w-64 rounded-lg border border-border bg-popover p-4 shadow-md',
+              'z-[var(--z-overlay,50)] w-64 rounded-lg border border-border bg-popover p-3 text-ui shadow-[var(--shadow-popover)]',
               className
             )}
             data-slot="hover-card-content"

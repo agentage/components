@@ -1,10 +1,10 @@
 import { cva } from 'class-variance-authority';
-import { cn } from '../lib/utils';
-import { TREND_TONE, type TrendTone } from './stat-card';
+import { cn, formatNumber } from '../lib/utils';
+import { TREND_TONE, type TrendTone } from './stat-card.parts';
 
 // The inline charts moved to ./stat-card-charts; re-exported to keep this import path.
 export { Sparkline, MiniBars } from './stat-card-charts';
-export type { SparklineProps, MiniBarsProps } from './stat-card-charts';
+export type { SparklineProps, MiniBarsProps, MiniBarsTone } from './stat-card-charts';
 
 export const statComparisonDeltaVariants = cva(
   'inline-flex items-center gap-0.5 tabular-nums font-medium',
@@ -79,7 +79,7 @@ export const StatProgress = ({
   className,
   ...props
 }: StatProgressProps): React.JSX.Element => {
-  const fmt = format ?? ((n: number) => n.toLocaleString());
+  const fmt = format ?? formatNumber;
   const pct = Math.min(100, (current / Math.max(target, 1)) * 100);
   return (
     <div className={cn('space-y-1', className)} data-slot="stat-progress" {...props}>
@@ -115,9 +115,10 @@ export const StatComparison = ({
   tone,
   ...props
 }: StatComparisonProps): React.JSX.Element => {
-  const fmt = format ?? ((n: number) => n.toLocaleString());
+  const fmt = format ?? formatNumber;
   const delta = current - previous;
-  const pct = previous === 0 ? 0 : (delta / previous) * 100;
+  const isNew = previous === 0 && current !== 0;
+  const pct = previous === 0 ? 0 : (Math.abs(delta) / Math.abs(previous)) * 100;
   const up = delta >= 0;
   return (
     <div
@@ -131,7 +132,7 @@ export const StatComparison = ({
       <span className={cn(statComparisonDeltaVariants({ tone: tone ?? (up ? 'up' : 'down') }))}>
         <span aria-hidden="true">{up ? '▲' : '▼'}</span>
         <span className="sr-only">{up ? 'Up' : 'Down'}</span>
-        {pct.toFixed(1)}%
+        {isNew ? 'new' : `${pct.toFixed(1)}%`}
       </span>
     </div>
   );

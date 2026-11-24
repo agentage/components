@@ -10,6 +10,7 @@ export interface PageLayoutProps extends PageHeaderProps {
   rootClassName?: string;
 }
 
+/** @deprecated Compose `PageHeader` and your own layout container. */
 export const PageLayout = React.forwardRef<HTMLDivElement, PageLayoutProps>(
   ({ children, contentClassName, rootClassName, ...headerProps }, ref) => (
     <div ref={ref} className={cn('flex h-full flex-col', rootClassName)} data-slot="page-layout">

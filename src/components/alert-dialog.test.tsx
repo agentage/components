@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { AlertDialog } from './alert-dialog';
@@ -66,21 +66,17 @@ describe('AlertDialog', () => {
 });
 
 // Frozen pre-CVA output of the destructive branch.
-const CONFIRM_BASE =
-  'inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
-
 const confirmClass = (): string | undefined =>
   document.body.querySelectorAll('[role="alertdialog"] button')[1]?.className;
 
-describe('AlertDialog class parity', () => {
-  it('renders the default confirm button byte-identically', () => {
+describe('AlertDialog buttons', () => {
+  it('renders the confirm as a default Button', () => {
     render(<AlertDialog open onOpenChange={vi.fn()} title="T" onConfirm={vi.fn()} />);
-    expect(confirmClass()).toBe(
-      `${CONFIRM_BASE} bg-primary text-primary-foreground hover:bg-primary/90`
-    );
+    expect(confirmClass()).toContain('bg-primary');
+    expect(confirmClass()).toContain('h-7');
   });
 
-  it('renders the destructive confirm button byte-identically', () => {
+  it('renders the destructive confirm as a destructive Button', () => {
     render(
       <AlertDialog
         open
@@ -90,9 +86,7 @@ describe('AlertDialog class parity', () => {
         variant="destructive"
       />
     );
-    expect(confirmClass()).toBe(
-      `${CONFIRM_BASE} bg-destructive-solid text-on-solid hover:bg-destructive-solid/90`
-    );
+    expect(confirmClass()).toContain('bg-destructive-solid');
   });
 
   it('merges className last on the panel and spreads props', () => {
@@ -107,9 +101,46 @@ describe('AlertDialog class parity', () => {
       />
     );
     const panel = document.body.querySelector('[data-slot="alert-dialog-content"]');
-    expect(panel?.className).toBe(
-      'relative z-10 w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-lg mt-4'
-    );
+    expect(panel?.className.endsWith(' mt-4')).toBe(true);
     expect(panel?.id).toBe('ad');
+  });
+});
+
+describe('AlertDialog async confirm', () => {
+  it('stays open and pending until the promise resolves', async () => {
+    let resolve: () => void = () => {};
+    const onOpenChange = vi.fn();
+    render(
+      <AlertDialog
+        open
+        onOpenChange={onOpenChange}
+        title="Delete?"
+        confirmLabel="Delete"
+        onConfirm={() => new Promise<void>((r) => (resolve = r))}
+      />
+    );
+    const confirmButton = screen.getByRole('button', { name: 'Delete' });
+    fireEvent.click(confirmButton);
+    expect(confirmButton.getAttribute('aria-busy')).toBe('true');
+    expect(onOpenChange).not.toHaveBeenCalled();
+    await act(async () => resolve());
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('stays open when the confirm fails', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <AlertDialog
+        open
+        onOpenChange={onOpenChange}
+        title="Delete?"
+        confirmLabel="Delete"
+        onConfirm={() => Promise.reject(new Error('no'))}
+      />
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    });
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 });

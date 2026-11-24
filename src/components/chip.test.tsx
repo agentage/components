@@ -18,7 +18,7 @@ describe('Chip', () => {
     expect(chip.getAttribute('tabindex')).toBe('0');
     expect(chip.dataset.slot).toBe('chip-body');
     const wrapper = chip.parentElement as HTMLElement;
-    expect(wrapper.className).toContain('has-[[data-slot=chip-body]:focus-visible]:ring-2');
+    expect(wrapper.className).toContain('has-[[data-slot=chip-body]:focus-visible]:outline-ring');
   });
 
   it('activates on Enter', async () => {
@@ -76,7 +76,7 @@ describe('Chip', () => {
       </Chip>
     );
     const remove = screen.getByRole('button', { name: 'Remove tag' });
-    expect(remove.className).toContain('focus-visible:ring-2');
+    expect(remove.className).toContain('focus-ring');
   });
 
   it('removes without also activating the chip', async () => {

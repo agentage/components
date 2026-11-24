@@ -8,7 +8,7 @@ describe('ScrollArea', () => {
     render(<ScrollArea aria-label="Log output">line</ScrollArea>);
     const region = screen.getByRole('region', { name: 'Log output' });
     expect(region.getAttribute('tabindex')).toBe('0');
-    expect(region.className).toContain('focus-visible:ring-ring/50');
+    expect(region.className).toContain('focus-ring');
 
     await userEvent.tab();
     expect(document.activeElement).toBe(region);
@@ -34,8 +34,8 @@ describe('ScrollArea', () => {
 });
 
 describe('scrollAreaVariants', () => {
-  it('renders the exact class string for every orientation', () => {
-    const focus = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
+  it('renders the overflow classes for every orientation', () => {
+    const focus = 'focus-ring';
     const expected = {
       vertical: `relative overflow-y-auto overflow-x-hidden ${focus}`,
       horizontal: `relative overflow-x-auto overflow-y-hidden ${focus}`,

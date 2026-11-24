@@ -1,26 +1,26 @@
 import { Alert, Badge, Heading, InlineCode, Prose } from '../../src';
 import { Code } from '../components/code';
 
-const INSTALL = `npm install @agentage/design-system`;
+const INSTALL = `npm install @agentage/components`;
 
 const THEME_IMPORT = `// app/layout.tsx (or your root entry)
-import '@agentage/design-system/theme.css';`;
+import '@agentage/components/theme.css';`;
 
 const TAILWIND_SOURCE = `/* globals.css - Tailwind v4, CSS-first config */
 @import 'tailwindcss';
-@import '@agentage/design-system/theme.css';
+@import '@agentage/components/theme.css';
 
 /* Tailwind must scan the SHIPPED JS, not the source, or every
-   design-system class is tree-shaken out of your build. The path is the
+   component class is tree-shaken out of your build. The path is the
    hoisted root of your install - not ./node_modules of a workspace package. */
-@source "../../node_modules/@agentage/design-system/dist/**/*.js";`;
+@source "../../node_modules/@agentage/components/dist/**/*.js";`;
 
 const RSC = `// Server component - fine, Card is server-safe.
-import { Card, CardHeader, CardTitle } from '@agentage/design-system/card';
+import { Card, CardHeader, CardTitle } from '@agentage/components/card';
 
 // Interactive components already carry 'use client' as line 1,
 // so importing them from a server component works unchanged.
-import { Modal } from '@agentage/design-system/modal';`;
+import { Modal } from '@agentage/components/modal';`;
 
 export const InstallPage = () => (
   <div className="space-y-8">

@@ -21,7 +21,7 @@ ENV COMMIT_SHA=$COMMIT_SHA
 # USER root for this layer only: the base image runs as uid 101, which cannot write
 # into the root-owned web root. Dropped back immediately so nothing else runs as root.
 USER root
-RUN printf '{"success":true,"data":{"status":"ok","service":"agentage-ds","commit":"%s","buildTime":"%s"}}' \
+RUN printf '{"success":true,"data":{"status":"ok","service":"agentage-components","commit":"%s","buildTime":"%s"}}' \
       "$COMMIT_SHA" "$BUILD_TIME" > /usr/share/nginx/html/health.json \
   && chown 101:101 /usr/share/nginx/html/health.json
 USER 101

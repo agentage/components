@@ -45,22 +45,28 @@ describe('Card', () => {
   });
 });
 
-describe('Card flat variant', () => {
-  it('drops the shadow and slot grid for a padded block', () => {
+describe('Card surface', () => {
+  it('renders the same surface for the deprecated flat variant', () => {
     const { container } = render(<Card variant="flat">Body</Card>);
     const card = container.querySelector('[data-slot="card"]') as HTMLElement;
     expect(card.dataset.variant).toBe('flat');
-    expect(card.className).toContain('p-5');
-    expect(card.className).toContain('block');
-    expect(card.className).not.toContain('shadow-sm');
-    expect(card.className).not.toContain('py-6');
+    expect(card.className).toContain('rounded-lg');
+    expect(card.className).toContain('px-3.5 py-3');
+    expect(card.className).not.toContain('shadow');
   });
 
-  it('keeps the default surface unchanged', () => {
+  it('renders the default surface with no shadow', () => {
     const { container } = render(<Card>Body</Card>);
     const card = container.querySelector('[data-slot="card"]') as HTMLElement;
     expect(card.dataset.variant).toBe('default');
-    expect(card.className).toContain('shadow-sm');
-    expect(card.className).toContain('py-6');
+    expect(card.className).toContain('bg-card');
+    expect(card.className).not.toContain('shadow');
+  });
+
+  it('uses the larger padding for padding md', () => {
+    const { container } = render(<Card padding="md">Body</Card>);
+    const card = container.querySelector('[data-slot="card"]') as HTMLElement;
+    expect(card.className).toContain('px-5');
+    expect(card.className).toContain('py-4');
   });
 });

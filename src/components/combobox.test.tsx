@@ -11,9 +11,9 @@ const options: ComboboxOption[] = [
 const setup = (props: { value?: string } = {}) => {
   const onValueChange = vi.fn();
   render(<Combobox options={options} onValueChange={onValueChange} {...props} />);
-  const trigger = screen.getByRole('button', { name: /select|red|green|blue/i });
+  const trigger = screen.getByRole('combobox', { name: 'Select...' });
   fireEvent.click(trigger);
-  return { onValueChange, trigger, input: screen.getByRole('combobox') };
+  return { onValueChange, trigger, input: screen.getByRole('combobox', { name: 'Search...' }) };
 };
 
 const optionEls = (): HTMLElement[] => screen.getAllByRole('option');
@@ -103,18 +103,20 @@ describe('Combobox', () => {
 describe('Combobox class strings', () => {
   const opts = [{ value: 'a', label: 'A' }];
 
-  it('keeps the placeholder trigger class string byte-identical', () => {
+  it('renders the placeholder trigger as a 30 px field with a focus ring', () => {
     render(<Combobox options={opts} />);
-    expect(screen.getByRole('button').className).toBe(
-      'flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-muted-foreground'
-    );
+    const cls = screen.getByRole('combobox').className;
+    for (const c of ['h-[30px]', 'rounded-md', 'focus-ring', 'text-muted-foreground']) {
+      expect(cls).toContain(c);
+    }
   });
 
-  it('keeps the selected + disabled trigger class string byte-identical', () => {
+  it('renders the selected, disabled trigger and merges className last', () => {
     render(<Combobox options={opts} value="a" disabled className="mt-4" />);
-    expect(screen.getByRole('button').className).toBe(
-      'flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 opacity-50 cursor-not-allowed'
-    );
+    const cls = screen.getByRole('combobox').className;
+    expect(cls).toContain('opacity-50');
+    expect(cls).toContain('cursor-not-allowed');
+    expect(cls.split(' ')).not.toContain('text-muted-foreground');
   });
 
   it('keeps the root class string byte-identical', () => {
@@ -126,7 +128,7 @@ describe('Combobox class strings', () => {
 
   it('marks the trigger invalid and swaps the resting border on error', () => {
     render(<Combobox options={opts} error />);
-    const trigger = screen.getByRole('button');
+    const trigger = screen.getByRole('combobox');
     expect(trigger.getAttribute('aria-invalid')).toBe('true');
     expect(trigger.className).toContain('border-destructive');
     expect(trigger.className).not.toContain('border-border');
@@ -135,5 +137,15 @@ describe('Combobox class strings', () => {
   it('spreads unknown props onto the root', () => {
     render(<Combobox options={opts} data-testid="cbx" />);
     expect(screen.getByTestId('cbx').getAttribute('data-slot')).toBe('combobox');
+  });
+});
+
+describe('trigger sizes', () => {
+  it('is 30 px by default and 26 px as size sm', async () => {
+    const { comboboxTriggerVariants } = await import('./combobox.variants');
+    const { datePickerTriggerVariants } = await import('./date-picker');
+    expect(comboboxTriggerVariants()).toContain('h-[30px]');
+    expect(comboboxTriggerVariants({ size: 'sm' })).toContain('h-[26px]');
+    expect(datePickerTriggerVariants({ size: 'sm' })).toContain('h-[26px]');
   });
 });

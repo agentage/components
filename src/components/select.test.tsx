@@ -2,7 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Select, SelectTrigger, SelectValue } from './select';
 
-const trigger = (props: { compact?: boolean; error?: boolean; className?: string }): void => {
+const trigger = (props: {
+  compact?: boolean;
+  size?: 'sm' | 'md';
+  error?: boolean;
+  className?: string;
+}): void => {
   render(
     <Select>
       <SelectTrigger {...props}>
@@ -13,18 +18,26 @@ const trigger = (props: { compact?: boolean; error?: boolean; className?: string
 };
 
 describe('SelectTrigger class strings', () => {
-  it('keeps the default class string byte-identical', () => {
+  it('defaults to the dense 30 px md size and merges className last', () => {
     trigger({ className: 'mt-4' });
-    expect(screen.getByRole('combobox').className).toBe(
-      'inline-flex w-full items-center justify-between gap-2 rounded-md border border-border text-foreground transition-colors focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 data-[placeholder]:text-muted-foreground data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 [&>span:first-child]:min-w-0 [&>span:first-child]:flex-1 [&>span:first-child]:truncate [&>span:first-child]:text-left h-9 px-3 text-sm bg-muted/30 focus:bg-background mt-4'
-    );
+    const cls = screen.getByRole('combobox').className;
+    expect(cls).toContain('h-[30px] px-2.5 text-ui');
+    expect(cls.endsWith('mt-4')).toBe(true);
   });
 
-  it('keeps the compact class string byte-identical', () => {
+  it('renders size sm at 26 px with 12 px text', () => {
+    trigger({ size: 'sm' });
+    const cls = screen.getByRole('combobox').className;
+    expect(cls).toContain('h-[26px]');
+    expect(cls).toContain('text-xs');
+    expect(cls).not.toContain('h-[30px]');
+  });
+
+  it('maps the deprecated compact prop to the sm look', () => {
     trigger({ compact: true });
-    expect(screen.getByRole('combobox').className).toBe(
-      'inline-flex w-full items-center justify-between gap-2 rounded-md border border-border bg-background text-foreground transition-colors focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 data-[placeholder]:text-muted-foreground data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 [&>span:first-child]:min-w-0 [&>span:first-child]:flex-1 [&>span:first-child]:truncate [&>span:first-child]:text-left h-7 px-2 text-xs'
-    );
+    const cls = screen.getByRole('combobox').className;
+    expect(cls).toContain('h-[26px]');
+    expect(cls).not.toContain('h-[30px]');
   });
 
   it('marks the trigger invalid and swaps the resting border on error', () => {

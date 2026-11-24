@@ -1,31 +1,36 @@
 'use client';
 import { RankedListCard } from '../../src';
+import { Block } from '../components/demo';
 
-export const Demo = () => (
-  <>
-    <p className="-mt-2 text-xs text-muted-foreground">
-      Rank + label + value. Use for top agents, busiest machines, hottest queries.
-    </p>
-    <div className="grid grid-cols-2 gap-4">
+export const Example = () => (
+  <Block caption="A rank, a label and a value per row, with an optional hint. Use it for top teams, busiest services or hottest queries.">
+    <div className="max-w-md">
       <RankedListCard
-        title="Top agents by run count"
+        title="Top teams by report count"
         items={[
-          { label: 'code-reviewer', value: 184, hint: '2.1s avg' },
-          { label: 'test-gen', value: 152, hint: '3.4s avg' },
-          { label: 'doc-writer', value: 98, hint: '5.8s avg' },
-          { label: 'deploy', value: 67, hint: '12.3s avg' },
-          { label: 'monitor', value: 41, hint: '0.8s avg' },
-        ]}
-      />
-      <RankedListCard
-        title="Busiest machines (24h)"
-        items={[
-          { label: 'prod-worker-1', value: '94%', hint: '8 agents' },
-          { label: 'dev-machine', value: '67%', hint: '5 agents' },
-          { label: 'staging-01', value: '42%', hint: '3 agents' },
-          { label: 'test-runner', value: '18%', hint: '1 agent' },
+          { label: 'Design', value: 184, hint: '2.1 s average' },
+          { label: 'Support', value: 152, hint: '3.4 s average' },
+          { label: 'Finance', value: 98, hint: '5.8 s average' },
+          { label: 'Legal', value: 67, hint: '12.3 s average' },
+          { label: 'Sales', value: 41, hint: '0.8 s average' },
         ]}
       />
     </div>
-  </>
+  </Block>
+);
+
+export const Variants = () => (
+  <Block caption="Values can be formatted strings, such as percentages.">
+    <div className="max-w-md">
+      <RankedListCard
+        title="Busiest services, 24 hours"
+        items={[
+          { label: 'billing-api', value: '94%', hint: '8 workers' },
+          { label: 'search', value: '67%', hint: '5 workers' },
+          { label: 'exports', value: '42%', hint: '3 workers' },
+          { label: 'mailer', value: '18%', hint: '1 worker' },
+        ]}
+      />
+    </div>
+  </Block>
 );

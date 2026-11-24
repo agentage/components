@@ -1,9 +1,14 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
-import { CARD_BASE, TITLE, DESC } from './card-base';
+import {
+  chartCardDescriptionVariants,
+  chartCardTitleVariants,
+  chartCardVariants,
+  type ChartCardDensity,
+} from './chart-card.variants';
 
 /* ============================================================================
- * ScoreCard — 0..max score with optional colored bands (NPS, CSAT, health).
+ * ScoreCard - 0..max score with optional colored bands (NPS, CSAT, health).
  * ========================================================================= */
 
 export interface ScoreBand {
@@ -14,6 +19,11 @@ export interface ScoreBand {
 }
 
 export interface ScoreCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Deprecated: The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   * @deprecated The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   */
+  density?: ChartCardDensity;
   title: string;
   score: number;
   max?: number;
@@ -24,15 +34,23 @@ export interface ScoreCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const ScoreCard = React.forwardRef<HTMLDivElement, ScoreCardProps>(
-  ({ title, score, max = 100, bands, description, className, chartLabel, ...props }, ref) => {
+  (
+    { title, score, max = 100, bands, description, density, className, chartLabel, ...props },
+    ref
+  ) => {
     const current = bands?.find((b) => score >= b.from && score <= b.to);
     const pct = Math.max(0, Math.min(100, (score / Math.max(max, 1)) * 100));
     const band = current ? `, ${current.label}` : '';
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="score-card" {...props}>
-        <div className={TITLE}>{title}</div>
+      <div
+        ref={ref}
+        className={cn(chartCardVariants({ density }), className)}
+        data-slot="score-card"
+        {...props}
+      >
+        <div className={chartCardTitleVariants({ density })}>{title}</div>
         <div className="mt-1 flex items-baseline gap-2">
-          <div className="text-3xl font-semibold tabular-nums text-foreground">{score}</div>
+          <div className="text-2xl font-semibold tabular-nums text-foreground">{score}</div>
           <div className="text-xs text-muted-foreground">/ {max}</div>
           {current && (
             <span
@@ -78,7 +96,9 @@ export const ScoreCard = React.forwardRef<HTMLDivElement, ScoreCardProps>(
             <span>{max}</span>
           </div>
         </div>
-        {description && <div className={DESC}>{description}</div>}
+        {description && (
+          <div className={chartCardDescriptionVariants({ density })}>{description}</div>
+        )}
       </div>
     );
   }

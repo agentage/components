@@ -4,8 +4,10 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { createContext, useContext, useId, useState, type ReactNode } from 'react';
 import { cn } from '../lib/utils';
+import { Count } from './count';
+import { Disclosure, DisclosureChevron } from './disclosure';
 
-interface CollapsibleContextValue {
+export interface CollapsibleContextValue {
   open: boolean;
   toggle: () => void;
   triggerId: string;
@@ -19,7 +21,10 @@ const CollapsibleContext = createContext<CollapsibleContextValue>({
   contentId: '',
 });
 
-export interface CollapsibleProps {
+/** State and ids of the nearest Collapsible, for a custom trigger. */
+export const useCollapsible = (): CollapsibleContextValue => useContext(CollapsibleContext);
+
+export interface CollapsibleProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -27,50 +32,60 @@ export interface CollapsibleProps {
   className?: string;
 }
 
-export const Collapsible = ({
-  open: controlledOpen,
-  defaultOpen = false,
-  onOpenChange,
-  children,
-  className,
-}: CollapsibleProps): React.JSX.Element => {
-  const [internalOpen, setInternalOpen] = useState(defaultOpen);
-  const isOpen = controlledOpen ?? internalOpen;
-  const instanceId = useId();
+export const Collapsible = React.forwardRef<HTMLDivElement, CollapsibleProps>(
+  (
+    { open: controlledOpen, defaultOpen = false, onOpenChange, children, className, ...props },
+    ref
+  ) => {
+    const [internalOpen, setInternalOpen] = useState(defaultOpen);
+    const isOpen = controlledOpen ?? internalOpen;
+    const instanceId = useId();
 
-  const toggle = (): void => {
-    const next = !isOpen;
-    setInternalOpen(next);
-    onOpenChange?.(next);
-  };
+    const toggle = (): void => {
+      const next = !isOpen;
+      setInternalOpen(next);
+      onOpenChange?.(next);
+    };
 
-  return (
-    <CollapsibleContext.Provider
-      value={{
-        open: isOpen,
-        toggle,
-        triggerId: `${instanceId}-trigger`,
-        contentId: `${instanceId}-content`,
-      }}
-    >
-      <div className={className} data-slot="collapsible" data-state={isOpen ? 'open' : 'closed'}>
-        {typeof children === 'function'
-          ? (children as (props: { open: boolean; toggle: () => void }) => ReactNode)({
-              open: isOpen,
-              toggle,
-            })
-          : children}
-      </div>
-    </CollapsibleContext.Provider>
-  );
-};
+    return (
+      <CollapsibleContext.Provider
+        value={{
+          open: isOpen,
+          toggle,
+          triggerId: `${instanceId}-trigger`,
+          contentId: `${instanceId}-content`,
+        }}
+      >
+        <div
+          ref={ref}
+          className={className}
+          data-slot="collapsible"
+          data-state={isOpen ? 'open' : 'closed'}
+          {...props}
+        >
+          {typeof children === 'function'
+            ? (children as (props: { open: boolean; toggle: () => void }) => ReactNode)({
+                open: isOpen,
+                toggle,
+              })
+            : children}
+        </div>
+      </CollapsibleContext.Provider>
+    );
+  }
+);
+Collapsible.displayName = 'Collapsible';
 
 export interface CollapsibleTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
+  /** Leading chevron that turns when open. Default true (not drawn with asChild). */
+  chevron?: boolean;
+  /** Quiet trailing count, for example the number of items inside. */
+  count?: React.ReactNode;
 }
 
 export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, CollapsibleTriggerProps>(
-  ({ asChild = false, className, children, onClick, ...props }, ref) => {
+  ({ asChild = false, chevron = true, count, className, children, onClick, ...props }, ref) => {
     const { open, toggle, triggerId, contentId } = useContext(CollapsibleContext);
     const Comp = asChild ? Slot : 'button';
 
@@ -88,15 +103,23 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
         aria-controls={contentId || undefined}
         onClick={handleClick}
         className={cn(
-          'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-          'text-foreground hover:bg-accent/50',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+          'flex h-7 w-full items-center gap-2 rounded-md px-2 text-ui font-medium transition-colors duration-fast',
+          'text-foreground hover:bg-accent',
+          'focus-ring',
           className
         )}
         data-slot="collapsible-trigger"
         {...props}
       >
-        {asChild ? children : <span className="flex-1 text-left truncate">{children}</span>}
+        {asChild ? (
+          children
+        ) : (
+          <>
+            {chevron && <DisclosureChevron open={open} />}
+            <span className="min-w-0 truncate text-left">{children}</span>
+            {count !== undefined && <Count>{count}</Count>}
+          </>
+        )}
       </Comp>
     );
   }
@@ -106,20 +129,22 @@ CollapsibleTrigger.displayName = 'CollapsibleTrigger';
 export type CollapsibleContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const CollapsibleContent = React.forwardRef<HTMLDivElement, CollapsibleContentProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, children, ...props }, ref) => {
     const { open, triggerId, contentId } = useContext(CollapsibleContext);
 
     return (
-      <div
+      <Disclosure
         ref={ref}
+        open={open}
         id={contentId || undefined}
         role="region"
         aria-labelledby={triggerId || undefined}
-        hidden={!open}
-        className={cn('overflow-hidden transition-all', !open && 'hidden', className)}
+        className={className}
         data-slot="collapsible-content"
         {...props}
-      />
+      >
+        {children}
+      </Disclosure>
     );
   }
 );

@@ -1,18 +1,45 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
-import { CARD_BASE, TITLE, DESC } from './card-base';
+import {
+  chartCardDescriptionVariants,
+  chartCardTitleVariants,
+  chartCardVariants,
+  type ChartCardDensity,
+} from './chart-card.variants';
 
 /* ============================================================================
- * HeatmapCard — grid with intensity colors. Activity-by-day-hour, cohorts.
+ * HeatmapCard - grid with intensity colors. Activity-by-day-hour, cohorts.
  * ========================================================================= */
 
+export type HeatmapCardTone = 'primary' | 'success' | 'warning' | 'destructive' | 'info' | 'muted';
+
+const TONE_COLOR: Record<HeatmapCardTone, string> = {
+  primary: 'var(--color-primary)',
+  success: 'var(--color-success)',
+  warning: 'var(--color-warning)',
+  destructive: 'var(--color-destructive)',
+  info: 'var(--color-info)',
+  muted: 'var(--color-muted-foreground)',
+};
+
 export interface HeatmapCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Deprecated: The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   * @deprecated The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   */
+  density?: ChartCardDensity;
   title: string;
+  /** Values, one array per row. */
   data: number[][];
   rowLabels?: string[];
   colLabels?: string[];
   max?: number;
-  /** CSS colour the cell intensity ramp is mixed from. */
+  /** Colour meaning the cell intensity ramp is mixed from (default `primary`). */
+  tone?: HeatmapCardTone;
+  /**
+   * Deprecated: use `tone`; a raw CSS colour, used only when `tone` is not set.
+   * @deprecated Use `tone`; a raw CSS colour, used only when `tone` is not set.
+   */
   color?: string;
   description?: React.ReactNode;
   /** Overrides the screen-reader table caption (defaults to title). */
@@ -27,8 +54,10 @@ export const HeatmapCard = React.forwardRef<HTMLDivElement, HeatmapCardProps>(
       rowLabels,
       colLabels,
       max: maxProp,
-      color = 'var(--color-primary)',
+      tone,
+      color: colorProp,
       description,
+      density,
       className,
       chartLabel,
       ...props
@@ -36,10 +65,16 @@ export const HeatmapCard = React.forwardRef<HTMLDivElement, HeatmapCardProps>(
     ref
   ) => {
     const max = maxProp ?? (Math.max(...data.flat()) || 1);
+    const color = tone ? TONE_COLOR[tone] : (colorProp ?? TONE_COLOR.primary);
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="heatmap-card" {...props}>
-        <div className={TITLE}>{title}</div>
-        <div className="mt-3 overflow-x-auto">
+      <div
+        ref={ref}
+        className={cn(chartCardVariants({ density }), className)}
+        data-slot="heatmap-card"
+        {...props}
+      >
+        <div className={chartCardTitleVariants({ density })}>{title}</div>
+        <div className="mt-2.5 overflow-x-auto">
           <table className="border-separate" style={{ borderSpacing: 2 }}>
             <caption className="sr-only">{chartLabel ?? title}</caption>
             {colLabels && (
@@ -90,7 +125,9 @@ export const HeatmapCard = React.forwardRef<HTMLDivElement, HeatmapCardProps>(
             </tbody>
           </table>
         </div>
-        {description && <div className={DESC}>{description}</div>}
+        {description && (
+          <div className={chartCardDescriptionVariants({ density })}>{description}</div>
+        )}
       </div>
     );
   }

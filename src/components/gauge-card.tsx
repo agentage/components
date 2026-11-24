@@ -1,13 +1,22 @@
 import * as React from 'react';
-import { cn } from '../lib/utils';
-import { CARD_BASE, TITLE } from './card-base';
+import { cn, formatNumber } from '../lib/utils';
+import {
+  chartCardTitleVariants,
+  chartCardVariants,
+  type ChartCardDensity,
+} from './chart-card.variants';
 
 /* ============================================================================
- * GaugeCard — semicircle gauge w/ optional threshold zones
+ * GaugeCard - semicircle gauge w/ optional threshold zones
  * Use when threshold/utilization matters (capacity, error rate, latency).
  * ========================================================================= */
 
 export interface GaugeCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Deprecated: The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   * @deprecated The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   */
+  density?: ChartCardDensity;
   title: string;
   value: number;
   min?: number;
@@ -29,13 +38,14 @@ export const GaugeCard = React.forwardRef<HTMLDivElement, GaugeCardProps>(
       thresholds,
       format,
       description,
+      density,
       className,
       chartLabel,
       ...props
     },
     ref
   ) => {
-    const fmt = format ?? ((n: number) => n.toLocaleString());
+    const fmt = format ?? formatNumber;
     const clamped = Math.max(min, Math.min(max, value));
     const pct = (clamped - min) / Math.max(max - min, 1);
     const angle = -Math.PI + pct * Math.PI;
@@ -64,8 +74,13 @@ export const GaugeCard = React.forwardRef<HTMLDivElement, GaugeCardProps>(
         ]
       : [{ d: arc(-Math.PI, 0), c: 'var(--color-primary)' }];
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="gauge-card" {...props}>
-        <div className={TITLE}>{title}</div>
+      <div
+        ref={ref}
+        className={cn(chartCardVariants({ density }), className)}
+        data-slot="gauge-card"
+        {...props}
+      >
+        <div className={chartCardTitleVariants({ density })}>{title}</div>
         <svg
           viewBox="0 0 120 70"
           className="mt-1 h-20 w-full"
@@ -88,7 +103,7 @@ export const GaugeCard = React.forwardRef<HTMLDivElement, GaugeCardProps>(
           <circle cx={cx} cy={cy} r="3" fill="currentColor" className="text-foreground" />
         </svg>
         <div className="text-center">
-          <div className="text-2xl font-semibold tabular-nums text-foreground">{fmt(value)}</div>
+          <div className="text-xl font-semibold tabular-nums text-foreground">{fmt(value)}</div>
           {description && <div className="mt-1 text-xs text-muted-foreground">{description}</div>}
         </div>
       </div>

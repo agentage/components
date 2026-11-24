@@ -4,39 +4,27 @@ import { describe, expect, it } from 'vitest';
 import { UsageMeter } from './usage-meter';
 
 const meter = (): HTMLElement => screen.getByRole('meter');
-const fill = (): HTMLElement => document.querySelector('[data-slot="usage-meter-fill"]')!;
 
-describe('UsageMeter', () => {
+describe('UsageMeter (deprecated preset over Progress)', () => {
   it('names the meter through the label row and exposes the value range', () => {
     render(<UsageMeter label="Storage" value={17} max={100} />);
-    expect(meter().getAttribute('aria-valuenow')).toBe('17');
-    expect(meter().getAttribute('aria-valuemin')).toBe('0');
-    expect(meter().getAttribute('aria-valuemax')).toBe('100');
     expect(screen.getByRole('meter', { name: 'Storage' })).toBe(meter());
+    expect(meter().getAttribute('aria-valuenow')).toBe('17');
+    expect(meter().getAttribute('aria-valuemax')).toBe('100');
     expect(meter().getAttribute('aria-valuetext')).toBe('17 / 100');
-    expect(fill().style.width).toBe('17%');
+    expect(screen.getByText('17 / 100')).toBeTruthy();
   });
 
-  it('escalates default -> warning -> critical across the thresholds', () => {
-    const { rerender } = render(<UsageMeter label="Storage" value={50} max={100} />);
-    expect(screen.getByText('50 / 100').parentElement?.parentElement?.dataset.level).toBe(
-      'default'
-    );
-    expect(fill().className).toContain('bg-primary');
-
-    rerender(<UsageMeter label="Storage" value={85} max={100} />);
-    expect(fill().className).toContain('bg-warning');
-
+  it('adds the level to the value text past the thresholds', () => {
+    const { rerender } = render(<UsageMeter label="Storage" value={85} max={100} />);
+    expect(meter().getAttribute('aria-valuetext')).toBe('85 / 100, warning');
+    rerender(<UsageMeter label="Reports" value={55} max={100} thresholds={{ warning: 0.5 }} />);
+    expect(meter().getAttribute('aria-valuetext')).toBe('55 / 100, warning');
     rerender(<UsageMeter label="Storage" value={96} max={100} />);
-    expect(fill().className).toContain('bg-destructive');
+    expect(meter().getAttribute('aria-valuetext')).toBe('96 / 100, critical');
   });
 
-  it('honours custom thresholds', () => {
-    render(<UsageMeter label="Runs" value={55} max={100} thresholds={{ warning: 0.5 }} />);
-    expect(fill().className).toContain('bg-warning');
-  });
-
-  it('formats the value through formatValue and caps the fill at 100%', () => {
+  it('formats the value and clamps aria-valuenow to max', () => {
     render(
       <UsageMeter
         label="Storage"
@@ -45,29 +33,23 @@ describe('UsageMeter', () => {
         formatValue={(v, m) => `${String(v)} MB of ${String(m)} MB`}
       />
     );
-    expect(screen.getByText('120 MB of 100 MB')).not.toBeNull();
-    expect(meter().getAttribute('aria-valuetext')).toBe('120 MB of 100 MB');
-    expect(fill().style.width).toBe('100%');
+    expect(screen.getByText('120 MB of 100 MB')).toBeTruthy();
+    expect(meter().getAttribute('aria-valuenow')).toBe('100');
+    expect(meter().getAttribute('aria-valuetext')).toBe('120 MB of 100 MB, critical');
   });
 
-  it('hides the value column when showValue is false', () => {
-    render(<UsageMeter label="Storage" value={17} max={100} showValue={false} />);
-    expect(document.querySelector('[data-slot="usage-meter-value"]')).toBeNull();
-  });
-
-  it('switches the track height by size and forwards ref plus className', () => {
+  it('hides the value when showValue is false and forwards ref plus className', () => {
     const ref = createRef<HTMLDivElement>();
-    const { rerender } = render(
-      <UsageMeter ref={ref} label="Storage" value={1} max={10} size="sm" className="mt-4" />
+    render(
+      <UsageMeter ref={ref} label="Storage" value={1} max={10} showValue={false} className="mt-4" />
     );
-    expect(ref.current?.className).toBe('space-y-1.5 mt-4');
-    expect(meter().className).toContain('h-1.5');
-    rerender(<UsageMeter label="Storage" value={1} max={10} size="md" />);
-    expect(meter().className).toContain('h-2');
+    expect(screen.queryByText('1 / 10')).toBeNull();
+    expect(ref.current?.contains(meter())).toBe(true);
+    expect(ref.current?.dataset.slot).toBe('usage-meter');
   });
 
   it('treats a zero max as empty rather than dividing by zero', () => {
     render(<UsageMeter label="Storage" value={5} max={0} />);
-    expect(fill().style.width).toBe('0%');
+    expect(meter().getAttribute('aria-valuetext')).toBe('5 / 0');
   });
 });

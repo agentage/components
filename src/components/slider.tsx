@@ -19,8 +19,8 @@ export const sliderVariants = cva(
 
 export const sliderThumbVariants = cva(
   [
-    'pointer-events-none absolute size-4 rounded-full border-2 border-primary bg-foreground shadow-sm',
-    'group-focus-visible:ring-2 group-focus-visible:ring-ring/50 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
+    'pointer-events-none absolute size-4 rounded-full border-2 border-primary bg-foreground',
+    'group-focus-ring',
   ],
   {
     variants: {
@@ -44,6 +44,23 @@ export interface SliderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   disabled?: boolean;
   error?: boolean;
 }
+
+const PAGE_STEPS = 10;
+
+const decimalsOf = (n: number): number => {
+  const [, fraction = ''] = String(n).split('.');
+  return fraction.length;
+};
+
+/** Nearest point of the step grid anchored at `min`, or `max` itself when that is nearer; no float noise. */
+const snapToStep = (raw: number, min: number, max: number, step: number): number => {
+  const clamped = Math.min(max, Math.max(min, raw));
+  if (!(step > 0)) return clamped;
+  let stepped = min + Math.round((clamped - min) / step) * step;
+  if (stepped > max) stepped -= step;
+  if (max - clamped < clamped - stepped) return max;
+  return Number(stepped.toFixed(Math.max(decimalsOf(step), decimalsOf(min))));
+};
 
 export const Slider = forwardRef<HTMLDivElement, SliderProps>(
   (
@@ -72,7 +89,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       else if (ref) ref.current = node;
     };
 
-    const percentage = ((value - min) / (max - min)) * 100;
+    const percentage = max > min ? ((value - min) / (max - min)) * 100 : 0;
 
     const commit = useCallback(
       (next: number) => {
@@ -87,9 +104,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         if (!trackRef.current || disabled) return;
         const rect = trackRef.current.getBoundingClientRect();
         const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-        const raw = min + ratio * (max - min);
-        const stepped = Math.round(raw / step) * step;
-        commit(Math.min(max, Math.max(min, stepped)));
+        commit(snapToStep(min + ratio * (max - min), min, max, step));
       },
       [min, max, step, disabled, commit]
     );
@@ -117,8 +132,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
       if (disabled) return;
       let next = value;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(max, value + step);
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(min, value - step);
+      const by = (delta: number) => snapToStep(value + delta, min, max, step);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = by(step);
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = by(-step);
+      else if (e.key === 'PageUp') next = by(step * PAGE_STEPS);
+      else if (e.key === 'PageDown') next = by(-step * PAGE_STEPS);
       else if (e.key === 'Home') next = min;
       else if (e.key === 'End') next = max;
       else return;

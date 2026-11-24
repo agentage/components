@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 
 const setup = () =>
@@ -57,11 +57,8 @@ describe('Tabs', () => {
   });
 });
 
-const TRIGGER_STATE =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
-
 describe('tabs variants', () => {
-  const renderVariant = (variant: 'default' | 'underline') =>
+  const renderVariant = (variant: 'default' | 'underline' | 'pill' | 'line') =>
     render(
       <Tabs defaultValue="one" variant={variant}>
         <TabsList>
@@ -72,33 +69,39 @@ describe('tabs variants', () => {
       </Tabs>
     );
 
-  it('renders the exact class strings for the default variant', () => {
+  it('renders the pill look for the default variant', () => {
     renderVariant('default');
-    expect(screen.getByRole('tablist').className).toBe(
-      'w-fit self-start inline-flex items-center gap-1 rounded-lg bg-muted p-1'
-    );
-    expect(screen.getByRole('tab', { name: 'One' }).className).toBe(
-      `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${TRIGGER_STATE} bg-background text-foreground shadow-sm`
-    );
-    expect(screen.getByRole('tab', { name: 'Two' }).className).toBe(
-      `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${TRIGGER_STATE} text-muted-foreground hover:text-foreground`
-    );
-    expect(screen.getByRole('tabpanel').className).toBe(
-      'mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-    );
+    const list = screen.getByRole('tablist').className;
+    for (const c of ['h-8.5', 'rounded-lg', 'border', 'bg-card']) expect(list).toContain(c);
+    const on = screen.getByRole('tab', { name: 'One' }).className;
+    for (const c of ['h-7', 'rounded-md', 'focus-ring', 'bg-accent']) expect(on).toContain(c);
+    const off = screen.getByRole('tab', { name: 'Two' }).className;
+    // One weight in both states, so selecting a tab never widens it.
+    const weight = (cls: string) => cls.split(' ').filter((c) => c.startsWith('font-'));
+    expect(weight(on)).toEqual(weight(off));
+    expect(off).toContain('text-muted-foreground');
+    expect(off).toContain('hover:bg-accent');
+    expect(off.split(' ')).not.toContain('bg-accent');
+    expect(screen.getByRole('tabpanel').className).toContain('focus-ring');
   });
 
-  it('renders the exact class strings for the underline variant', () => {
+  it('renders the line look for the underline variant', () => {
     renderVariant('underline');
-    expect(screen.getByRole('tablist').className).toBe(
-      'w-fit self-start flex items-center gap-4 border-b border-border'
-    );
-    expect(screen.getByRole('tab', { name: 'One' }).className).toBe(
-      `-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all ${TRIGGER_STATE} border-foreground text-foreground`
-    );
-    expect(screen.getByRole('tab', { name: 'Two' }).className).toBe(
-      `-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all ${TRIGGER_STATE} border-transparent text-muted-foreground hover:text-foreground`
-    );
+    const list = screen.getByRole('tablist').className;
+    for (const c of ['h-9.5', 'border-b', 'w-full']) expect(list).toContain(c);
+    expect(list).not.toContain('rounded-lg');
+    const on = screen.getByRole('tab', { name: 'One' }).className;
+    expect(on).toContain('after:bg-primary');
+    expect(on.split(' ')).not.toContain('bg-accent');
+    expect(screen.getByRole('tab', { name: 'Two' }).className).not.toContain('after:bg-primary');
+  });
+
+  it('renders the same looks for the named pill and line variants', () => {
+    const pill = renderVariant('pill');
+    const pillList = screen.getByRole('tablist').className;
+    pill.unmount();
+    renderVariant('default');
+    expect(screen.getByRole('tablist').className).toBe(pillList);
   });
 });
 
@@ -123,14 +126,14 @@ describe('tabs pass-through', () => {
     expect(root.dataset.x).toBe('r');
 
     const list = screen.getByRole('tablist');
-    expect(list.className).toBe(
-      'self-start inline-flex items-center gap-1 rounded-lg bg-muted p-1 w-full'
-    );
+    expect(list.className).toContain('rounded-lg');
+    expect(list.className.endsWith('w-full')).toBe(true);
     expect(list.id).toBe('list');
     expect(list.dataset.x).toBe('l');
 
     const tab = screen.getByRole('tab', { name: 'One' });
-    expect(tab.className.endsWith('bg-background text-foreground shadow-sm grow')).toBe(true);
+    expect(tab.className.endsWith('grow')).toBe(true);
+    expect(tab.className).toContain('bg-accent');
     expect(tab.dataset.x).toBe('t');
     expect(tab.getAttribute('value')).toBe(null);
 
@@ -139,7 +142,7 @@ describe('tabs pass-through', () => {
     expect(panel.dataset.x).toBe('c');
   });
 
-  it('runs a caller onClick before switching tabs', () => {
+  it('calls a caller onClick before switching tabs', () => {
     const seen: string[] = [];
     render(
       <Tabs defaultValue="one">
@@ -198,5 +201,49 @@ describe('tabs keyboard reachability', () => {
     setup();
     expect(screen.getByRole('tab', { name: 'One' }).tabIndex).toBe(0);
     expect(screen.getByRole('tab', { name: 'Three' }).tabIndex).toBe(-1);
+  });
+});
+
+describe('tabs pill look', () => {
+  it('renders 28 px pills with the active one on the accent surface and a count', () => {
+    render(
+      <Tabs value="a" variant="pill">
+        <TabsList aria-label="Sections">
+          <TabsTrigger value="a" count={7}>
+            Installed
+          </TabsTrigger>
+          <TabsTrigger value="b">Market</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    const [a, b] = screen.getAllByRole('tab');
+    expect(a.className).toContain('h-7');
+    expect(a.className.split(' ')).toContain('bg-accent');
+    expect(b.className.split(' ')).not.toContain('bg-accent');
+    expect(screen.getByRole('tablist').className).toContain('h-8.5');
+    expect(a.querySelector('[data-slot="tabs-count"]')?.textContent).toBe('7');
+  });
+});
+
+describe('Tabs ids and forms', () => {
+  it('builds valid IDREFs from values with spaces and never submits a form', () => {
+    const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Tabs defaultValue="api keys">
+          <TabsList>
+            <TabsTrigger value="api keys">API keys</TabsTrigger>
+            <TabsTrigger value="other">Other</TabsTrigger>
+          </TabsList>
+          <TabsContent value="api keys">Keys</TabsContent>
+        </Tabs>
+      </form>
+    );
+    const tab = screen.getByRole('tab', { name: 'API keys' });
+    const panel = screen.getByRole('tabpanel', { name: 'API keys' });
+    expect(tab.id).not.toContain(' ');
+    expect(tab.getAttribute('aria-controls')).toBe(panel.id);
+    fireEvent.click(screen.getByRole('tab', { name: 'Other' }));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

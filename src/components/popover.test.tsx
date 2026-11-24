@@ -101,14 +101,31 @@ describe('Popover surface props', () => {
       />
     );
     const content = document.body.querySelector('[data-slot="popover-content"]');
-    expect(content?.className).toBe(
-      'z-[var(--z-overlay,50)] min-w-[300px] rounded-lg border border-border bg-popover p-4 shadow-lg mt-4'
-    );
+    expect(content?.className.split(' ').at(-1)).toBe('mt-4');
     expect(content?.id).toBe('pop');
   });
 
   it('accepts the canonical start/end align aliases', () => {
     render(<Popover trigger={<span>t</span>} content="c" isOpen onClose={vi.fn()} align="end" />);
     expect(document.body.querySelector('[data-slot="popover-content"]')).not.toBeNull();
+  });
+});
+
+describe('Popover side', () => {
+  it('opens on the given side as a named dialog and closes on Escape', () => {
+    const close = vi.fn();
+    render(
+      <Popover
+        isOpen
+        side="bottom"
+        onClose={close}
+        aria-label="Pick"
+        trigger={<button>t</button>}
+        content="c"
+      />
+    );
+    expect(screen.getByRole('dialog', { name: 'Pick' })).toBeTruthy();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(close).toHaveBeenCalled();
   });
 });

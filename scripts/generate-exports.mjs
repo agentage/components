@@ -15,6 +15,12 @@ const STATIC_EXPORTS = {
   './package.json': './package.json',
 };
 
+// Grouped entries: one file at src/<name>.ts re-exporting a set of components.
+const GROUPS = ['charts', 'site'];
+for (const name of GROUPS) {
+  STATIC_EXPORTS[`./${name}`] = { types: `./dist/${name}.d.ts`, import: `./dist/${name}.js` };
+}
+
 const isModule = (file) =>
   /\.tsx?$/.test(file) && !/\.test\.tsx?$/.test(file) && !/^index\.tsx?$/.test(file);
 
@@ -40,7 +46,7 @@ const next = `${JSON.stringify({ ...pkg, exports: exportsMap }, null, 2)}\n`;
 
 if (process.argv.includes('--check')) {
   if (next !== readFileSync(pkgPath, 'utf8')) {
-    console.error('package.json "exports" is stale — run: npm run exports:generate');
+    console.error('package.json "exports" is stale - run: npm run exports:generate');
     process.exit(1);
   }
   console.log(`exports map up to date (${Object.keys(exportsMap).length} entries)`);

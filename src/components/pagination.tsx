@@ -6,9 +6,9 @@ import { cn } from '../lib/utils';
 
 export const paginationButtonVariants = cva(
   [
-    'inline-flex size-8 items-center justify-center rounded-md text-sm transition-colors',
+    'inline-flex size-7 items-center justify-center rounded-lg text-ui tabular-nums transition-colors',
     'hover:bg-accent hover:text-accent-foreground',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'focus-ring',
     'disabled:pointer-events-none disabled:opacity-50',
   ],
   {

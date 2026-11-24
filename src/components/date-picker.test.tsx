@@ -78,18 +78,20 @@ describe('DatePicker', () => {
 });
 
 describe('DatePicker class strings', () => {
-  it('keeps the placeholder trigger class string byte-identical', () => {
+  it('renders the placeholder trigger as a 30 px field with a focus ring', () => {
     render(<DatePicker />);
-    expect(screen.getByRole('button').className).toBe(
-      'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-muted-foreground'
-    );
+    const cls = screen.getByRole('button').className;
+    for (const c of ['h-[30px]', 'cursor-pointer', 'focus-ring', 'text-muted-foreground']) {
+      expect(cls).toContain(c);
+    }
   });
 
-  it('keeps the filled + disabled trigger class string byte-identical', () => {
+  it('renders the filled, disabled trigger without the pointer cursor', () => {
     render(<DatePicker value={new Date('2026-01-02T00:00:00')} disabled className="mt-4" />);
-    expect(screen.getByRole('button').className).toBe(
-      'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 opacity-50 cursor-not-allowed'
-    );
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('opacity-50');
+    expect(cls).toContain('cursor-not-allowed');
+    expect(cls.split(' ')).not.toContain('text-muted-foreground');
   });
 
   it('keeps the root class string byte-identical', () => {

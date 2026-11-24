@@ -7,7 +7,7 @@ describe('DangerZone', () => {
   it('renders a labelled region with the default title', () => {
     render(
       <DangerZone description="Irreversible actions.">
-        <DangerZoneAction label="Delete memory" action={<button type="button">Delete</button>} />
+        <DangerZoneAction label="Delete record" action={<button type="button">Delete</button>} />
       </DangerZone>
     );
     const region = screen.getByRole('region', { name: 'Danger zone' });
@@ -32,9 +32,9 @@ describe('DangerZone', () => {
     render(
       <DangerZone>
         <DangerZoneAction
-          label="Delete memory"
-          description="Removes every note in this memory."
-          action={<button type="button">Delete memory</button>}
+          label="Delete record"
+          description="Removes every note in this record."
+          action={<button type="button">Delete record</button>}
         />
         <DangerZoneAction
           label="Revoke all tokens"
@@ -43,7 +43,7 @@ describe('DangerZone', () => {
       </DangerZone>
     );
     expect(document.querySelectorAll('[data-slot="danger-zone-action"]')).toHaveLength(2);
-    expect(screen.getByText('Removes every note in this memory.')).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Delete memory' })).not.toBeNull();
+    expect(screen.getByText('Removes every note in this record.')).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Delete record' })).not.toBeNull();
   });
 });

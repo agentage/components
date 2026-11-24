@@ -1,9 +1,14 @@
 import * as React from 'react';
-import { cn } from '../lib/utils';
-import { CARD_BASE, TITLE, DESC } from './card-base';
+import { cn, formatNumber } from '../lib/utils';
+import {
+  chartCardDescriptionVariants,
+  chartCardTitleVariants,
+  chartCardVariants,
+  type ChartCardDensity,
+} from './chart-card.variants';
 
 /* ============================================================================
- * FunnelCard — vertical conversion funnel with per-stage drop-off %.
+ * FunnelCard - vertical conversion funnel with per-stage drop-off %.
  * ========================================================================= */
 
 export interface FunnelStage {
@@ -12,6 +17,11 @@ export interface FunnelStage {
 }
 
 export interface FunnelCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Deprecated: The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   * @deprecated The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   */
+  density?: ChartCardDensity;
   title: string;
   stages: FunnelStage[];
   format?: (n: number) => string;
@@ -19,13 +29,18 @@ export interface FunnelCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const FunnelCard = React.forwardRef<HTMLDivElement, FunnelCardProps>(
-  ({ title, stages, format, description, className, ...props }, ref) => {
-    const fmt = format ?? ((n: number) => n.toLocaleString());
+  ({ title, stages, format, description, density, className, ...props }, ref) => {
+    const fmt = format ?? formatNumber;
     const max = stages[0]?.value || 1;
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="funnel-card" {...props}>
-        <div className={TITLE}>{title}</div>
-        <div className="mt-3 space-y-1.5">
+      <div
+        ref={ref}
+        className={cn(chartCardVariants({ density }), className)}
+        data-slot="funnel-card"
+        {...props}
+      >
+        <div className={chartCardTitleVariants({ density })}>{title}</div>
+        <div className="mt-2.5 space-y-1.5">
           {stages.map((s, i) => {
             const w = Math.max(2, (s.value / max) * 100);
             const conv =
@@ -65,7 +80,9 @@ export const FunnelCard = React.forwardRef<HTMLDivElement, FunnelCardProps>(
             );
           })}
         </div>
-        {description && <div className={DESC}>{description}</div>}
+        {description && (
+          <div className={chartCardDescriptionVariants({ density })}>{description}</div>
+        )}
       </div>
     );
   }

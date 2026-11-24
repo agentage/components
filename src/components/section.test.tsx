@@ -6,7 +6,7 @@ import { Section } from './section';
 describe('Section', () => {
   it('merges className last and spreads props on the root', () => {
     const { container } = render(
-      <Section title="T" className="p-6" id="sec" data-x="s">
+      <Section title="T" variant="boxed" className="p-6" id="sec" data-x="s">
         body
       </Section>
     );
@@ -23,6 +23,16 @@ describe('Section', () => {
       </Section>
     );
     expect(container.querySelector('[aria-hidden="true"]')).toBeTruthy();
+  });
+});
+
+describe('Section variants', () => {
+  it('is open by default with an h2 title and a divider', () => {
+    const { container } = render(<Section title="General">body</Section>);
+    const root = container.querySelector('[data-slot="section"]') as HTMLElement;
+    expect(root.dataset.variant).toBe('open');
+    expect(root.className).toContain('border-b');
+    expect(screen.getByRole('heading', { level: 2, name: 'General' })).toBeTruthy();
   });
 });
 
@@ -51,7 +61,7 @@ describe('PageLayout', () => {
       </PageLayout>
     );
     expect((container.querySelector('[data-slot="page-header"]') as HTMLElement).className).toBe(
-      'flex items-center justify-between gap-3 h-[52px] mb-1'
+      'flex h-12 items-center justify-between gap-3 mb-1'
     );
     expect(screen.getByText('body')).toBeTruthy();
   });

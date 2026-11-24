@@ -5,20 +5,14 @@ import {
   cloneElement,
   isValidElement,
   useCallback,
-  useEffect,
   useId,
+  useLayoutEffect,
   useState,
   type ReactElement,
   type ReactNode,
 } from 'react';
-import {
-  distributeSizes,
-  readStoredSizes,
-  resizeAt,
-  setSizeAt,
-  writeStoredSizes,
-  type PanelConstraint,
-} from '../lib/panel-sizes';
+import { distributeSizes, readStoredSizes, resizeAt, writeStoredSizes } from '../lib/panel-sizes';
+import { isPrepaintKey, resizablePanelsVar } from '../lib/split-px';
 import { cn } from '../lib/utils';
 import {
   ResizableHandle,
@@ -27,6 +21,7 @@ import {
   type ResizablePanelProps,
   type ResizeDirection,
 } from './resizable.parts';
+import { constraintsOf, sizesForKey, type Drag } from './resizable.model';
 import { resizablePanelGroupVariants } from './resizable.variants';
 
 export { ResizableHandle, ResizablePanel } from './resizable.parts';
@@ -37,31 +32,17 @@ export {
   resizablePanelVariants,
 } from './resizable.variants';
 
-interface Drag {
-  index: number;
-  origin: number;
-  base: number[];
-  extent: number;
-}
-
-const KEY_STEP = 2;
-const SHIFT_STEP = 10;
-
 export interface ResizablePanelGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   direction?: ResizeDirection;
-  /** Persists the sizes in `localStorage` under this key; restored after mount. */
+  /**
+   * Persists the sizes in `localStorage` under this key, restored in the hydration commit. List
+   * the key in `ResizableSplitPrepaint` (`[A-Za-z0-9._:-]`, max 64) so the server HTML paints them too.
+   */
   storageKey?: string;
   onSizesChange?: (sizes: number[]) => void;
   /** `ResizablePanel`s separated by `ResizableHandle`s. */
   children: ReactNode;
 }
-
-const constraintsOf = (panels: ReactElement<ResizablePanelProps>[]): PanelConstraint[] =>
-  panels.map(({ props }) => ({
-    defaultSize: props.defaultSize,
-    minSize: props.minSize ?? 10,
-    maxSize: props.maxSize ?? 100,
-  }));
 
 /**
  * Percentage-sized split view. A handle only spends its delta on the two panels it
@@ -82,14 +63,26 @@ export const ResizablePanelGroup = ({
   const count = constraints.length;
 
   const [drag, setDrag] = useState<Drag | null>(null);
-  const [sizes, setSizes] = useState<number[]>(() => distributeSizes(constraints));
+  const [seeded, setSizes] = useState<number[]>(() => distributeSizes(constraints));
+  // False on the server and in the hydration render: sizes then come from the prepaint variables.
+  const [restored, setRestored] = useState(false);
+  // A conditional panel changes the count; until the effect reseeds, fall back to the defaults.
+  const sizes = seeded.length === count ? seeded : distributeSizes(constraints);
   const uid = useId();
 
-  // Restored after mount, never during render: the server has no localStorage to match.
-  useEffect(() => {
-    const stored = readStoredSizes(storageKey, count);
-    if (stored) setSizes(stored);
+  // Read in the hydration commit, never during render: the server has no localStorage to match.
+  useLayoutEffect(() => {
+    const stored = readStoredSizes(storageKey, constraints);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSizes(stored ?? ((prev) => (prev.length === count ? prev : distributeSizes(constraints))));
+    setRestored(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reseed on count only, not on each render's constraints
   }, [storageKey, count]);
+  const prepaint = !restored && isPrepaintKey(storageKey) ? resizablePanelsVar(storageKey) : null;
+  const basis = (index: number): string =>
+    prepaint
+      ? `var(${prepaint}${String(count)}-${String(index)}, ${String(sizes[index])}%)`
+      : `${String(sizes[index])}%`;
 
   const commit = useCallback(
     (next: number[]) => {
@@ -139,15 +132,8 @@ export const ResizablePanelGroup = ({
   };
 
   const handleKey = (index: number, e: React.KeyboardEvent<HTMLDivElement>): void => {
-    const step = e.shiftKey ? SHIFT_STEP : KEY_STEP;
-    let next: number[] | null = null;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')
-      next = resizeAt(sizes, constraints, index, step);
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp')
-      next = resizeAt(sizes, constraints, index, -step);
-    else if (e.key === 'Home') next = setSizeAt(sizes, constraints, index, boundsAt(index).min);
-    else if (e.key === 'End') next = setSizeAt(sizes, constraints, index, boundsAt(index).max);
-    else return;
+    const next = sizesForKey(e.key, e.shiftKey, sizes, constraints, index, boundsAt(index));
+    if (!next) return;
     e.preventDefault();
     commit(next);
   };
@@ -161,7 +147,7 @@ export const ResizablePanelGroup = ({
       const index = panelsBefore(position);
       return cloneElement(panel, {
         id: panel.props.id ?? `${uid}-panel-${String(index)}`,
-        style: { ...panel.props.style, flexBasis: `${String(sizes[index])}%`, flexGrow: 0 },
+        style: { ...panel.props.style, flexBasis: basis(index), flexGrow: 0 },
       });
     }
     if (child.type === ResizableHandle) {

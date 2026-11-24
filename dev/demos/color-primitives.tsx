@@ -1,7 +1,7 @@
 'use client';
 import { Tooltip } from '../../src';
 
-export const Demo = () => (
+export const Example = () => (
   <>
     <div className="space-y-1.5">
       {['gold', 'neutral', 'red', 'green', 'blue', 'orange', 'violet', 'cyan', 'rose', 'amber'].map(

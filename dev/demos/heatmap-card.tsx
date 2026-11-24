@@ -1,40 +1,37 @@
 'use client';
 import { HeatmapCard } from '../../src';
+import { Block } from '../components/demo';
 
-// Deterministic-ish pseudo-random for the activity heatmap so frames don't dance.
 const heatmapData = (() => {
-  const rows = 7;
-  const cols = 12;
   const grid: number[][] = [];
   let seed = 1234;
   const rng = (): number => {
     seed = (seed * 9301 + 49297) % 233280;
     return seed / 233280;
   };
-  for (let r = 0; r < rows; r++) {
-    const row: number[] = [];
+  for (let r = 0; r < 7; r++) {
     const base = r < 5 ? 8 : 3;
-    for (let c = 0; c < cols; c++) {
-      row.push(Math.floor(rng() * base * (1 + c * 0.05)) + 1);
-    }
-    grid.push(row);
+    grid.push(Array.from({ length: 12 }, (_, c) => Math.floor(rng() * base * (1 + c * 0.05)) + 1));
   }
   return grid;
 })();
 
-export const Demo = () => (
-  <>
-    <p className="-mt-2 text-xs text-muted-foreground">
-      Grid where cell intensity encodes value. Use for activity-by-time, cohort retention,
-      error-by-route.
-    </p>
-    <div className="grid grid-cols-2 gap-4">
+export const Example = () => (
+  <Block caption="A grid where cell intensity encodes value. Use it for activity by time, retention or errors by route.">
+    <div className="max-w-md">
       <HeatmapCard
-        title="Activity (last 12 weeks)"
+        title="Activity, last 12 weeks"
         rowLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
         data={heatmapData}
-        description="Notes written per day · darker = more"
+        description="Documents edited per day, darker is more"
       />
+    </div>
+  </Block>
+);
+
+export const Variants = () => (
+  <Block caption="Column labels, a fixed max and a custom colour turn the grid into a retention table.">
+    <div className="max-w-md">
       <HeatmapCard
         title="Cohort retention"
         rowLabels={['Jan', 'Feb', 'Mar', 'Apr', 'May']}
@@ -47,9 +44,9 @@ export const Demo = () => (
           [100, 84, 0, 0, 0, 0],
         ]}
         max={100}
-        color="var(--color-info)"
-        description="% of cohort retained over months"
+        tone="info"
+        description="Percent of the cohort retained over months"
       />
     </div>
-  </>
+  </Block>
 );

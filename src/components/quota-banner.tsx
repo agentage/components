@@ -34,7 +34,7 @@ export interface QuotaBannerProps extends Omit<
   thresholds?: Partial<UsageThresholds>;
   /** Replaces the generated sentence. */
   message?: React.ReactNode;
-  /** Trailing slot — usually an upgrade or cleanup button. */
+  /** Trailing slot - usually an upgrade or cleanup button. */
   action?: React.ReactNode;
   icon?: React.ReactNode;
 }

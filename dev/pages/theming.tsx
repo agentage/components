@@ -10,9 +10,9 @@ import {
   TableRow,
 } from '../../src';
 import { Code } from '../components/code';
-import { Demo as ColorPrimitivesDemo } from '../demos/color-primitives';
-import { Demo as SemanticColorsDemo } from '../demos/semantic-colors';
-import { Demo as TypographyDemo } from '../demos/typography';
+import { Example as ColorPrimitivesDemo } from '../demos/color-primitives';
+import { Example as SemanticColorsDemo } from '../demos/semantic-colors';
+import { Example as TypographyDemo } from '../demos/typography';
 
 const TIERS = [
   {
@@ -81,7 +81,7 @@ export const ThemingPage = () => (
         </Table>
       </div>
       <p className="text-sm text-muted-foreground">
-        <InlineCode>@agentage/design-system/theme.css</InlineCode> imports all three, in that order.
+        <InlineCode>@agentage/components/theme.css</InlineCode> imports all three, in that order.
       </p>
     </section>
 

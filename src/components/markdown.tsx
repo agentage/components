@@ -1,8 +1,9 @@
 'use client';
+
 import ReactMarkdown, { type Options as ReactMarkdownOptions } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { Prose } from './prose';
+import { Prose, type ProseProps } from './prose';
 
 export type MarkdownComponents = ReactMarkdownOptions['components'];
 
@@ -14,6 +15,8 @@ export interface MarkdownRendererProps extends Omit<
   allowHtml?: boolean;
   /** Per-node renderers forwarded to react-markdown. */
   components?: MarkdownComponents;
+  /** Prose size: md (default) or sm, 13 px for panes and cards. */
+  size?: ProseProps['size'];
 }
 
 export const MarkdownRenderer = ({

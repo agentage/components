@@ -1,19 +1,36 @@
 'use client';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '../../src';
+import { Block } from '../components/demo';
 
-export const Demo = () => {
-  const [radio, setRadio] = useState('option1');
-
+export const Example = () => {
+  const [value, setValue] = useState('weekly');
   return (
-    <>
-      <RadioGroup value={radio} onValueChange={setRadio}>
-        <RadioGroupItem value="option1">Default option</RadioGroupItem>
-        <RadioGroupItem value="option2">Alternative option</RadioGroupItem>
-        <RadioGroupItem value="option3" disabled>
-          Disabled option
-        </RadioGroupItem>
+    <Block caption="One choice from a short list; arrow keys move the selection.">
+      <RadioGroup value={value} onValueChange={setValue} aria-label="Frequency">
+        <RadioGroupItem value="daily">Daily</RadioGroupItem>
+        <RadioGroupItem value="weekly">Weekly</RadioGroupItem>
+        <RadioGroupItem value="monthly">Monthly</RadioGroupItem>
       </RadioGroup>
-    </>
+    </Block>
   );
 };
+
+export const States = () => (
+  <div className="space-y-5">
+    <Block caption="A disabled option stays visible but cannot be picked.">
+      <RadioGroup defaultValue="daily" aria-label="Frequency with disabled option">
+        <RadioGroupItem value="daily">Daily</RadioGroupItem>
+        <RadioGroupItem value="weekly" disabled>
+          Weekly
+        </RadioGroupItem>
+      </RadioGroup>
+    </Block>
+    <Block caption="Error marks the group when no valid choice was made.">
+      <RadioGroup error aria-label="Required frequency">
+        <RadioGroupItem value="daily">Daily</RadioGroupItem>
+        <RadioGroupItem value="weekly">Weekly</RadioGroupItem>
+      </RadioGroup>
+    </Block>
+  </div>
+);

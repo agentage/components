@@ -9,20 +9,22 @@ import { RankedListCard } from './ranked-list-card';
 import { ScoreCard } from './score-card';
 import { StatCard, type StatCardTrend } from './stat-card';
 import { MiniBars, Sparkline } from './stat-card-charts';
-import { StatBreakdown, StatComparison, StatProgress } from './stat-card-extensions';
+import { StatBreakdown, StatComparison, StatProgress } from './index';
 
 const cls = (el: Element | null | undefined): string => el?.getAttribute('class') ?? '';
 const q = (c: HTMLElement, s: string): Element | null => c.querySelector(s);
 const qa = (c: HTMLElement, s: string): Element[] => Array.from(c.querySelectorAll(s));
 
-const CARD_ROOT = 'rounded-lg border border-border bg-sidebar p-4';
+const CARD_ROOT = 'rounded-lg border border-border bg-card px-3.5 py-3';
+// Compact (default) trend chip: 20 px tall.
 const TREND_BASE =
-  'flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium border border-border bg-muted/30';
+  'flex items-center gap-1 rounded-md text-2xs font-medium border border-border bg-muted/30';
+const TREND_DENSE = 'h-5 px-1.5 py-0';
 const DELTA_BASE = 'inline-flex items-center gap-0.5 tabular-nums font-medium';
 
 const trendClass = (trend: StatCardTrend): string => {
   const { container, unmount } = render(<StatCard title="T" value={1} trend={trend} />);
-  const out = cls(qa(container, '[data-slot="stat-card"] > div > div')[1]);
+  const out = cls(qa(container, '[data-slot="stat-card"] > div > div')[1].lastElementChild);
   unmount();
   return out;
 };
@@ -83,17 +85,40 @@ describe('chart accessibility', () => {
   });
 });
 
-describe('rendered class strings stay byte-identical', () => {
-  it('keeps the stat card root, icon and trend classes', () => {
+describe('rendered classes of the dense look', () => {
+  it('keeps the dense stat card root, icon and trend classes', () => {
     const { container } = render(<StatCard title="T" value={1} icon={<svg />} className="mt-4" />);
-    expect(cls(q(container, '[data-slot="stat-card"]'))).toBe(
-      'rounded-lg border border-border bg-sidebar p-5 transition-[box-shadow,border-color] duration-[140ms] hover:border-muted-foreground hover:shadow-md mt-4'
-    );
+    const root = cls(q(container, '[data-slot="stat-card"]'));
+    for (const c of ['rounded-lg', 'bg-card', 'duration-fast', 'px-3.5 py-3', 'mt-4']) {
+      expect(root).toContain(c);
+    }
+    expect(root.endsWith('mt-4')).toBe(true);
     expect(cls(q(container, '[data-slot="stat-card"] div div div'))).toBe(
-      'flex size-8 items-center justify-center rounded-md [&_svg]:size-4 bg-primary-soft text-primary-emphasis'
+      'flex shrink-0 items-center justify-center rounded-md size-6 [&_svg]:size-3.5 bg-primary-soft text-primary-emphasis'
     );
-    expect(trendClass({ value: '+1%', up: true })).toBe(`${TREND_BASE} text-success`);
-    expect(trendClass({ value: '-1%', up: false })).toBe(`${TREND_BASE} text-destructive`);
+    expect(trendClass({ value: '+1%', up: true })).toBe(
+      `${TREND_BASE} text-success ${TREND_DENSE}`
+    );
+    expect(trendClass({ value: '-1%', up: false })).toBe(
+      `${TREND_BASE} text-destructive ${TREND_DENSE}`
+    );
+  });
+
+  it('keeps the pre-0.21 stat card as density comfortable', () => {
+    const { container } = render(<StatCard title="T" value={1} density="comfortable" />);
+    expect(cls(q(container, '[data-slot="stat-card"]'))).toContain('p-5');
+  });
+
+  it('renders the stat card footer above a rule', () => {
+    const { container } = render(<StatCard title="T" value={1} footer="Last sync 3 h ago" />);
+    expect(cls(q(container, '[data-slot="stat-card-footer"]'))).toContain('border-t');
+  });
+
+  it('restores the old chart card padding with density comfortable', () => {
+    const { container } = render(<GaugeCard title="G" value={1} density="comfortable" />);
+    expect(cls(q(container, '[data-slot="gauge-card"]'))).toBe(
+      'rounded-lg border border-border bg-card p-4'
+    );
   });
 
   it('keeps the multi stat dividers and trend classes', () => {
@@ -165,7 +190,9 @@ describe('canonical status tones', () => {
       ['down', 'text-destructive'],
     ];
     for (const [tone, color] of cases) {
-      expect(trendClass({ value: 'x', up: true, tone })).toBe(`${TREND_BASE} ${color}`);
+      expect(trendClass({ value: 'x', up: true, tone })).toBe(
+        `${TREND_BASE} ${color} ${TREND_DENSE}`
+      );
     }
   });
 

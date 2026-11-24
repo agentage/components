@@ -4,18 +4,20 @@ import { Link } from '../lib/router';
 import { ALL_COMPONENTS, CATEGORIES } from '../registry';
 import { COMPONENT_PROPS } from '../generated/props';
 
-const documented = ALL_COMPONENTS.flatMap(({ component }) => component.exports).filter(
-  (name) => name in COMPONENT_PROPS
-).length;
+const documented = new Set(
+  ALL_COMPONENTS.flatMap(({ component }) => component.exports).filter(
+    (name) => name in COMPONENT_PROPS
+  )
+).size;
 
 export const HomePage = () => (
   <div className="space-y-8">
     <div className="flex items-start justify-between gap-4">
       <Heading
         as="h1"
-        description="OKLCH design tokens and React components, shared by the agentage dashboard, admin console and public sites."
+        description="OKLCH design tokens and React components, shared by every app and site in the product line."
       >
-        Agentage Design System
+        Agentage Components
       </Heading>
       <Badge variant="secondary" className="mt-1 shrink-0 font-mono">
         v{__DS_VERSION__}
@@ -44,7 +46,7 @@ export const HomePage = () => (
       </span>
     </div>
 
-    <Code language="bash" code="npm install @agentage/design-system" />
+    <Code language="bash" code="npm install @agentage/components" />
 
     <section className="space-y-4" data-section="Categories">
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">

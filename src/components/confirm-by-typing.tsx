@@ -24,7 +24,7 @@ export interface ConfirmByTypingProps {
 }
 
 /**
- * Destructive AlertDialog gated on retyping `phrase` — the confirm button stays
+ * Destructive AlertDialog gated on retyping `phrase` - the confirm button stays
  * disabled until the input matches exactly.
  */
 export const ConfirmByTyping = ({
@@ -99,7 +99,7 @@ export const ConfirmByTyping = ({
             className={cn('text-xs', matches ? 'text-success' : 'text-muted-foreground')}
           >
             {matches
-              ? `Phrase matches — ${actionLabel} is enabled.`
+              ? `Phrase matches - ${actionLabel} is enabled.`
               : `Enter the exact phrase to enable ${actionLabel}.`}
           </p>
         </div>

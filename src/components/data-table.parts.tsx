@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { type SortDirection } from '../lib/table-sort';
 import { cn } from '../lib/utils';
+import type { DataTableDensity } from './data-table.group';
 import { dataTableHeadVariants } from './data-table.variants';
 import { TableHead } from './table';
 
@@ -31,12 +32,15 @@ export const SortIndicator = ({
 
 export interface DataTableHeadCellProps {
   align?: 'left' | 'center' | 'right';
-  density?: 'default' | 'compact';
+  density?: DataTableDensity;
   sticky?: boolean;
+  /** Column key, used by `hideBelow` container queries. */
+  col?: string;
   sortable?: boolean;
   direction?: SortDirection | null;
   onSort?: () => void;
   width?: number | string;
+  className?: string;
   children?: React.ReactNode;
 }
 
@@ -50,13 +54,16 @@ export const DataTableHeadCell = ({
   direction,
   onSort,
   width,
+  col,
+  className,
   children,
 }: DataTableHeadCellProps): React.JSX.Element => (
   <TableHead
     sticky={sticky}
+    data-col={col}
     aria-sort={sortable ? (direction ? ARIA_SORT[direction] : 'none') : undefined}
     style={width === undefined ? undefined : { width }}
-    className={cn(dataTableHeadVariants({ density, align }))}
+    className={cn(dataTableHeadVariants({ density, align }), className)}
     data-slot="data-table-head"
   >
     {sortable ? (
@@ -64,8 +71,7 @@ export const DataTableHeadCell = ({
         type="button"
         onClick={onSort}
         className={cn(
-          'inline-flex items-center gap-1 uppercase tracking-[0.04em] transition-colors',
-          'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
+          'inline-flex items-center gap-1 rounded-sm transition-colors duration-fast hover:text-foreground focus-ring',
           direction && 'text-foreground'
         )}
         data-slot="data-table-sort-button"
@@ -79,8 +85,7 @@ export const DataTableHeadCell = ({
   </TableHead>
 );
 
-const STRETCHED =
-  'after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
+const STRETCHED = 'after:absolute after:inset-0 focus-ring';
 
 export interface RowActivatorProps {
   href?: string;
@@ -91,11 +96,21 @@ export interface RowActivatorProps {
 /** Stretched link/button: one real control per row, actions stay clickable above it (z-10). */
 export const RowActivator = ({ href, onClick, children }: RowActivatorProps): React.JSX.Element =>
   href === undefined ? (
-    <button type="button" onClick={onClick} className={cn(STRETCHED, 'text-left')}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(STRETCHED, 'min-w-0 text-left')}
+      data-slot="data-table-activator"
+    >
       {children}
     </button>
   ) : (
-    <a href={href} onClick={onClick} className={cn(STRETCHED, 'block')}>
+    <a
+      href={href}
+      onClick={onClick}
+      className={cn(STRETCHED, 'block min-w-0')}
+      data-slot="data-table-activator"
+    >
       {children}
     </a>
   );

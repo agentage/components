@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useId, useRef, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { useFocusTrap } from '../lib/use-focus-trap';
-import { useMounted } from '../lib/use-mounted';
-import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
+import { Button } from './button';
+import { DialogBackdrop, DialogPortal, useDialogShell } from './dialog-shell';
+import { OverlayLayerProvider } from '../lib/overlay-layer';
 
+/** @deprecated AlertDialog renders `Button` now; kept for markup that styled its own confirm. */
 export const alertDialogConfirmVariants = cva(
   [
-    'inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-ui font-medium transition-colors',
+    'focus-ring',
   ],
   {
     variants: {
@@ -38,7 +38,10 @@ export interface AlertDialogProps
   description?: string;
   cancelLabel?: string;
   confirmLabel?: string;
-  onConfirm: () => void;
+  /** A returned promise keeps the dialog open with a pending confirm; it closes on resolve only. */
+  onConfirm: () => void | Promise<unknown>;
+  /** Confirm in flight from the caller's own state. Default false. */
+  pending?: boolean;
   /** Blocks the confirm action, e.g. until a confirmation phrase matches. */
   confirmDisabled?: boolean;
   children?: ReactNode;
@@ -53,32 +56,37 @@ export const AlertDialog = ({
   confirmLabel = 'Confirm',
   onConfirm,
   confirmDisabled = false,
+  pending = false,
   variant,
   children,
   className,
   ...props
 }: AlertDialogProps): React.JSX.Element | null => {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const mounted = useMounted();
   const instanceId = useId();
   const titleId = `${instanceId}-title`;
   const descId = `${instanceId}-desc`;
+  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const [busy, setBusy] = useState(false);
+  const confirm = async (): Promise<void> => {
+    const result = onConfirm();
+    if (!result || typeof (result as Promise<unknown>).then !== 'function') {
+      onOpenChange(false);
+      return;
+    }
+    setBusy(true);
+    try {
+      await result;
+      onOpenChange(false);
+    } catch {
+      // A rejected confirm keeps the dialog open; the caller shows its own error.
+    } finally {
+      setBusy(false);
+    }
+  };
+  const { mounted, layer } = useDialogShell(dialogRef, open, close);
 
-  useScrollLock(open);
-  useFocusTrap(dialogRef, open && mounted);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onOpenChange(false);
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [open, onOpenChange]);
-
-  // Runs after the trap's initial focus so the safe action stays the landing point.
+  // Fires after the trap's initial focus so the safe action stays the landing point.
   useEffect(() => {
     if (open && mounted)
       dialogRef.current?.querySelector<HTMLButtonElement>('[data-cancel]')?.focus();
@@ -86,65 +94,54 @@ export const AlertDialog = ({
 
   if (!open || !mounted) return null;
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[var(--z-overlay,50)] flex items-center justify-center p-4"
-      role="alertdialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      aria-describedby={description ? descId : undefined}
-      data-slot="alert-dialog"
-    >
-      <div
-        aria-hidden="true"
-        className="fixed inset-0 bg-overlay backdrop-blur-sm"
-        onClick={() => onOpenChange(false)}
-      />
-      <div
-        ref={dialogRef}
-        className={cn(
-          'relative z-10 w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-lg',
-          className
-        )}
-        data-slot="alert-dialog-content"
-        {...props}
-      >
-        <h2 id={titleId} className="text-lg font-semibold text-foreground">
-          {title}
-        </h2>
-        {description && (
-          <p id={descId} className="mt-2 text-sm text-muted-foreground">
-            {description}
-          </p>
-        )}
-        {children && <div className="mt-4">{children}</div>}
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            data-cancel
-            onClick={() => onOpenChange(false)}
+  return (
+    <DialogPortal>
+      <OverlayLayerProvider layer={layer}>
+        <div
+          className="fixed inset-0 z-[var(--z-overlay,50)] flex items-center justify-center p-4"
+          data-slot="alert-dialog"
+        >
+          <DialogBackdrop layer={layer} onClick={close} />
+          <div
+            ref={dialogRef}
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            aria-describedby={description ? descId : undefined}
             className={cn(
-              'inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors',
-              'border border-border bg-background hover:bg-accent hover:text-accent-foreground',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
+              'relative z-10 w-full max-w-md rounded-lg border border-border bg-background p-4 shadow-[var(--shadow-popover)]',
+              className
             )}
+            data-slot="alert-dialog-content"
+            {...props}
           >
-            {cancelLabel}
-          </button>
-          <button
-            type="button"
-            disabled={confirmDisabled}
-            onClick={() => {
-              onConfirm();
-              onOpenChange(false);
-            }}
-            className={cn(alertDialogConfirmVariants({ variant, disabled: confirmDisabled }))}
-          >
-            {confirmLabel}
-          </button>
+            <h2 id={titleId} className="m-0 text-sm font-semibold text-foreground">
+              {title}
+            </h2>
+            {description && (
+              <p id={descId} className="mt-1.5 text-ui text-muted-foreground">
+                {description}
+              </p>
+            )}
+            {children && <div className="mt-4">{children}</div>}
+            <div className="mt-4 flex justify-end gap-2">
+              <Button type="button" variant="outline" data-cancel onClick={close}>
+                {cancelLabel}
+              </Button>
+              <Button
+                type="button"
+                variant={variant === 'destructive' ? 'destructive' : 'default'}
+                disabled={confirmDisabled}
+                pending={pending || busy}
+                data-slot="alert-dialog-confirm"
+                onClick={() => void confirm()}
+              >
+                {confirmLabel}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>,
-    document.body
+      </OverlayLayerProvider>
+    </DialogPortal>
   );
 };

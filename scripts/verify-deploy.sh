@@ -41,7 +41,7 @@ done
 }
 
 echo "-- renders --"
-curl -fsS "${svc_hdr[@]}" "https://${SITE_FQDN}/" | grep -q "Agentage Design System" || {
+curl -fsS "${svc_hdr[@]}" "https://${SITE_FQDN}/" | grep -q "Agentage Components" || {
   echo "::error::${SITE_FQDN} answered /health but did not render the showcase"
   exit 1
 }

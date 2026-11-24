@@ -104,7 +104,9 @@ export const ResizableSplit = ({
     e.preventDefault();
   };
 
-  const size = `var(${collapsedName}, clamp(${String(min)}px, var(${name}, ${String(init)}px), ${String(max)}px))`;
+  const px = `clamp(${String(min)}px, var(${name}, ${String(init)}px), ${String(max)}px)`;
+  // Only a collapsible split reads the collapsed variable: a stale flag cannot hide a fixed pane.
+  const size = collapsible ? `var(${collapsedName}, ${px})` : px;
   const template = vertical ? `minmax(0, 1fr) 1px ${size}` : `${size} 1px minmax(0, 1fr)`;
   const pane = (index: 0 | 1): React.JSX.Element => {
     const sized = collapsed && (index === 1) === vertical;

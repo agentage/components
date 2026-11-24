@@ -16,7 +16,7 @@ describe('IconButton', () => {
     const onClick = vi.fn();
     render(<IconButton icon={<Icon />} aria-label="Refresh" onClick={onClick} />);
     const button = screen.getByRole('button', { name: 'Refresh' });
-    expect(button.className).toContain('focus-visible:ring-2');
+    expect(button.className).toContain('focus-ring');
     await userEvent.tab();
     expect(document.activeElement).toBe(button);
     await userEvent.keyboard('{Enter}');
@@ -30,17 +30,17 @@ describe('IconButton', () => {
   });
 });
 
-// Frozen pre-CVA output of the md (previously only) size.
-const ICON_BUTTON_MD =
-  'flex items-center justify-center rounded-md p-1.5 transition-colors text-muted-foreground hover:bg-accent hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
-
-describe('IconButton class parity', () => {
-  it('renders the default (md) size byte-identically', () => {
-    render(<IconButton icon={<Icon />} aria-label="Refresh" onClick={vi.fn()} />);
-    expect(screen.getByRole('button').className).toBe(ICON_BUTTON_MD);
+describe('IconButton sizes and pressed', () => {
+  it.each([
+    ['sm', 'size-6'],
+    ['md', 'size-7'],
+    ['lg', 'size-8'],
+  ] as const)('renders size %s as %s', (size, cls) => {
+    render(<IconButton icon={<Icon />} aria-label="Refresh" size={size} onClick={vi.fn()} />);
+    expect(screen.getByRole('button').className).toContain(cls);
   });
 
-  it('keeps the disabled + className tail in order', () => {
+  it('defaults to 28 px and keeps the disabled + className tail last', () => {
     render(
       <IconButton
         icon={<Icon />}
@@ -50,16 +50,13 @@ describe('IconButton class parity', () => {
         onClick={vi.fn()}
       />
     );
-    expect(screen.getByRole('button').className).toBe(
-      `${ICON_BUTTON_MD} opacity-50 cursor-not-allowed mt-4`
-    );
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('size-7');
+    expect(cls.endsWith('opacity-50 cursor-not-allowed mt-4')).toBe(true);
   });
 
-  it.each([
-    ['sm', 'p-1'],
-    ['lg', 'p-2'],
-  ] as const)('supports the canonical %s size', (size, pad) => {
-    render(<IconButton icon={<Icon />} aria-label="Refresh" size={size} onClick={vi.fn()} />);
-    expect(screen.getByRole('button').className).toBe(ICON_BUTTON_MD.replace('p-1.5', pad));
+  it('exposes the pressed state', () => {
+    render(<IconButton icon={<Icon />} aria-label="Grid" pressed onClick={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Grid' }).getAttribute('aria-pressed')).toBe('true');
   });
 });

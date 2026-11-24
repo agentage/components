@@ -31,11 +31,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
       ref={ref}
       role="region"
       tabIndex={focusable ? 0 : undefined}
-      className={cn(
-        scrollAreaVariants({ orientation }),
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        className
-      )}
+      className={cn(scrollAreaVariants({ orientation }), 'focus-ring', className)}
       data-slot="scroll-area"
       {...props}
     >

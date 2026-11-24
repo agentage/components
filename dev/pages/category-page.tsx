@@ -1,5 +1,12 @@
 import { EntityList, Heading, ListRow } from '../../src';
-import { componentPath, type CategoryEntry } from '../registry';
+import { builtFrom } from '../lib/built-from';
+import { componentPath, type CategoryEntry, type ComponentEntry } from '../registry';
+
+const metaOf = (component: ComponentEntry): string => {
+  const n = component.sources ? builtFrom(component).length : component.exports.length;
+  const unit = component.sources ? 'component' : 'export';
+  return `${String(n)} ${unit}${n === 1 ? '' : 's'}`;
+};
 
 export const CategoryPage = ({ category }: { category: CategoryEntry }) => (
   <div className="space-y-6">
@@ -13,7 +20,7 @@ export const CategoryPage = ({ category }: { category: CategoryEntry }) => (
           href={componentPath(category.slug, component.slug)}
           title={component.name}
           description={component.description}
-          meta={`${String(component.exports.length)} export${component.exports.length === 1 ? '' : 's'}`}
+          meta={metaOf(component)}
         />
       ))}
     </EntityList>

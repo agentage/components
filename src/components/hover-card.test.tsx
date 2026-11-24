@@ -79,7 +79,7 @@ describe('HoverCard surface props', () => {
     tick(100);
     const surface = document.body.querySelector('[data-slot="hover-card-content"]');
     expect(surface?.className).toBe(
-      'z-[var(--z-overlay,50)] w-64 rounded-lg border border-border bg-popover p-4 shadow-md mt-4'
+      'z-[var(--z-overlay,50)] w-64 rounded-lg border border-border bg-popover p-3 text-ui shadow-[var(--shadow-popover)] mt-4'
     );
     expect(surface?.getAttribute('data-testid')).toBe('hc');
   });

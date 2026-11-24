@@ -31,6 +31,7 @@ export interface FilterButtonGroupProps<T extends string> extends Omit<
   onChange: (value: T) => void;
 }
 
+/** @deprecated Use `ListToolbar` with `FilterMenu` or `ToolbarToggle`. */
 export const FilterButtonGroup = <T extends string>({
   label,
   options,
@@ -41,7 +42,7 @@ export const FilterButtonGroup = <T extends string>({
 }: FilterButtonGroupProps<T>): React.JSX.Element => (
   <div className={cn('flex flex-col gap-1', className)} data-slot="filter-button-group" {...props}>
     {label && <span className="text-xs text-muted-foreground">{label}</span>}
-    <div className="flex items-center rounded-lg border border-border bg-muted/30 p-1 h-[36px]">
+    <div className="flex h-7 items-center gap-0.5 rounded-lg border border-border p-px">
       {options.map((option) => {
         const isActive = value === option.value;
         return (
@@ -80,6 +81,7 @@ export interface FilterSortProps<T extends string> extends Omit<
   onChange: (value: T, order: 'asc' | 'desc') => void;
 }
 
+/** @deprecated Use `ListToolbar` with `DisplayMenu`. */
 export const FilterSort = <T extends string>({
   label,
   options,
@@ -91,7 +93,7 @@ export const FilterSort = <T extends string>({
 }: FilterSortProps<T>): React.JSX.Element => (
   <div className={cn('flex flex-col gap-1', className)} data-slot="filter-sort" {...props}>
     {label && <span className="text-xs text-muted-foreground">{label}</span>}
-    <div className="flex items-center rounded-lg border border-border bg-muted/30 p-1 h-[36px]">
+    <div className="flex h-7 items-center gap-0.5 rounded-lg border border-border p-px">
       {options.map((option) => {
         const isActive = value === option.value;
         return (
@@ -122,11 +124,12 @@ export const FilterSort = <T extends string>({
 
 export type FilterBarProps = React.HTMLAttributes<HTMLDivElement>;
 
+/** @deprecated Use `ListToolbar`. */
 export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex flex-wrap items-end gap-3', className)}
+      className={cn('flex flex-wrap items-end gap-2', className)}
       data-slot="filter-bar"
       {...props}
     >
@@ -145,11 +148,12 @@ export interface FilterResultsProps extends Omit<React.HTMLAttributes<HTMLDivEle
   label?: string;
 }
 
+/** @deprecated Use `ListToolbarEnd` with a count. */
 export const FilterResults = React.forwardRef<HTMLDivElement, FilterResultsProps>(
   ({ icon, filtered, total, label = 'items', className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center gap-2 text-sm text-muted-foreground', className)}
+      className={cn('flex items-center gap-2 text-xs text-muted-foreground', className)}
       data-slot="filter-results"
       aria-live="polite"
       {...props}

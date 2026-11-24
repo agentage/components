@@ -1,46 +1,43 @@
 'use client';
 import { Footer, FooterBottom, FooterLink, FooterSection, FooterSections } from '../../src';
+import { Block } from '../components/demo';
 
-export const Demo = () => (
-  <>
-    <div className="-mx-6 rounded-lg overflow-hidden border border-border">
+export const Example = () => (
+  <Block caption="A footer groups links into titled sections and ends with a bottom line for the copyright and social links.">
+    <div className="overflow-hidden rounded-lg border border-border">
       <Footer className="border-t-0">
         <FooterSections>
           <FooterSection title="Product">
-            <FooterLink href="#">Memory</FooterLink>
-            <FooterLink href="#">MCP Hub</FooterLink>
-            <FooterLink href="#">Pricing</FooterLink>
+            <FooterLink href="#footer">Overview</FooterLink>
+            <FooterLink href="#footer">Pricing</FooterLink>
+            <FooterLink href="#footer">Changelog</FooterLink>
           </FooterSection>
           <FooterSection title="Developers">
-            <FooterLink href="#">Docs</FooterLink>
-            <FooterLink href="#">API</FooterLink>
-            <FooterLink href="#">CLI</FooterLink>
+            <FooterLink href="#footer">Docs</FooterLink>
+            <FooterLink href="#footer">API</FooterLink>
+            <FooterLink href="#footer">CLI</FooterLink>
           </FooterSection>
           <FooterSection title="Company">
-            <FooterLink href="#">About</FooterLink>
-            <FooterLink href="#">Blog</FooterLink>
-            <FooterLink href="#">Contact</FooterLink>
+            <FooterLink href="#footer">About</FooterLink>
+            <FooterLink href="#footer">Blog</FooterLink>
+            <FooterLink href="#footer">Contact</FooterLink>
           </FooterSection>
           <FooterSection title="Legal">
-            <FooterLink href="#">Privacy</FooterLink>
-            <FooterLink href="#">Terms</FooterLink>
-            <FooterLink href="#">Sub-processors</FooterLink>
+            <FooterLink href="#footer">Privacy</FooterLink>
+            <FooterLink href="#footer">Terms</FooterLink>
           </FooterSection>
         </FooterSections>
-        <FooterBottom copyright="© 2026 agentage. All rights reserved.">
+        <FooterBottom copyright="© 2026 Example Co. All rights reserved.">
           <div className="flex items-center gap-3">
-            <a href="#" className="transition-colors hover:text-foreground">
-              GitHub
+            <a href="#footer" className="transition-colors hover:text-foreground">
+              Source
             </a>
-            <a href="#" className="transition-colors hover:text-foreground">
-              X
-            </a>
-            <a href="#" className="transition-colors hover:text-foreground">
-              RSS
+            <a href="#footer" className="transition-colors hover:text-foreground">
+              Feed
             </a>
           </div>
         </FooterBottom>
       </Footer>
     </div>
-  </>
+  </Block>
 );

@@ -16,13 +16,20 @@ const ChevronIcon = (): React.JSX.Element => (
   </svg>
 );
 
-export const Breadcrumb = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
-  ({ className, ...props }, ref) => (
+export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
+  /** path: monospace segments with slash separators that scroll sideways without a scrollbar. */
+  variant?: 'default' | 'path';
+}
+
+// The variant rides on a CSS group, so the parts stay server components with no context.
+export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
+  ({ className, variant = 'default', ...props }, ref) => (
     <nav
       ref={ref}
       aria-label="Breadcrumb"
-      className={cn(className)}
+      className={cn('group/crumb min-w-0', className)}
       data-slot="breadcrumb"
+      data-variant={variant}
       {...props}
     />
   )
@@ -35,7 +42,11 @@ export const BreadcrumbList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ol
     ref={ref}
-    className={cn('flex items-center gap-1.5 text-sm text-muted-foreground', className)}
+    className={cn(
+      'flex items-center gap-1.5 text-ui text-muted-foreground',
+      'group-data-[variant=path]/crumb:gap-0.5 group-data-[variant=path]/crumb:overflow-x-auto group-data-[variant=path]/crumb:whitespace-nowrap group-data-[variant=path]/crumb:font-mono group-data-[variant=path]/crumb:[scrollbar-width:none] group-data-[variant=path]/crumb:[&::-webkit-scrollbar]:hidden',
+      className
+    )}
     data-slot="breadcrumb-list"
     {...props}
   />
@@ -46,7 +57,7 @@ export const BreadcrumbItem = React.forwardRef<HTMLLIElement, React.HTMLAttribut
   ({ className, ...props }, ref) => (
     <li
       ref={ref}
-      className={cn('inline-flex items-center gap-1.5', className)}
+      className={cn('inline-flex shrink-0 items-center gap-1.5', className)}
       data-slot="breadcrumb-item"
       {...props}
     />
@@ -61,8 +72,9 @@ export const BreadcrumbLink = React.forwardRef<
   <a
     ref={ref}
     className={cn(
-      'transition-colors hover:text-foreground',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+      'rounded-md transition-colors hover:text-foreground',
+      'focus-ring',
+      'group-data-[variant=path]/crumb:inline-flex group-data-[variant=path]/crumb:h-7 group-data-[variant=path]/crumb:items-center group-data-[variant=path]/crumb:px-1.5 group-data-[variant=path]/crumb:hover:bg-accent',
       className
     )}
     data-slot="breadcrumb-link"
@@ -80,7 +92,11 @@ export const BreadcrumbPage = React.forwardRef<
   <span
     ref={ref}
     aria-current="page"
-    className={cn('font-medium text-foreground', className)}
+    className={cn(
+      'font-medium text-foreground',
+      'group-data-[variant=path]/crumb:px-1.5 group-data-[variant=path]/crumb:font-normal',
+      className
+    )}
     data-slot="breadcrumb-page"
     {...props}
   />
@@ -95,11 +111,21 @@ export const BreadcrumbSeparator = React.forwardRef<
     ref={ref}
     role="presentation"
     aria-hidden="true"
-    className={cn('text-muted-foreground', className)}
+    className={cn(
+      'shrink-0 text-muted-foreground group-data-[variant=path]/crumb:opacity-60',
+      className
+    )}
     data-slot="breadcrumb-separator"
     {...props}
   >
-    {children ?? <ChevronIcon />}
+    {children ?? (
+      <>
+        <span className="inline-flex group-data-[variant=path]/crumb:hidden">
+          <ChevronIcon />
+        </span>
+        <span className="hidden group-data-[variant=path]/crumb:inline">/</span>
+      </>
+    )}
   </li>
 ));
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';

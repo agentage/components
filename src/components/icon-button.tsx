@@ -2,12 +2,12 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export const iconButtonVariants = cva('flex items-center justify-center rounded-md', {
+export const iconButtonVariants = cva('flex shrink-0 items-center justify-center rounded-lg', {
   variants: {
     size: {
-      sm: 'p-1',
-      md: 'p-1.5',
-      lg: 'p-2',
+      sm: 'size-6 [&_svg]:size-3.5',
+      md: 'size-7 [&_svg]:size-4',
+      lg: 'size-8 [&_svg]:size-4',
     },
   },
   defaultVariants: {
@@ -16,13 +16,19 @@ export const iconButtonVariants = cva('flex items-center justify-center rounded-
 });
 
 export interface IconButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof iconButtonVariants> {
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    Omit<VariantProps<typeof iconButtonVariants>, 'size'> {
+  /** sm 24 px with a 14 px icon, md 28 px (default). `lg` (32 px) is deprecated: use `md`. */
+  size?: 'sm' | 'md' | 'lg' | null;
   icon: React.ReactNode;
   onClick: (e: React.MouseEvent) => void;
+  /** Toggle state: sets aria-pressed and keeps the accent surface on. */
+  pressed?: boolean;
 }
 
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ icon, title, 'aria-label': ariaLabel, disabled, size, className, ...props }, ref) => (
+  ({ icon, title, 'aria-label': ariaLabel, disabled, size, pressed, className, ...props }, ref) => (
     <button
       ref={ref}
       type="button"
@@ -30,11 +36,13 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       aria-label={ariaLabel ?? title}
       disabled={disabled}
       data-slot="icon-button"
+      aria-pressed={pressed}
       className={cn(
         iconButtonVariants({ size }),
         'transition-colors',
         'text-muted-foreground hover:bg-accent hover:text-foreground',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        'aria-pressed:bg-accent aria-pressed:text-foreground',
+        'focus-ring',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}

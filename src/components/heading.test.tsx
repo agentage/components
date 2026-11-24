@@ -7,7 +7,7 @@ describe('headingVariants', () => {
     const expected = {
       h1: 'text-3xl font-bold tracking-[-0.02em] text-foreground',
       h2: 'text-xl font-semibold tracking-[-0.02em] text-foreground',
-      h3: 'text-lg font-semibold text-foreground',
+      h3: 'text-base font-semibold text-foreground',
       h4: 'text-sm font-semibold text-foreground',
     } as const;
 

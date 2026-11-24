@@ -1,81 +1,25 @@
 import * as React from 'react';
-import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+import { CardAnnounce, CardMeta } from './card-state';
 import { Progress } from './progress';
+import { CONTAINER, Comparison, Facts, StatSkeleton, ValueRow } from './stat-card.body';
+import { statCardVariants, Trend } from './stat-card.parts';
+import type { StatCardProps } from './stat-card.types';
+import { StatStateBody } from './stat-card.state';
+import { RAISE, splitControlProps, StatHeader } from './stat-card.header';
 
-// `up`/`down` are direction aliases kept for compat; the rest is the canonical status vocabulary.
-export const TREND_TONE = {
-  up: 'text-success',
-  down: 'text-destructive',
-  default: 'text-muted-foreground',
-  success: 'text-success',
-  warning: 'text-warning',
-  destructive: 'text-destructive',
-  info: 'text-info',
-} as const;
+export {
+  statCardTrendVariants,
+  statCardVariants,
+  TREND_TONE,
+  type StatCardSentiment,
+  type StatCardTrend,
+  type TrendTone,
+} from './stat-card.parts';
+export type { StatCardComparison, StatCardFact } from './stat-card.body';
+export type { StatCardProps } from './stat-card.types';
 
-export type TrendTone = keyof typeof TREND_TONE;
-
-export const statCardTrendVariants = cva(
-  'flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium border border-border bg-muted/30',
-  {
-    variants: { tone: TREND_TONE },
-    defaultVariants: { tone: 'up' },
-  }
-);
-
-export interface StatCardTrend {
-  value: string;
-  up: boolean;
-  /** Overrides the colour derived from `up`. */
-  tone?: TrendTone;
-}
-
-export const statCardVariants = cva(
-  // Hover affordance is border+shadow only - cards must not move (user rule: no position change on hover).
-  'rounded-lg border border-border bg-sidebar p-5 transition-[box-shadow,border-color] duration-[140ms] hover:border-muted-foreground hover:shadow-md',
-  {
-    variants: {
-      pressable: {
-        true: 'w-full cursor-pointer text-left active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        false: '',
-      },
-    },
-    defaultVariants: { pressable: false },
-  }
-);
-
-export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: React.ReactNode;
-  iconColor?: string;
-  title: string;
-  value: string | number;
-  trend?: StatCardTrend;
-  description?: React.ReactNode;
-  /** 0-100; renders a Progress bar under the value. */
-  progress?: number;
-  /** Accessible name for the progress bar; defaults to the card title. */
-  progressLabel?: string;
-  /** Renders the card as a button (click + keyboard + active state). */
-  pressable?: boolean;
-}
-
-const TrendIcon = (): React.JSX.Element => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-    <polyline points="16 7 22 7 22 13" />
-  </svg>
-);
+const FOOTER = 'flex items-center justify-between gap-2 text-xs text-muted-foreground';
 
 export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
   (
@@ -85,80 +29,170 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       title,
       value,
       trend,
+      indicator,
+      period,
       description,
+      comparison,
+      chart,
+      chartLabel,
+      facts,
+      breakdown,
+      history,
+      footer,
       progress,
       progressLabel,
+      state,
+      skeleton,
+      empty,
+      error,
+      onRetry,
+      source,
+      updatedAt,
+      stale,
+      onRefresh,
+      refreshing,
       pressable = false,
+      density = 'compact',
       className,
+      onClick,
       ...props
     },
     ref
   ) => {
-    const body = (
+    const compact = density === 'compact';
+    const uid = React.useId();
+    const { control, root } = splitControlProps(props, pressable);
+    const covered = state === 'loading' || state === 'empty' || state === 'error';
+    // Covered parts are hidden, so the state body is the description then.
+    const describedBy =
+      (control['aria-describedby'] as string | undefined) ??
+      (covered
+        ? `${uid}-state`
+        : [`${uid}-value`, comparison && `${uid}-cmp`, description && `${uid}-desc`]
+            .filter(Boolean)
+            .join(' '));
+    const isStale = state === 'stale' || !!stale;
+    const metaOwn = source !== undefined || updatedAt !== undefined || !!onRefresh;
+    // Without a footer the stale badge sits in the header, so the card keeps its height.
+    const staleInHeader = isStale && !footer && !metaOwn;
+    const meta = metaOwn || (isStale && !staleInHeader);
+    const reflows = !!chart || !!facts?.length;
+
+    const middle = (
       <>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            {icon && (
+        <div className={compact ? 'space-y-1' : 'space-y-2'}>
+          <ValueRow
+            value={
               <div
+                id={`${uid}-value`}
                 className={cn(
-                  'flex size-8 items-center justify-center rounded-md [&_svg]:size-4',
-                  iconColor ?? 'bg-primary-soft text-primary-emphasis'
+                  'font-semibold tabular-nums text-foreground',
+                  compact ? 'text-xl leading-7' : 'text-2xl'
                 )}
               >
-                {icon}
+                {value}
               </div>
-            )}
-            <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">
-              {title}
-            </div>
-          </div>
-          {trend && (
-            <div
-              className={cn(
-                statCardTrendVariants({ tone: trend.tone ?? (trend.up ? 'up' : 'down') })
-              )}
-            >
-              <TrendIcon />
-              <span className="sr-only">{trend.up ? 'Trending up' : 'Trending down'}</span>
-              <span>{trend.value}</span>
+            }
+            comparison={
+              comparison && <Comparison id={`${uid}-cmp`} comparison={comparison} trend={trend} />
+            }
+            chart={chart}
+            chartLabel={chartLabel}
+          />
+          {description && (
+            <div id={`${uid}-desc`} className="text-xs text-muted-foreground">
+              {description}
             </div>
           )}
         </div>
-        <div className="space-y-2">
-          <div className="text-2xl font-semibold tabular-nums text-foreground">{value}</div>
-          {description && <div className="text-xs text-muted-foreground">{description}</div>}
-        </div>
+        {facts && facts.length > 0 && <Facts facts={facts} />}
+        {breakdown && <Progress segments={breakdown} legend />}
         {progress != null && (
-          <div className="mt-4" data-slot="stat-card-progress">
+          <div className={compact ? undefined : 'mt-4'} data-slot="stat-card-progress">
             <Progress value={progress} label={progressLabel ?? title} />
+          </div>
+        )}
+        {history && (
+          <div className={RAISE} data-slot="stat-card-history">
+            {history}
           </div>
         )}
       </>
     );
 
-    if (pressable) {
-      return (
-        <button
-          ref={ref as unknown as React.Ref<HTMLButtonElement>}
-          type="button"
-          className={cn(statCardVariants({ pressable: true }), className)}
-          data-slot="stat-card"
-          data-pressable=""
-          {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
-        >
-          {body}
-        </button>
-      );
-    }
+    const shape = {
+      chart: !!chart,
+      comparison: !!comparison,
+      description: !!description,
+      facts: facts?.length ?? 0,
+      breakdown: !!breakdown,
+      progress: progress != null,
+      history: !!history,
+    };
 
     return (
       <div
         ref={ref}
-        className={cn(statCardVariants({ pressable: false }), className)}
+        className={cn(statCardVariants({ pressable, density }), className)}
         data-slot="stat-card"
-        {...props}
+        data-pressable={pressable ? '' : undefined}
+        data-state={state}
+        aria-busy={state === 'loading' || undefined}
+        {...(pressable
+          ? {}
+          : { role: 'group', 'aria-labelledby': `${uid}-title`, 'aria-describedby': describedBy })}
+        {...root}
+        {...(pressable ? {} : { onClick })}
       >
-        {body}
+        <StatHeader
+          {...{ icon, iconColor, title, period, indicator, pressable, compact, control, onClick }}
+          describedBy={describedBy}
+          titleId={`${uid}-title`}
+          stale={staleInHeader}
+          trend={trend && !covered && <Trend trend={trend} compact={compact} />}
+        />
+        {covered ? (
+          // The real parts stay in flow, hidden, so a covered card keeps its ready height.
+          <div className={cn('grid flex-1 [&>*]:col-start-1 [&>*]:row-start-1', CONTAINER)}>
+            <div className="invisible flex flex-col gap-2" aria-hidden="true">
+              {middle}
+            </div>
+            <div id={`${uid}-state`} data-slot="stat-card-state">
+              {state === 'loading' ? (
+                (skeleton ?? <StatSkeleton shape={shape} />)
+              ) : (
+                <StatStateBody state={state} empty={empty} error={error} onRetry={onRetry} />
+              )}
+            </div>
+          </div>
+        ) : reflows ? (
+          <div className={cn('flex flex-col gap-2', CONTAINER)}>{middle}</div>
+        ) : (
+          middle
+        )}
+        {(footer || meta) && (
+          <div
+            className={cn(
+              'mt-auto border-t border-border pt-2',
+              meta ? 'flex flex-col gap-1' : FOOTER,
+              RAISE,
+              !compact && 'mt-4'
+            )}
+            data-slot="stat-card-footer"
+          >
+            {footer && meta ? <div className={FOOTER}>{footer}</div> : footer}
+            {meta && (
+              <CardMeta
+                source={source}
+                updatedAt={updatedAt}
+                stale={isStale}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
+              />
+            )}
+          </div>
+        )}
+        {state !== undefined && <CardAnnounce state={state} label={title} />}
       </div>
     );
   }

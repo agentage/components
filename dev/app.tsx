@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { CopyButton, EmptyState, Heading, ToastProvider, ToggleGroup } from '../src';
+import { CopyButton, EmptyState, ToastProvider, ToggleGroup } from '../src';
 import { DocsNav } from './components/docs-nav';
 import { Search } from './components/search';
 import { BrandedLogo, GitHubIcon, NpmIcon } from './lib/icons';
 import { Link, RouterProvider, useRoute } from './lib/router';
+import { CatalogIndex } from './pages/catalog-index';
 import { CategoryPage } from './pages/category-page';
 import { ComponentPage } from './pages/component-page';
 import { HomePage } from './pages/home';
@@ -18,23 +19,12 @@ const TOP_NAV = [
   { to: '/theming', label: 'Theming' },
 ];
 
-const INSTALL_CMD = 'npm i @agentage/design-system';
+const INSTALL_CMD = 'npm i @agentage/components';
 
 const EXTERNAL_LINKS = [
-  { href: 'https://www.npmjs.com/package/@agentage/design-system', label: 'npm', Icon: NpmIcon },
-  { href: 'https://github.com/agentage/design-system', label: 'GitHub', Icon: GitHubIcon },
+  { href: 'https://www.npmjs.com/package/@agentage/components', label: 'npm', Icon: NpmIcon },
+  { href: 'https://github.com/agentage/components', label: 'GitHub', Icon: GitHubIcon },
 ];
-
-const AllCategories = () => (
-  <div className="space-y-6">
-    <Heading as="h1" description="Every component, grouped by what it is for.">
-      Components
-    </Heading>
-    {CATEGORIES.map((category) => (
-      <CategoryPage key={category.slug} category={category} />
-    ))}
-  </div>
-);
 
 const NotFound = ({ path }: { path: string }) => (
   <EmptyState
@@ -51,7 +41,7 @@ const Routed = () => {
   if (root === 'install') return <InstallPage />;
   if (root === 'theming') return <ThemingPage />;
   if (root === 'components') {
-    if (!categorySlug) return <AllCategories />;
+    if (!categorySlug) return <CatalogIndex />;
     const category = CATEGORIES.find((c) => c.slug === categorySlug);
     if (!category) return <NotFound path={path} />;
     if (!componentSlug) return <CategoryPage category={category} />;

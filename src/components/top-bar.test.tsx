@@ -27,21 +27,21 @@ describe('topBarVariants', () => {
 });
 
 describe('topBarNavItemVariants', () => {
-  it('renders the exact class string for both states', () => {
-    const base =
-      'rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
+  it('renders the active and idle states', () => {
     const { unmount } = render(
       <TopBarNavItem href="#" active>
         A
       </TopBarNavItem>
     );
-    expect(screen.getByRole('link').className).toBe(`${base} bg-accent text-foreground`);
+    const on = screen.getByRole('link').className;
+    for (const c of ['h-7', 'focus-ring', 'bg-accent', 'text-foreground']) expect(on).toContain(c);
     expect(screen.getByRole('link').getAttribute('aria-current')).toBe('page');
     unmount();
 
     render(<TopBarNavItem href="#">B</TopBarNavItem>);
-    expect(screen.getByRole('link').className).toBe(
-      `${base} text-foreground/70 hover:bg-accent/50 hover:text-foreground`
-    );
+    const off = screen.getByRole('link').className;
+    expect(off).toContain('text-foreground/70');
+    expect(off).toContain('hover:bg-accent');
+    expect(off.split(' ')).not.toContain('bg-accent');
   });
 });

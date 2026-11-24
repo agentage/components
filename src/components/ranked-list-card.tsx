@@ -1,9 +1,14 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
-import { CARD_BASE, TITLE, DESC } from './card-base';
+import {
+  chartCardDescriptionVariants,
+  chartCardTitleVariants,
+  chartCardVariants,
+  type ChartCardDensity,
+} from './chart-card.variants';
 
 /* ============================================================================
- * RankedListCard — top-N list with rank, optional icon, value.
+ * RankedListCard - top-N list with rank, optional icon, value.
  * ========================================================================= */
 
 export interface RankedItem {
@@ -14,6 +19,11 @@ export interface RankedItem {
 }
 
 export interface RankedListCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Deprecated: The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   * @deprecated The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   */
+  density?: ChartCardDensity;
   title: string;
   items: RankedItem[];
   format?: (n: number | string) => string;
@@ -21,12 +31,17 @@ export interface RankedListCardProps extends React.HTMLAttributes<HTMLDivElement
 }
 
 export const RankedListCard = React.forwardRef<HTMLDivElement, RankedListCardProps>(
-  ({ title, items, format, description, className, ...props }, ref) => {
+  ({ title, items, format, description, density, className, ...props }, ref) => {
     const fmt = format ?? ((n: number | string) => String(n));
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="ranked-list-card" {...props}>
-        <div className={TITLE}>{title}</div>
-        <ol className="mt-3 space-y-1.5">
+      <div
+        ref={ref}
+        className={cn(chartCardVariants({ density }), className)}
+        data-slot="ranked-list-card"
+        {...props}
+      >
+        <div className={chartCardTitleVariants({ density })}>{title}</div>
+        <ol className="mt-2.5 space-y-1.5">
           {items.map((it, i) => (
             <li key={i} className="flex items-center gap-3 text-xs">
               <span className="flex size-5 items-center justify-center rounded-full bg-muted text-2xs font-semibold tabular-nums text-foreground">
@@ -43,7 +58,9 @@ export const RankedListCard = React.forwardRef<HTMLDivElement, RankedListCardPro
             </li>
           ))}
         </ol>
-        {description && <div className={DESC}>{description}</div>}
+        {description && (
+          <div className={chartCardDescriptionVariants({ density })}>{description}</div>
+        )}
       </div>
     );
   }

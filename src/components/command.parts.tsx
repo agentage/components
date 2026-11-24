@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { cn } from '../lib/utils';
+import { Kbd } from './kbd';
 import { CommandContext, nodeText } from './command.context';
 import { commandItemVariants } from './command.variants';
 
@@ -35,7 +36,7 @@ export const CommandGroup = ({
       {...props}
     >
       {heading && (
-        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{heading}</div>
+        <div className="px-2 pt-1.5 pb-1 text-xs font-medium text-muted-foreground">{heading}</div>
       )}
       {children}
     </div>
@@ -83,9 +84,7 @@ export const CommandItem = ({
     >
       {icon && <span className="shrink-0 text-muted-foreground [&_svg]:size-4">{icon}</span>}
       <span className="flex-1 truncate text-left">{children}</span>
-      {shortcut && (
-        <kbd className="ml-auto text-xs text-muted-foreground font-mono">{shortcut}</kbd>
-      )}
+      {shortcut && <Kbd className="ml-auto">{shortcut}</Kbd>}
     </button>
   );
 };
@@ -93,14 +92,14 @@ export const CommandItem = ({
 export const CommandSeparator = (): React.JSX.Element | null => {
   const { matchCount, ready } = useContext(CommandContext);
   if (ready && matchCount === 0) return null;
-  return <div className="-mx-2 my-1 h-px bg-border" data-slot="command-separator" />;
+  return <div className="-mx-1.5 my-1 h-px bg-border" data-slot="command-separator" />;
 };
 
 export const CommandEmpty = ({ children }: { children: ReactNode }): React.JSX.Element | null => {
   const { matchCount, ready } = useContext(CommandContext);
   if (!ready || matchCount > 0) return null;
   return (
-    <div className="py-6 text-center text-sm text-muted-foreground" data-slot="command-empty">
+    <div className="py-6 text-center text-ui text-muted-foreground" data-slot="command-empty">
       {children}
     </div>
   );

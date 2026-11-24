@@ -95,10 +95,11 @@ export interface FilterSearchProps extends Omit<
   className?: string;
 }
 
+/** @deprecated Use `ToolbarSearch`. */
 export const FilterSearch = React.forwardRef<HTMLInputElement, FilterSearchProps>(
   ({ value, onChange, placeholder = 'Search...', className, ...props }, ref) => (
     <div className={cn('relative flex-1 min-w-[200px]', className)} data-slot="filter-search">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none [&_svg]:size-3.5">
         <SearchIcon />
       </span>
       <input
@@ -116,7 +117,7 @@ export const FilterSearch = React.forwardRef<HTMLInputElement, FilterSearchProps
           onClick={() => onChange('')}
           className={cn(
             'absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground transition-colors',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
+            'focus-ring'
           )}
           aria-label="Clear search"
         >
@@ -138,6 +139,7 @@ export interface FilterClearProps extends Omit<
   onClear: () => void;
 }
 
+/** @deprecated Use `FilterMenu` Clear all or `ActiveFilters`. */
 export const FilterClear = React.forwardRef<HTMLButtonElement, FilterClearProps>(
   ({ active, onClear, className, ...props }, ref) => (
     <button

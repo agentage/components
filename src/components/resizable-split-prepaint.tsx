@@ -3,7 +3,7 @@ import { resizableSplitPrepaint } from '../lib/split-px';
 export { resizableSplitPrepaint } from '../lib/split-px';
 
 export interface ResizableSplitPrepaintProps {
-  /** Storage keys of every `ResizableSplit` on the page. */
+  /** Storage keys of every `ResizableSplit` and `ResizablePanelGroup` on the page. */
   storageKeys: string[];
 }
 

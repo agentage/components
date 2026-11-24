@@ -2,14 +2,14 @@ import { cva } from 'class-variance-authority';
 
 export const filterOptionVariants = cva(
   [
-    'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'flex h-6 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors cursor-pointer',
+    'focus-ring',
   ],
   {
     variants: {
       active: {
-        true: 'bg-background text-foreground shadow-sm',
-        false: 'text-muted-foreground hover:text-foreground',
+        true: 'bg-accent text-foreground',
+        false: 'text-muted-foreground hover:bg-accent hover:text-foreground',
       },
     },
     defaultVariants: {
@@ -20,9 +20,9 @@ export const filterOptionVariants = cva(
 
 export const filterSearchInputVariants = cva(
   [
-    'w-full rounded-lg border border-border bg-background py-2 pl-9 text-sm',
+    'h-7 w-full rounded-md border border-border bg-background pl-8 text-ui',
     'placeholder:text-muted-foreground/60',
-    'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary',
+    'focus-ring',
     'transition-colors',
   ],
   {
@@ -41,8 +41,8 @@ export const filterSearchInputVariants = cva(
 
 export const filterClearVariants = cva(
   [
-    'flex items-center gap-1 rounded-md px-2 py-1.5 self-end text-sm transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'flex h-7 items-center gap-1.5 rounded-lg px-2.5 self-end text-ui font-medium transition-colors',
+    'focus-ring',
   ],
   {
     variants: {

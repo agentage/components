@@ -1,9 +1,14 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
-import { CARD_BASE, TITLE, DESC } from './card-base';
+import {
+  chartCardDescriptionVariants,
+  chartCardTitleVariants,
+  chartCardVariants,
+  type ChartCardDensity,
+} from './chart-card.variants';
 
 /* ============================================================================
- * DonutCard — donut chart for part-of-whole
+ * DonutCard - donut chart for part-of-whole
  * Use when showing composition (storage breakdown, traffic source mix).
  * ========================================================================= */
 
@@ -14,6 +19,11 @@ export interface DonutSegment {
 }
 
 export interface DonutCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Deprecated: The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   * @deprecated The 12/14 compact card is the only look; `comfortable` is the pre-0.21 card.
+   */
+  density?: ChartCardDensity;
   title: string;
   segments: DonutSegment[];
   total?: number;
@@ -33,6 +43,7 @@ export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
       centerLabel,
       centerSubLabel,
       description,
+      density,
       className,
       chartLabel,
       ...props
@@ -47,9 +58,14 @@ export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
       .map((s) => `${s.label} ${Math.round((s.value / sum) * 100)}%`)
       .join(', ');
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="donut-card" {...props}>
-        <div className={TITLE}>{title}</div>
-        <div className="mt-3 flex items-center gap-4">
+      <div
+        ref={ref}
+        className={cn(chartCardVariants({ density }), className)}
+        data-slot="donut-card"
+        {...props}
+      >
+        <div className={chartCardTitleVariants({ density })}>{title}</div>
+        <div className="mt-2.5 flex items-center gap-4">
           <div className="relative size-24 shrink-0">
             <svg
               viewBox="0 0 50 50"
@@ -93,7 +109,7 @@ export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
                   </div>
                 )}
                 {centerSubLabel && (
-                  <div className="text-3xs leading-tight text-muted-foreground">
+                  <div className="text-2xs leading-tight text-muted-foreground">
                     {centerSubLabel}
                   </div>
                 )}
@@ -113,7 +129,9 @@ export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
             ))}
           </ul>
         </div>
-        {description && <div className={DESC}>{description}</div>}
+        {description && (
+          <div className={chartCardDescriptionVariants({ density })}>{description}</div>
+        )}
       </div>
     );
   }

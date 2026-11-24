@@ -1,14 +1,14 @@
 import { cva } from 'class-variance-authority';
 
 export const commandContentVariants = cva(
-  'relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-2xl overflow-hidden'
+  'relative z-10 w-full max-w-lg overflow-hidden rounded-lg border border-border bg-popover shadow-[var(--shadow-popover)]'
 );
 
 export const commandItemVariants = cva(
   [
-    'flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors',
+    'flex h-7 w-full items-center gap-2.5 rounded-md px-2 text-ui transition-colors duration-fast',
     'text-popover-foreground hover:bg-accent hover:text-accent-foreground',
-    'focus:outline-none focus:bg-accent focus:text-accent-foreground',
+    'focus-ring focus:bg-accent focus:text-accent-foreground',
   ],
   {
     variants: {

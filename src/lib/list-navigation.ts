@@ -1,8 +1,4 @@
-/**
- * Wrapping target index for arrow / Home / End navigation over a list of `count` items.
- * `current` may be -1 (nothing active yet); returns null when the key does not navigate.
- * Set `horizontal` to false for controls where Left/Right belong to a text caret.
- */
+/** Wrapping index for arrow, Home and End keys; null when the key does not navigate. */
 export const nextListIndex = (
   key: string,
   current: number,

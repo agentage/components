@@ -79,14 +79,14 @@ TopBarNav.displayName = 'TopBarNav';
 
 export const topBarNavItemVariants = cva(
   [
-    'rounded-md px-3 py-1.5 text-sm transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'inline-flex h-7 items-center rounded-md px-2.5 text-ui transition-colors duration-fast',
+    'focus-ring',
   ],
   {
     variants: {
       active: {
         true: 'bg-accent text-foreground',
-        false: 'text-foreground/70 hover:bg-accent/50 hover:text-foreground',
+        false: 'text-foreground/70 hover:bg-accent hover:text-foreground',
       },
     },
     defaultVariants: {

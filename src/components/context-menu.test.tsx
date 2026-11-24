@@ -90,7 +90,7 @@ describe('ContextMenu', () => {
     expect(document.activeElement).toBe(target);
   });
 
-  it('runs the item handler and closes', () => {
+  it('calls the item handler and closes', () => {
     const onPick = vi.fn();
     const { target } = setup({ onPick });
     fireEvent.contextMenu(target);

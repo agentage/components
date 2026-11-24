@@ -1,6 +1,6 @@
 'use client';
 
-export const Demo = () => (
+export const Example = () => (
   <>
     <div className="flex flex-wrap gap-3">
       {[

@@ -2,11 +2,13 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { type VariantProps } from 'class-variance-authority';
+import { copyText } from '../lib/copy-text';
 import { cn } from '../lib/utils';
 import { buttonVariants } from './button.variants';
 
-const CopyIcon = (): React.JSX.Element => (
+const CopyIcon = ({ className }: { className?: string }): React.JSX.Element => (
   <svg
+    className={className}
     width="14"
     height="14"
     viewBox="0 0 24 24"
@@ -21,8 +23,9 @@ const CopyIcon = (): React.JSX.Element => (
   </svg>
 );
 
-const CheckIcon = (): React.JSX.Element => (
+const CheckIcon = ({ className }: { className?: string }): React.JSX.Element => (
   <svg
+    className={className}
     width="14"
     height="14"
     viewBox="0 0 24 24"
@@ -36,8 +39,9 @@ const CheckIcon = (): React.JSX.Element => (
   </svg>
 );
 
-const ErrorIcon = (): React.JSX.Element => (
+const ErrorIcon = ({ className }: { className?: string }): React.JSX.Element => (
   <svg
+    className={className}
     width="14"
     height="14"
     viewBox="0 0 24 24"
@@ -52,26 +56,6 @@ const ErrorIcon = (): React.JSX.Element => (
   </svg>
 );
 
-// Fallback for insecure contexts / denied permissions: select a detached textarea and execCommand.
-const legacyCopy = (text: string): boolean => {
-  if (typeof document === 'undefined') return false;
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  area.style.position = 'fixed';
-  area.style.opacity = '0';
-  area.style.pointerEvents = 'none';
-  document.body.appendChild(area);
-  try {
-    area.select();
-    return document.execCommand('copy');
-  } catch {
-    return false;
-  } finally {
-    document.body.removeChild(area);
-  }
-};
-
 export interface CopyButtonProps
   extends
     Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
@@ -82,6 +66,7 @@ export interface CopyButtonProps
   /** Shown briefly when both the async and legacy copy paths fail. */
   errorLabel?: string;
   duration?: number;
+  /** The 24 px square small control with a 14 px glyph, for rows too; `size` is ignored. */
   iconOnly?: boolean;
 }
 
@@ -109,24 +94,22 @@ export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
     const handle = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
       onClick?.(e);
       if (e.defaultPrevented) return;
-      let ok = false;
-      try {
-        await navigator.clipboard.writeText(text);
-        ok = true;
-      } catch {
-        ok = legacyCopy(text);
-      }
+      const ok = await copyText(text);
       setState(ok ? 'copied' : 'error');
       setTimeout(() => setState('idle'), duration);
     };
 
     const currentLabel = copied ? successLabel : failed ? errorLabel : label;
+    const glyph = iconOnly ? 'size-3.5' : undefined;
 
     return (
       <button
         ref={ref}
         type="button"
-        className={cn(buttonVariants({ variant, size: iconOnly ? 'icon-sm' : size }), className)}
+        className={cn(
+          buttonVariants({ variant, size: iconOnly ? 'icon-sm' : (size ?? 'sm') }),
+          className
+        )}
         onClick={handle}
         aria-label={iconOnly ? currentLabel : undefined}
         data-slot="copy-button"
@@ -134,7 +117,13 @@ export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
         data-error={failed || undefined}
         {...props}
       >
-        {copied ? <CheckIcon /> : failed ? <ErrorIcon /> : <CopyIcon />}
+        {copied ? (
+          <CheckIcon className={glyph} />
+        ) : failed ? (
+          <ErrorIcon className={glyph} />
+        ) : (
+          <CopyIcon className={glyph} />
+        )}
         {!iconOnly && (
           // All labels share one grid cell so the button width never shifts on state change.
           <span className="inline-grid" aria-live="polite">

@@ -1,6 +1,6 @@
 import { createRef } from 'react';
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { Button, buttonVariants } from './button';
 
 describe('Button', () => {
@@ -24,25 +24,32 @@ describe('Button', () => {
 
   it('keeps a focus-visible ring', () => {
     render(<Button>Save</Button>);
-    expect(screen.getByRole('button', { name: 'Save' }).className).toContain(
-      'focus-visible:ring-ring/50'
-    );
+    expect(screen.getByRole('button', { name: 'Save' }).className).toContain('focus-ring');
   });
 });
 
-// Frozen pre-CVA output for the default size; `md` must be an exact alias.
-const BUTTON_DEFAULT_CLASS =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] bg-primary text-primary-foreground hover:bg-primary/90 h-7 px-3 py-1.5 has-[>svg]:px-2.5';
-
+// One control metric: md 28 px, px 10, gap 6, 13 px; `md` must be an exact alias of default.
 describe('Button size scale', () => {
-  it('renders the default size byte-identically', () => {
+  it('renders the 28 px control metric by default', () => {
     render(<Button>Save</Button>);
-    expect(screen.getByRole('button').className).toBe(BUTTON_DEFAULT_CLASS);
+    const cls = screen.getByRole('button').className;
+    for (const c of ['h-7', 'px-2.5', 'gap-1.5', 'rounded-lg', 'text-ui', 'font-semibold']) {
+      expect(cls.split(' ')).toContain(c);
+    }
   });
 
   it('renders md as an exact alias of default', () => {
     render(<Button size="md">Save</Button>);
-    expect(screen.getByRole('button').className).toBe(BUTTON_DEFAULT_CLASS);
+    const md = screen.getByRole('button').className;
+    cleanup();
+    render(<Button>Save</Button>);
+    expect(screen.getByRole('button').className).toBe(md);
+  });
+
+  it('renders sm at 24 px with px 8, gap 4 and 12 px text', () => {
+    render(<Button size="sm">Save</Button>);
+    const cls = screen.getByRole('button').className.split(' ');
+    for (const c of ['h-6', 'px-2', 'gap-1', 'text-xs']) expect(cls).toContain(c);
   });
 
   it('renders icon-md as an exact alias of icon', () => {
@@ -51,6 +58,60 @@ describe('Button size scale', () => {
 
   it('merges className last', () => {
     render(<Button className="mt-4">Save</Button>);
-    expect(screen.getByRole('button').className).toBe(`${BUTTON_DEFAULT_CLASS} mt-4`);
+    expect(screen.getByRole('button').className.endsWith(' mt-4')).toBe(true);
+  });
+});
+
+describe('Button outline-primary and pending', () => {
+  it('renders the amber outline look at weight 600', () => {
+    render(<Button variant="outline-primary">New service</Button>);
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('border-primary');
+    expect(cls).toContain('text-primary-emphasis');
+    expect(cls).toContain('font-semibold');
+  });
+
+  it('keeps focus, blocks clicks and submits, and marks busy while pending', () => {
+    const onClick = vi.fn();
+    const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
+    const { rerender } = render(
+      <form onSubmit={onSubmit}>
+        <Button type="submit" onClick={onClick}>
+          Save
+        </Button>
+      </form>
+    );
+    const button = screen.getByRole('button', { name: 'Save' }) as HTMLButtonElement;
+    button.focus();
+    rerender(
+      <form onSubmit={onSubmit}>
+        <Button type="submit" onClick={onClick} pending>
+          Save
+        </Button>
+      </form>
+    );
+    expect(document.activeElement).toBe(button);
+    expect(button.disabled).toBe(false);
+    expect(button.getAttribute('aria-disabled')).toBe('true');
+    expect(button.getAttribute('aria-busy')).toBe('true');
+    expect(button.querySelector('[data-slot="button-spinner"]')).not.toBeNull();
+    fireEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Save' })).toBe(button);
+  });
+
+  it('defaults to type button, so it never submits a form by accident', () => {
+    const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Button>Remove</Button>
+        <Button type="submit">Save</Button>
+      </form>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 });

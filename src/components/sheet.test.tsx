@@ -76,7 +76,7 @@ describe('Sheet', () => {
 
 // Frozen pre-CVA output of the side ternary.
 const SHEET_BASE =
-  'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-lg outline-none';
+  'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-[var(--shadow-popover)] outline-none';
 
 const panelClass = (): string | undefined =>
   document.body.querySelector('[data-slot="sheet-content"]')?.className;

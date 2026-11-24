@@ -1,4 +1,4 @@
-// Advanced full-card patterns — split into one file per component; this barrel
+// Advanced full-card patterns - split into one file per component; this barrel
 // preserves the original import path (`./card-patterns`).
 export * from './gauge-card';
 export * from './donut-card';

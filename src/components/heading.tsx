@@ -9,7 +9,7 @@ export const headingVariants = cva('', {
     as: {
       h1: 'text-3xl font-bold tracking-[-0.02em]',
       h2: 'text-xl font-semibold tracking-[-0.02em]',
-      h3: 'text-lg font-semibold',
+      h3: 'text-base font-semibold',
       h4: 'text-sm font-semibold',
     },
   },

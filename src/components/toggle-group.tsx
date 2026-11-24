@@ -1,44 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { cva } from 'class-variance-authority';
 import { nextListIndex } from '../lib/list-navigation';
 import { cn } from '../lib/utils';
 
-export type ToggleGroupColumns = 1 | 2 | 3 | 4 | 5 | 6;
+import {
+  toggleButtonVariants,
+  toggleGroupVariants,
+  type ToggleGroupColumns,
+} from './toggle-group.variants';
 
-// Tailwind cannot generate class names at runtime, so the static ones are mapped explicitly.
-export const toggleGroupVariants = cva('grid gap-2', {
-  variants: {
-    columns: {
-      1: 'grid-cols-1',
-      2: 'grid-cols-2',
-      3: 'grid-cols-3',
-      4: 'grid-cols-4',
-      5: 'grid-cols-5',
-      6: 'grid-cols-6',
-    },
-  },
-});
-
-export const toggleButtonVariants = cva(
-  [
-    'flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs transition-all duration-200',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-  ],
-  {
-    variants: {
-      selected: {
-        true: 'bg-primary text-primary-foreground',
-        false:
-          'bg-muted/30 text-muted-foreground hover:bg-accent hover:text-foreground border border-border',
-      },
-      vertical: { true: 'flex-col gap-1 py-1.5', false: '' },
-      error: { true: 'border border-destructive', false: '' },
-    },
-    defaultVariants: { selected: false, vertical: false, error: false },
-  }
-);
+export { toggleButtonVariants, toggleGroupVariants } from './toggle-group.variants';
+export type { ToggleGroupColumns } from './toggle-group.variants';
 
 const isGridColumns = (n: number): n is ToggleGroupColumns =>
   Number.isInteger(n) && n >= 1 && n <= 6;
@@ -47,6 +20,9 @@ export interface ToggleOption<T extends string> {
   value: T;
   label: string;
   icon?: React.ReactNode;
+  /** Show only the icon; the label stays the accessible name and the hover title. */
+  iconOnly?: boolean;
+  disabled?: boolean;
 }
 
 export interface ToggleGroupProps<T extends string> extends Omit<
@@ -54,37 +30,59 @@ export interface ToggleGroupProps<T extends string> extends Omit<
   'onChange' | 'children'
 > {
   value: T;
-  onChange: (value: T) => void;
+  onValueChange?: (value: T) => void;
+  /** @deprecated Use `onValueChange`. */
+  onChange?: (value: T) => void;
   options: ToggleOption<T>[];
   columns?: ToggleGroupColumns;
   vertical?: boolean;
   error?: boolean;
+  /** Disables every option. */
+  disabled?: boolean;
+  /** default: a grid of separate buttons; segmented: one joined 28 px control. */
+  variant?: 'default' | 'segmented';
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 export const ToggleGroup = <T extends string>({
   value,
+  onValueChange,
   onChange,
   options,
   columns,
   vertical = false,
   error = false,
+  disabled = false,
+  variant = 'default',
   className,
   style,
   ...props
 }: ToggleGroupProps<T>): React.JSX.Element => {
   const buttonsRef = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const commit = (next: T): void => {
+    onValueChange?.(next);
+    onChange?.(next);
+  };
+  const segmented = variant === 'segmented';
   const gridCols = columns ?? Math.max(1, options.length);
-  const mapped = isGridColumns(gridCols);
+  const mapped = segmented || isGridColumns(gridCols);
   const selectedIndex = options.findIndex((option) => option.value === value);
-  const tabStop = selectedIndex >= 0 ? selectedIndex : 0;
+  const enabled = (i: number): boolean => !disabled && !options[i]?.disabled;
+  const firstEnabled = options.findIndex((_, i) => enabled(i));
+  const tabStop = selectedIndex >= 0 && enabled(selectedIndex) ? selectedIndex : firstEnabled;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
     const buttons = buttonsRef.current;
     const focused = buttons.findIndex((button) => button === document.activeElement);
-    const next = nextListIndex(e.key, focused >= 0 ? focused : tabStop, options.length);
+    let next = nextListIndex(e.key, focused >= 0 ? focused : tabStop, options.length);
     if (next === null) return;
     e.preventDefault();
-    onChange(options[next].value);
+    // Arrows step over disabled options; Home and End land on the nearest enabled one.
+    const step = e.key === 'Home' || e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
+    for (let tries = 0; next !== null && !enabled(next) && tries < options.length; tries++)
+      next = (next + step + options.length) % options.length;
+    if (next === null || !enabled(next)) return;
+    commit(options[next].value);
     buttons[next]?.focus();
   };
 
@@ -92,7 +90,14 @@ export const ToggleGroup = <T extends string>({
     <div
       role="radiogroup"
       aria-invalid={error || undefined}
-      className={cn(toggleGroupVariants({ columns: mapped ? gridCols : undefined, className }))}
+      aria-disabled={disabled || undefined}
+      className={cn(
+        toggleGroupVariants({
+          variant,
+          columns: !segmented && isGridColumns(gridCols) ? gridCols : undefined,
+          className,
+        })
+      )}
       style={
         mapped
           ? style
@@ -110,15 +115,17 @@ export const ToggleGroup = <T extends string>({
           selected={value === option.value}
           tabIndex={index === tabStop ? 0 : -1}
           onKeyDown={handleKeyDown}
-          onClick={() => {
-            onChange(option.value);
-          }}
+          onClick={() => commit(option.value)}
+          disabled={disabled || option.disabled}
           vertical={vertical}
           error={error}
+          variant={variant}
+          iconOnly={option.iconOnly}
+          title={option.iconOnly ? option.label : undefined}
           aria-label={option.label}
         >
           {option.icon}
-          <span>{option.label}</span>
+          {!option.iconOnly && <span>{option.label}</span>}
         </ToggleButton>
       ))}
     </div>
@@ -131,17 +138,33 @@ export interface ToggleButtonProps extends React.ButtonHTMLAttributes<HTMLButton
   vertical?: boolean;
   children: React.ReactNode;
   error?: boolean;
+  variant?: 'default' | 'segmented';
+  iconOnly?: boolean;
 }
 
 export const ToggleButton = React.forwardRef<HTMLButtonElement, ToggleButtonProps>(
-  ({ selected, vertical = false, error = false, children, className, ...props }, ref) => (
+  (
+    {
+      selected,
+      vertical = false,
+      error = false,
+      variant = 'default',
+      iconOnly = false,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => (
     <button
       ref={ref}
       type="button"
       role="radio"
       aria-checked={selected}
       data-slot="toggle-button"
-      className={cn(toggleButtonVariants({ selected, vertical, error, className }))}
+      className={cn(
+        toggleButtonVariants({ variant, selected, vertical, iconOnly, error, className })
+      )}
       {...props}
     >
       {children}

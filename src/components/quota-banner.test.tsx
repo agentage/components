@@ -33,15 +33,15 @@ describe('QuotaBanner', () => {
   it('accepts custom thresholds, message and an action slot', () => {
     render(
       <QuotaBanner
-        label="memories"
+        label="documents"
         value={60}
         max={100}
         thresholds={{ warning: 0.5, critical: 0.9 }}
-        message="Only 40 memories left on the free plan."
+        message="Only 40 documents left on the free plan."
         action={<button type="button">Upgrade</button>}
       />
     );
-    expect(screen.getByText('Only 40 memories left on the free plan.')).not.toBeNull();
+    expect(screen.getByText('Only 40 documents left on the free plan.')).not.toBeNull();
     expect(screen.getByRole('button', { name: 'Upgrade' })).not.toBeNull();
   });
 });

@@ -1,11 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { useFocusTrap } from '../lib/use-focus-trap';
-import { useMounted } from '../lib/use-mounted';
-import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
+import { DialogBackdrop, DialogPortal, useDialogShell } from './dialog-shell';
+import { OverlayLayerProvider } from '../lib/overlay-layer';
+import { Kbd } from './kbd';
 import { CommandContext } from './command.context';
 import { commandContentVariants } from './command.variants';
 
@@ -39,7 +38,7 @@ export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   'aria-label'?: string;
   /** Accessible name for the palette dialog. */
   dialogLabel?: string;
-  /** Spread onto the search input — id, data-testid, autoComplete, etc. */
+  /** Spread onto the search input - id, data-testid, autoComplete, etc. */
   inputProps?: Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
     'value' | 'onChange' | 'type' | 'role'
@@ -65,11 +64,9 @@ export const Command = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
-  const mounted = useMounted();
   const listId = `${useId()}-list`;
-
-  useScrollLock(open);
-  useFocusTrap(dialogRef, open && mounted);
+  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const { mounted, layer } = useDialogShell(dialogRef, open, close);
 
   const register = useCallback((id: string, text: string) => {
     setItems((prev) => [...prev.filter((item) => item.id !== id), { id, text }]);
@@ -80,6 +77,14 @@ export const Command = ({
 
   const query = search.trim().toLowerCase();
   const matches = items.filter((item) => item.text.includes(query)).map((item) => item.id);
+  // Registration order drifts from the DOM when items mount late or rename; arrows follow the DOM.
+  const ordered = (): string[] =>
+    [...matches].sort((a, b) => {
+      const na = document.getElementById(a);
+      const nb = document.getElementById(b);
+      if (!na || !nb) return 0;
+      return na.compareDocumentPosition(nb) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+    });
 
   useEffect(() => {
     if (open) setSearch('');
@@ -88,7 +93,8 @@ export const Command = ({
   useEffect(() => setReady(true), []);
 
   useEffect(() => {
-    if (!activeId || !matches.includes(activeId)) setActiveId(matches[0] ?? null);
+    if (!activeId || !matches.includes(activeId)) setActiveId(ordered()[0] ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ordered reads the same matches
   }, [activeId, matches]);
 
   useEffect(() => {
@@ -96,102 +102,89 @@ export const Command = ({
     document.getElementById(activeId)?.scrollIntoView?.({ block: 'nearest' });
   }, [activeId]);
 
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onOpenChange(false);
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [open, onOpenChange]);
-
   const move = (delta: number): void => {
-    if (matches.length === 0) return;
-    const current = activeId ? matches.indexOf(activeId) : -1;
-    setActiveId(matches[(current + delta + matches.length) % matches.length]);
+    const list = ordered();
+    if (list.length === 0) return;
+    const current = activeId ? list.indexOf(activeId) : -1;
+    setActiveId(list[(current + delta + list.length) % list.length]);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'ArrowDown') move(1);
     else if (e.key === 'ArrowUp') move(-1);
-    else if (e.key === 'Home') setActiveId(matches[0] ?? null);
-    else if (e.key === 'End') setActiveId(matches[matches.length - 1] ?? null);
-    else if (e.key === 'Enter' && activeId) document.getElementById(activeId)?.click();
-    else if (e.key === 'Escape') onOpenChange(false);
+    else if (e.key === 'Home') setActiveId(ordered()[0] ?? null);
+    else if (e.key === 'End') setActiveId(ordered().at(-1) ?? null);
+    else if (e.key === 'Enter' && activeId && !e.nativeEvent.isComposing)
+      document.getElementById(activeId)?.click();
     else return;
     e.preventDefault();
   };
 
   if (!open || !mounted) return null;
 
-  return createPortal(
-    <CommandContext.Provider
-      value={{
-        query,
-        activeId,
-        setActiveId,
-        matchCount: matches.length,
-        ready,
-        isMatch: (id) => matches.includes(id),
-        register,
-      }}
-    >
-      <div
-        className="fixed inset-0 z-[var(--z-overlay,50)] flex items-start justify-center pt-[20vh]"
-        data-slot="command"
+  return (
+    <DialogPortal>
+      <CommandContext.Provider
+        value={{
+          query,
+          activeId,
+          setActiveId,
+          matchCount: matches.length,
+          ready,
+          isMatch: (id) => matches.includes(id),
+          register,
+        }}
       >
-        <div
-          aria-hidden="true"
-          className="fixed inset-0 bg-overlay backdrop-blur-sm"
-          onClick={() => onOpenChange(false)}
-        />
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={dialogLabel}
-          className={cn(commandContentVariants(), className)}
-          data-slot="command-content"
-          {...props}
-        >
-          <div className="flex items-center gap-2 border-b border-border px-3">
-            <SearchIcon />
-            <input
-              {...inputProps}
-              ref={externalInputRef}
-              type="text"
-              role="combobox"
-              aria-label={ariaLabel}
-              aria-expanded
-              aria-autocomplete="list"
-              aria-controls={listId}
-              aria-activedescendant={activeId ?? undefined}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                inputProps?.onKeyDown?.(e);
-                if (!e.defaultPrevented) handleKeyDown(e);
-              }}
-              placeholder={inputProps?.placeholder ?? placeholder}
-              data-slot="command-input"
-              className={cn(
-                'flex-1 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground',
-                inputProps?.className
-              )}
-            />
-            <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-2xs font-medium text-muted-foreground">
-              ESC
-            </kbd>
+        <OverlayLayerProvider layer={layer}>
+          <div
+            className="fixed inset-0 z-[var(--z-overlay,50)] flex items-start justify-center pt-[20vh]"
+            data-slot="command"
+          >
+            <DialogBackdrop layer={layer} onClick={close} />
+            <div
+              ref={dialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={dialogLabel}
+              className={cn(commandContentVariants(), className)}
+              data-slot="command-content"
+              {...props}
+            >
+              <div className="flex h-10 items-center gap-2 border-b border-border px-3">
+                <SearchIcon />
+                <input
+                  {...inputProps}
+                  ref={externalInputRef}
+                  type="text"
+                  role="combobox"
+                  aria-label={ariaLabel}
+                  aria-expanded
+                  aria-autocomplete="list"
+                  aria-controls={listId}
+                  aria-activedescendant={activeId ?? undefined}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    inputProps?.onKeyDown?.(e);
+                    if (!e.defaultPrevented) handleKeyDown(e);
+                  }}
+                  placeholder={inputProps?.placeholder ?? placeholder}
+                  data-slot="command-input"
+                  className={cn(
+                    'h-7.5 min-w-0 flex-1 bg-transparent text-ui text-foreground outline-none placeholder:text-muted-foreground',
+                    inputProps?.className
+                  )}
+                />
+                <Kbd className="hidden sm:inline-flex">Esc</Kbd>
+              </div>
+              <div id={listId} role="listbox" className="max-h-80 overflow-y-auto p-1.5">
+                {children}
+              </div>
+            </div>
           </div>
-          <div id={listId} role="listbox" className="max-h-[300px] overflow-y-auto p-2">
-            {children}
-          </div>
-        </div>
-      </div>
-    </CommandContext.Provider>,
-    document.body
+        </OverlayLayerProvider>
+      </CommandContext.Provider>
+    </DialogPortal>
   );
 };
 export { CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from './command.parts';

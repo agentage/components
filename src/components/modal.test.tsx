@@ -11,7 +11,7 @@ const Harness = (): React.JSX.Element => {
       <button type="button" onClick={() => setOpen(true)}>
         Open
       </button>
-      <Modal isOpen={open} onClose={() => setOpen(false)} title="Create Run">
+      <Modal isOpen={open} onClose={() => setOpen(false)} title="Create Report">
         <button type="button">Save</button>
       </Modal>
     </div>
@@ -22,7 +22,7 @@ describe('Modal', () => {
   it('renders into document.body, escaping any clipping ancestor', () => {
     const { container } = render(
       <div style={{ overflow: 'hidden' }}>
-        <Modal isOpen onClose={vi.fn()} title="Create Run">
+        <Modal isOpen onClose={vi.fn()} title="Create Report">
           content
         </Modal>
       </div>
@@ -33,7 +33,7 @@ describe('Modal', () => {
 
   it('locks body scroll while open and releases it on close', () => {
     const { rerender } = render(
-      <Modal isOpen onClose={vi.fn()} title="Create Run">
+      <Modal isOpen onClose={vi.fn()} title="Create Report">
         content
       </Modal>
     );
@@ -41,7 +41,7 @@ describe('Modal', () => {
     expect(document.body.style.paddingRight).not.toBe('');
 
     rerender(
-      <Modal isOpen={false} onClose={vi.fn()} title="Create Run">
+      <Modal isOpen={false} onClose={vi.fn()} title="Create Report">
         content
       </Modal>
     );
@@ -65,7 +65,7 @@ describe('Modal', () => {
 
 // Frozen pre-CVA output of the hand-rolled sizeClasses lookup.
 const MODAL_BASE =
-  'relative z-10 w-full rounded-lg border border-border bg-background shadow-lg outline-none';
+  'relative z-10 w-full rounded-lg border border-border bg-background shadow-[var(--shadow-popover)] outline-none';
 
 const panelClass = (): string | undefined =>
   document.body.querySelector('[data-slot="modal-content"]')?.className;

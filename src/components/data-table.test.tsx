@@ -4,20 +4,20 @@ import { DataTable, type DataTableColumn } from './data-table';
 
 interface Machine {
   name: string;
-  agents: number;
+  members: number;
   lastSeen: Date;
   status?: string;
 }
 
 const DATA: Machine[] = [
-  { name: 'ci-runner', agents: 7, lastSeen: new Date('2026-01-03'), status: 'online' },
-  { name: 'Alpha', agents: 12, lastSeen: new Date('2026-01-01') },
-  { name: 'beta', agents: 2, lastSeen: new Date('2026-01-02'), status: 'offline' },
+  { name: 'ci-runner', members: 7, lastSeen: new Date('2026-01-03'), status: 'online' },
+  { name: 'Alpha', members: 12, lastSeen: new Date('2026-01-01') },
+  { name: 'beta', members: 2, lastSeen: new Date('2026-01-02'), status: 'offline' },
 ];
 
 const COLUMNS: DataTableColumn<Machine>[] = [
   { key: 'name', header: 'Name', sortable: true },
-  { key: 'agents', header: 'Agents', sortable: true, align: 'right' },
+  { key: 'members', header: 'Members', sortable: true, align: 'right' },
   {
     key: 'lastSeen',
     header: 'Last seen',
@@ -64,7 +64,7 @@ describe('DataTable', () => {
 
   it('sorts numbers numerically and dates chronologically', () => {
     render(<DataTable columns={COLUMNS} data={DATA} />);
-    fireEvent.click(screen.getByRole('button', { name: /Agents/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Members/ }));
     expect(names()).toEqual(['beta', 'ci-runner', 'Alpha']);
 
     fireEvent.click(screen.getByRole('button', { name: /Last seen/ }));
@@ -83,7 +83,7 @@ describe('DataTable', () => {
 
   it('honours a custom comparator and sortValue', () => {
     const columns: DataTableColumn<Machine>[] = [
-      { key: 'name', header: 'Name', sortable: true, compare: (a, b) => a.agents - b.agents },
+      { key: 'name', header: 'Name', sortable: true, compare: (a, b) => a.members - b.members },
       { key: 'status', header: 'Status', sortable: true, sortValue: (row) => row.status ?? null },
     ];
     render(<DataTable columns={columns} data={DATA} />);
@@ -101,7 +101,7 @@ describe('DataTable', () => {
       <DataTable
         columns={COLUMNS}
         data={DATA}
-        sort={{ key: 'agents', direction: 'desc' }}
+        sort={{ key: 'members', direction: 'desc' }}
         onSortChange={onSortChange}
       />
     );
@@ -121,10 +121,10 @@ describe('DataTable', () => {
 
   it('applies the compact density and per-column align / nowrap / width', () => {
     render(<DataTable columns={COLUMNS} data={DATA} density="compact" />);
-    expect(header('Agents').className).toContain('py-2');
-    expect(header('Agents').className).toContain('text-right');
-    const [, agents, lastSeen] = Array.from(screen.getAllByRole('row')[1].querySelectorAll('td'));
-    expect(agents.className).toContain('py-2');
+    expect(header('Members').className).toContain('py-2');
+    expect(header('Members').className).toContain('text-right');
+    const [, members, lastSeen] = Array.from(screen.getAllByRole('row')[1].querySelectorAll('td'));
+    expect(members.className).toContain('py-2');
     expect(lastSeen.className).toContain('whitespace-nowrap');
   });
 

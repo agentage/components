@@ -1,58 +1,47 @@
 import { cva } from 'class-variance-authority';
 
-export type TabsVariant = 'default' | 'underline';
+/** `line` and `pill` are the two looks; `default` and `underline` are deprecated aliases of them. */
+export type TabsVariant = 'default' | 'underline' | 'line' | 'pill';
+
+const LINE_LIST = 'flex h-9.5 w-full items-center gap-1 self-stretch border-b border-border';
+const PILL_LIST =
+  'inline-flex h-8.5 items-center gap-0.5 rounded-lg border border-border bg-card p-0.5';
 
 // `w-fit self-start` stops the list stretching to the Tabs column width.
 export const tabsListVariants = cva('w-fit self-start', {
   variants: {
     variant: {
-      default: 'inline-flex items-center gap-1 rounded-lg bg-muted p-1',
-      underline: 'flex items-center gap-4 border-b border-border',
+      /** @deprecated Renders `pill`. */
+      default: PILL_LIST,
+      /** @deprecated Renders `line`. */
+      underline: LINE_LIST,
+      /** 38 px list over a 1 px rule; the active tab has a 2 px amber bar. */
+      line: LINE_LIST,
+      /** 34 px bordered tray of 28 px pills. */
+      pill: PILL_LIST,
     },
   },
-  defaultVariants: {
-    variant: 'default',
-  },
+  defaultVariants: { variant: 'default' },
 });
 
-const TRIGGER_STATE = [
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-  'disabled:pointer-events-none disabled:opacity-50',
-];
+const TRIGGER =
+  'relative inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-ui font-medium transition-colors duration-fast focus-ring disabled:pointer-events-none disabled:opacity-50';
+const LINE_ON =
+  'text-foreground after:absolute after:inset-x-2 after:-bottom-1.5 after:h-0.5 after:rounded-[1px] after:bg-primary';
+// Same weight in every state: a bolder active pill would widen and move its neighbours.
+const PILL_ON = 'bg-accent text-foreground';
+const OFF = 'text-muted-foreground hover:bg-accent hover:text-foreground';
 
-export const tabsTriggerVariants = cva('', {
+export const tabsTriggerVariants = cva(TRIGGER, {
   variants: {
-    variant: {
-      default: [
-        'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all',
-        ...TRIGGER_STATE,
-      ],
-      underline: [
-        '-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all',
-        ...TRIGGER_STATE,
-      ],
-    },
-    active: {
-      true: '',
-      false: '',
-    },
+    variant: { default: '', underline: '', line: '', pill: '' },
+    active: { true: '', false: OFF },
   },
   compoundVariants: [
-    { variant: 'default', active: true, class: 'bg-background text-foreground shadow-sm' },
-    { variant: 'default', active: false, class: 'text-muted-foreground hover:text-foreground' },
-    { variant: 'underline', active: true, class: 'border-foreground text-foreground' },
-    {
-      variant: 'underline',
-      active: false,
-      class: 'border-transparent text-muted-foreground hover:text-foreground',
-    },
+    { variant: ['line', 'underline'], active: true, class: LINE_ON },
+    { variant: ['pill', 'default'], active: true, class: PILL_ON },
   ],
-  defaultVariants: {
-    variant: 'default',
-    active: false,
-  },
+  defaultVariants: { variant: 'default', active: false },
 });
 
-export const tabsContentVariants = cva(
-  'mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-);
+export const tabsContentVariants = cva('mt-3 focus-ring');

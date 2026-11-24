@@ -2,60 +2,117 @@
 
 import * as React from 'react';
 import { AccordionContext, AccordionItemContext } from './accordion.context';
+import { nextListIndex } from '../lib/list-navigation';
+import { useControlled } from '../lib/use-controlled';
 import { cn } from '../lib/utils';
+import { Disclosure } from './disclosure';
 
-const ChevronDown = ({ open }: { open: boolean }): React.JSX.Element => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn('shrink-0 transition-transform duration-200', open && 'rotate-180')}
-  >
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);
+export { AccordionTrigger } from './accordion.trigger';
+export type { AccordionTriggerProps } from './accordion.trigger';
 
-export interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
+const isStrings = (v: unknown): v is string[] =>
+  Array.isArray(v) && v.every((s) => typeof s === 'string');
+
+const TRIGGERS = '[data-slot="accordion-trigger"]:not(:disabled)';
+
+export interface AccordionProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue'> {
+  /** `single` keeps at most one item open; `multiple` any number. Defaults to `single`. */
   type?: 'single' | 'multiple';
+  /** Open item values, controlled. */
+  value?: string[];
   defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+  /** Keep the open items in localStorage under this key (uncontrolled only). */
+  storageKey?: string;
+  /** `default` rows divided by rules; `section` 32 px section headers (icon, title, summary). */
+  variant?: 'default' | 'section';
+  /** Wraps each trigger in a heading of this level; the look stays the same. */
+  level?: 2 | 3 | 4;
   children: React.ReactNode;
 }
 
-export const Accordion = ({
-  type = 'single',
-  defaultValue = [],
-  className,
-  children,
-  ...props
-}: AccordionProps): React.JSX.Element => {
-  const [openItems, setOpenItems] = React.useState<string[]>(defaultValue);
-
-  const toggle = React.useCallback(
-    (value: string) => {
-      if (type === 'single') {
-        setOpenItems((prev) => (prev.includes(value) ? [] : [value]));
-      } else {
-        setOpenItems((prev) =>
-          prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-        );
-      }
-    },
-    [type]
+const ownTriggers = (root: HTMLElement): HTMLElement[] =>
+  Array.from(root.querySelectorAll<HTMLElement>(TRIGGERS)).filter(
+    (el) => el.closest('[data-slot="accordion"]') === root && !el.closest('[inert]')
   );
 
-  return (
-    <AccordionContext.Provider value={{ openItems, toggle }}>
-      <div className={cn('divide-y divide-border', className)} data-slot="accordion" {...props}>
-        {children}
-      </div>
-    </AccordionContext.Provider>
-  );
+// Every header stays a Tab stop (APG accordion); arrows, Home and End only move focus.
+const moveFocus = (root: HTMLElement, e: KeyboardEvent): void => {
+  const target = e.target as HTMLElement;
+  if (e.defaultPrevented || !target.matches(TRIGGERS)) return;
+  const items = ownTriggers(root);
+  const next = nextListIndex(e.key, items.indexOf(target), items.length, false);
+  if (next === null || !items.includes(target)) return;
+  e.preventDefault();
+  items[next]?.focus();
 };
+
+/** A set of collapsible items, one or many open; Up, Down, Home and End move between headers. */
+export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
+  (
+    {
+      type = 'single',
+      value,
+      defaultValue = [],
+      onValueChange,
+      storageKey,
+      variant = 'default',
+      level,
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const root = React.useRef<HTMLDivElement>(null);
+    React.useImperativeHandle(ref, () => root.current as HTMLDivElement);
+    React.useEffect(() => {
+      const el = root.current;
+      if (!el) return;
+      const onKey = (e: KeyboardEvent): void => moveFocus(el, e);
+      el.addEventListener('keydown', onKey);
+      return () => el.removeEventListener('keydown', onKey);
+    }, []);
+    // A stored value of another shape (an older key) falls back to the default.
+    const [openItems, setOpenItems, restoring] = useControlled(
+      value,
+      defaultValue,
+      onValueChange,
+      storageKey,
+      isStrings
+    );
+    const toggle = React.useCallback(
+      (item: string) => {
+        const open = openItems.includes(item);
+        if (type === 'single') setOpenItems(open ? [] : [item]);
+        else setOpenItems(open ? openItems.filter((v) => v !== item) : [...openItems, item]);
+      },
+      [type, openItems, setOpenItems]
+    );
+    const ctx = React.useMemo(
+      () => ({ openItems, toggle, variant, level, restoring }),
+      [openItems, toggle, variant, level, restoring]
+    );
+
+    return (
+      <AccordionContext.Provider value={ctx}>
+        <div
+          ref={root}
+          className={cn(
+            variant === 'section' ? 'border-t border-border' : 'divide-y divide-border',
+            className
+          )}
+          data-slot="accordion"
+          data-variant={variant === 'section' ? 'section' : undefined}
+          {...props}
+        >
+          {children}
+        </div>
+      </AccordionContext.Provider>
+    );
+  }
+);
+Accordion.displayName = 'Accordion';
 
 export interface AccordionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string;
@@ -70,7 +127,7 @@ export const AccordionItem = ({
   disabled = false,
   ...props
 }: AccordionItemProps): React.JSX.Element => {
-  const { openItems } = React.useContext(AccordionContext);
+  const { openItems, variant } = React.useContext(AccordionContext);
   const isOpen = openItems.includes(value);
   const instanceId = React.useId();
 
@@ -84,7 +141,7 @@ export const AccordionItem = ({
       }}
     >
       <div
-        className={className}
+        className={cn(variant === 'section' && 'border-b border-border', className)}
         data-state={isOpen ? 'open' : 'closed'}
         data-slot="accordion-item"
         {...props}
@@ -95,85 +152,33 @@ export const AccordionItem = ({
   );
 };
 
-const NAV_KEYS = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
-
-const moveFocus = (trigger: HTMLButtonElement, key: string): void => {
-  const root = trigger.closest('[data-slot="accordion"]');
-  if (!root) return;
-  const all = Array.from(
-    root.querySelectorAll<HTMLButtonElement>('[data-slot="accordion-trigger"]:not(:disabled)')
-  );
-  const at = all.indexOf(trigger);
-  if (at < 0) return;
-  if (key === 'ArrowDown') all[(at + 1) % all.length].focus();
-  else if (key === 'ArrowUp') all[(at - 1 + all.length) % all.length].focus();
-  else if (key === 'Home') all[0].focus();
-  else if (key === 'End') all[all.length - 1].focus();
-};
-
-export type AccordionTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
-
-export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-  ({ className, children, disabled, onKeyDown, ...props }, ref) => {
-    const { toggle, openItems } = React.useContext(AccordionContext);
-    const item = React.useContext(AccordionItemContext);
-    const isOpen = openItems.includes(item.value);
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
-      onKeyDown?.(e);
-      if (e.defaultPrevented || !NAV_KEYS.includes(e.key)) return;
-      e.preventDefault();
-      moveFocus(e.currentTarget, e.key);
-    };
-
-    return (
-      <button
-        ref={ref}
-        type="button"
-        id={item.triggerId || undefined}
-        onClick={() => toggle(item.value)}
-        onKeyDown={handleKeyDown}
-        aria-expanded={isOpen}
-        aria-controls={item.contentId || undefined}
-        disabled={disabled ?? item.disabled}
-        className={cn(
-          'flex w-full items-center justify-between py-4 text-sm font-medium text-foreground cursor-pointer',
-          'transition-colors hover:text-foreground/80',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-          className
-        )}
-        data-slot="accordion-trigger"
-        {...props}
-      >
-        <span className="text-left">{children}</span>
-        <ChevronDown open={isOpen} />
-      </button>
-    );
-  }
-);
-AccordionTrigger.displayName = 'AccordionTrigger';
-
 export type AccordionContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
   ({ className, children, ...props }, ref) => {
-    const { openItems } = React.useContext(AccordionContext);
+    const { openItems, variant, restoring } = React.useContext(AccordionContext);
     const { value, triggerId, contentId } = React.useContext(AccordionItemContext);
-
-    if (!openItems.includes(value)) return null;
+    const open = openItems.includes(value);
 
     return (
-      <div
+      <Disclosure
         ref={ref}
+        open={open}
+        bodyClassName={restoring ? 'transition-none' : undefined}
         id={contentId || undefined}
         role="region"
         aria-labelledby={triggerId || undefined}
-        className={cn('pb-4 text-sm text-muted-foreground', className)}
+        className={cn(
+          variant === 'section'
+            ? 'flex flex-col gap-2.5 px-1 pb-4 pt-0.5 text-ui'
+            : 'px-2 pb-3 text-ui text-muted-foreground',
+          className
+        )}
         data-slot="accordion-content"
         {...props}
       >
         {children}
-      </div>
+      </Disclosure>
     );
   }
 );

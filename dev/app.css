@@ -26,7 +26,7 @@
 }
 
 /* base.css styles ::-webkit-scrollbar globally, and Chromium prefers the
- * pseudo-elements over scrollbar-color once they exist — so override both. */
+ * pseudo-elements over scrollbar-color once they exist - so override both. */
 .rail-scroll::-webkit-scrollbar {
   width: 6px;
 }
@@ -39,6 +39,49 @@
 .rail-scroll:hover::-webkit-scrollbar-thumb,
 .rail-scroll:focus-within::-webkit-scrollbar-thumb {
   background: var(--color-border);
+}
+
+/* App theme review aid: kit tokens (agentage/platform packages/app/theme.css), outranks light. */
+html.theme-app,
+html.theme-app[data-theme] {
+  color-scheme: dark;
+  --color-background: #1f2028;
+  --color-foreground: #ffffff;
+  --color-card: #2e3039;
+  --color-card-foreground: #ffffff;
+  --color-popover: #2e3039;
+  --color-popover-foreground: #ffffff;
+  --color-sidebar: #1f2028;
+  --color-sidebar-foreground: #ffffff;
+  --color-sidebar-border: #3a3d4a;
+  --color-primary: #f5a623;
+  --color-primary-foreground: #1f2028;
+  --color-primary-emphasis: #f5a623;
+  --color-primary-soft: rgb(245 166 35 / 0.12);
+  --color-primary-hover: #d97706;
+  --color-secondary: #2e3039;
+  --color-secondary-foreground: #ffffff;
+  --color-accent: #3a3d4a;
+  --color-accent-foreground: #ffffff;
+  --color-muted: #2e3039;
+  --color-muted-foreground: #a9adc1;
+  --color-destructive: #f08a7e;
+  --color-destructive-foreground: #1f2028;
+  --color-success: #5fd08f;
+  --color-success-foreground: #1f2028;
+  --color-border: #3a3d4a;
+  --color-input: #3a3d4a;
+  --color-ring: #f5a623;
+  --color-destructive-solid: oklch(0.588 0.208 25.6);
+  /* 4.9:1 on the kit accent; the DS dark warning is 3.8:1 there. */
+  --color-warning: oklch(0.77 0.16 50);
+  --color-warning-foreground: oklch(0.085 0.013 277);
+  /* Kit has no info; the prototype's blue, since DS dark info is 3.6:1 on the kit card. */
+  --color-info: #8fa8ff;
+  --color-info-foreground: #1f2028;
+  --color-status-offline: oklch(0.7 0.014 256);
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 /* ── highlight.js theme ───────────────────────────────────────────────────

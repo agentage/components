@@ -18,10 +18,12 @@ export const iconContainerVariants = cva('flex items-center justify-center round
       destructive: 'bg-destructive/10 text-destructive',
       info: 'bg-info/10 text-info',
     },
+    /** sm 24, md 28 (default), lg 32, xl 40 px; md was 32 px before 0.21 (now lg). */
     size: {
-      sm: 'size-6',
-      md: 'size-8',
-      lg: 'size-10',
+      sm: 'size-6 [&_svg]:size-3.5',
+      md: 'size-7 [&_svg]:size-4',
+      lg: 'size-8 [&_svg]:size-4',
+      xl: 'size-10 [&_svg]:size-5',
     },
   },
   defaultVariants: {
@@ -34,17 +36,27 @@ export type IconContainerColor = NonNullable<VariantProps<typeof iconContainerVa
 
 export type IconContainerSize = NonNullable<VariantProps<typeof iconContainerVariants>['size']>;
 
+/** Same values as `IconContainerColor`: the status words are a meaning, the hues decorate. */
+export type IconContainerTone = IconContainerColor;
+
 export interface IconContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
-  color: IconContainerColor;
+  /** Colour meaning of the tile; `muted` when neither `tone` nor `color` is set. */
+  tone?: IconContainerTone;
+  /**
+   * Deprecated: use `tone`.
+   * @deprecated Use `tone`.
+   */
+  color?: IconContainerColor;
+  /** sm 24, md 28 (default), lg 32, xl 40 px: a decorative tile, not a control height. */
   size?: IconContainerSize;
   children: React.ReactNode;
 }
 
 export const IconContainer = React.forwardRef<HTMLDivElement, IconContainerProps>(
-  ({ color, size, children, className, ...props }, ref) => (
+  ({ tone, color, size, children, className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(iconContainerVariants({ color, size }), className)}
+      className={cn(iconContainerVariants({ color: tone ?? color, size }), className)}
       data-slot="icon-container"
       {...props}
     >

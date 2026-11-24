@@ -46,7 +46,7 @@ export const resizeAt = (
   return next;
 };
 
-/** Absolute variant of `resizeAt` — used by Home/End, which target a bound directly. */
+/** Absolute variant of `resizeAt` - used by Home/End, which target a bound directly. */
 export const setSizeAt = (
   sizes: number[],
   panels: PanelConstraint[],
@@ -54,17 +54,28 @@ export const setSizeAt = (
   size: number
 ): number[] => resizeAt(sizes, panels, index, size - sizes[index]);
 
-const isSizeArray = (value: unknown, length: number): value is number[] =>
+// Stored sizes must fit today's panels: same count, each inside its bounds, summing to 100.
+const fits = (value: unknown, panels: PanelConstraint[]): value is number[] =>
   Array.isArray(value) &&
-  value.length === length &&
-  value.every((n) => typeof n === 'number' && Number.isFinite(n));
+  value.length === panels.length &&
+  value.every(
+    (n, i) =>
+      typeof n === 'number' &&
+      Number.isFinite(n) &&
+      n >= panels[i].minSize - 0.5 &&
+      n <= panels[i].maxSize + 0.5
+  ) &&
+  Math.abs(value.reduce((sum: number, n: number) => sum + n, 0) - 100) <= 1;
 
-export const readStoredSizes = (key: string | undefined, length: number): number[] | null => {
+export const readStoredSizes = (
+  key: string | undefined,
+  panels: PanelConstraint[]
+): number[] | null => {
   if (!key || typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem(key);
     const parsed: unknown = raw === null ? null : JSON.parse(raw);
-    return isSizeArray(parsed, length) ? parsed : null;
+    return fits(parsed, panels) ? parsed : null;
   } catch {
     return null;
   }
@@ -75,6 +86,6 @@ export const writeStoredSizes = (key: string | undefined, sizes: number[]): void
   try {
     window.localStorage.setItem(key, JSON.stringify(sizes));
   } catch {
-    // Storage can be full or blocked; sizes stay in memory for this session.
+    // Storage can be full or blocked; sizes hold for this page only.
   }
 };
