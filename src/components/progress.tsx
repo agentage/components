@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import type { UsageThresholds } from '../lib/usage-level';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 import { LevelCue, progressLevel, ProgressTop } from './progress.meter';
 import { ProgressSegments, type ProgressSegment } from './progress.segments';
@@ -8,7 +7,7 @@ import { ProgressSegments, type ProgressSegment } from './progress.segments';
 export { segmentVariants } from './progress.segments';
 export type { ProgressSegment, ProgressSegmentTone } from './progress.segments';
 
-export const progressVariants = cva('h-full rounded-full transition-all', {
+export const progressVariants = cva('h-full rounded-full transition-all duration-300', {
   variants: {
     variant: {
       default: 'bg-primary',
@@ -28,52 +27,38 @@ export const progressVariants = cva('h-full rounded-full transition-all', {
   },
 });
 
-export interface ProgressProps
-  extends
-    React.HTMLAttributes<HTMLDivElement>,
-    Omit<VariantProps<typeof progressVariants>, 'indeterminate'> {
+export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Omit for unknown progress: no `aria-valuenow` and an animated full-width bar. */
   value?: number;
   max?: number;
   variant?: 'default' | 'success' | 'warning' | 'destructive' | 'info';
   /** Name of the bar: the default `aria-label`, and the visible text with `showValue`. */
   label?: string;
-  /** Shows the value: beside the bar ("2 of 7 done, 29%"), or on the right of the label row. */
+  /** Shows the value: beside the bar ("2 of 7 done, 29%"), or on the right of the meter label row. */
   showValue?: boolean;
-  /** `inline` (default) the bar alone or with the value beside it; `top` a label row over it. */
-  labelPosition?: 'inline' | 'top';
   /** Value text, visible and in `aria-valuetext`; defaults to the rounded percentage. */
   formatValue?: (value: number, max: number) => string;
-  /** Quota levels: past `warning` / `critical` (fractions of max) the bar turns warning / destructive, with a glyph and the level in `aria-valuetext`. */
-  thresholds?: Partial<UsageThresholds>;
+  /** Quota meter: `role="meter"`, a label row over the bar, warning past 80 % and destructive past 95 % with a glyph. */
+  meter?: boolean;
   /** `md` 8 px track (default), `sm` 6 px. */
   size?: 'sm' | 'md';
-  /** Unknown progress: omits `aria-valuenow` and renders an animated full-width bar. */
-  indeterminate?: boolean;
-  /** Fill transition in ms; `false` disables the transition. Defaults to 300. */
-  duration?: number | false;
   /** Part of whole: one proportional bar per segment with 2 px gaps, in place of value and max. */
   segments?: ProgressSegment[];
   /** With `segments`: a legend row of glyph, name and count. */
   legend?: boolean;
 }
 
-/**
- * A determinate or indeterminate bar. `role="meter"` with `thresholds` makes it a quota meter;
- * with `labelPosition="top"` the ref and the rest props go to the outer block.
- */
+/** A determinate or indeterminate bar, a quota `meter`, or a part-of-whole bar from `segments`. */
 export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
   (
     {
-      value = 0,
+      value: valueProp,
       max = 100,
       variant = 'default',
       label,
-      indeterminate = false,
-      duration = 300,
       showValue = false,
-      labelPosition = 'inline',
       formatValue,
-      thresholds,
+      meter = false,
       size = 'md',
       className,
       'aria-label': ariaLabel,
@@ -95,20 +80,18 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           {...props}
         />
       );
+    const indeterminate = valueProp === undefined;
+    const value = valueProp ?? 0;
     const percentage = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
     const pct = Math.round(percentage);
-    const info = progressLevel(value, max, pct, { thresholds, formatValue, variant });
-    const top = labelPosition === 'top';
-    const fillStyle: React.CSSProperties = {
-      ...(indeterminate ? {} : { width: `${String(percentage)}%` }),
-      transitionDuration: duration === false ? '0s' : `${String(duration)}ms`,
-    };
+    const info = progressLevel(value, max, pct, { meter, formatValue, variant });
+    const top = meter;
+    const fillStyle = indeterminate ? undefined : { width: `${String(percentage)}%` };
     const inlineText = label ? `${label}, ${info.text}` : info.text;
-    const { role = 'progressbar', ...rest } = props;
     const bar = (
       <div
         ref={top ? undefined : ref}
-        role={role}
+        role={meter ? 'meter' : 'progressbar'}
         aria-valuenow={indeterminate ? undefined : Math.min(max, Math.max(0, value))}
         aria-valuemin={0}
         aria-valuemax={max}
@@ -123,7 +106,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           size === 'sm' ? 'h-1.5' : 'h-2',
           showValue && !top ? 'min-w-0 flex-1' : !top && className
         )}
-        {...(top ? {} : rest)}
+        {...(top ? {} : props)}
       >
         <div
           className={cn(progressVariants({ variant: info.variant, indeterminate }))}
@@ -139,7 +122,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           className={cn('space-y-1.5', className)}
           data-level={info.level}
           data-slot="progress-meter"
-          {...rest}
+          {...props}
         >
           <ProgressTop
             labelId={labelId}

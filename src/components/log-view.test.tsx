@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { LogView, type LogLine } from './log-view';
 import { indexAt, isAtBottom, offsetsOf, windowOf } from './log-view.model';
@@ -60,20 +61,26 @@ describe('LogView', () => {
 
   it('follows the tail, pauses on scroll up and jumps back with the new-lines button', () => {
     const onFollowChange = vi.fn();
+    const Tail = ({ lines: ls }: { lines: LogLine[] }) => {
+      const [f, setF] = useState(true);
+      const change = (v: boolean) => {
+        setF(v);
+        onFollowChange(v);
+      };
+      return <LogView lines={ls} follow={f} onFollowChange={change} />;
+    };
     let lines = make(100);
-    const { rerender } = render(
-      <LogView lines={lines} defaultFollow onFollowChange={onFollowChange} />
-    );
+    const { rerender } = render(<Tail lines={lines} />);
     const el = grid();
     fakeBox(el, () => lines.length * 24);
     lines = make(110);
-    rerender(<LogView lines={lines} defaultFollow onFollowChange={onFollowChange} />);
+    rerender(<Tail lines={lines} />);
     expect(el.scrollTop).toBe(110 * 24 - 240);
     el.scrollTop = 1000;
     fireEvent.scroll(el);
     expect(onFollowChange).toHaveBeenLastCalledWith(false);
     lines = make(113);
-    rerender(<LogView lines={lines} defaultFollow onFollowChange={onFollowChange} />);
+    rerender(<Tail lines={lines} />);
     expect(el.scrollTop).toBe(1000);
     fireEvent.click(screen.getByRole('button', { name: '3 new lines' }));
     expect(onFollowChange).toHaveBeenLastCalledWith(true);

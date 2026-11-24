@@ -1,5 +1,4 @@
 'use client';
-import { Separator } from '../../src';
 
 export const Example = () => (
   <>
@@ -12,7 +11,7 @@ export const Example = () => (
         <span className="text-xs text-muted-foreground font-mono">font-mono</span>
         <p className="font-mono text-base">The system monospace stack</p>
       </div>
-      <Separator />
+      <div role="none" className="h-px w-full bg-border" />
       <div className="space-y-2">
         {(
           [
@@ -34,7 +33,7 @@ export const Example = () => (
           </div>
         ))}
       </div>
-      <Separator />
+      <div role="none" className="h-px w-full bg-border" />
       <div className="flex gap-6">
         {['font-normal', 'font-medium', 'font-semibold', 'font-bold'].map((w) => (
           <div key={w} className="text-center">

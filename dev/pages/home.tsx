@@ -1,4 +1,5 @@
-import { Badge, Button, Heading, Kbd, StatCard } from '../../src';
+import { Badge, Button, Kbd, StatCard } from '../../src';
+import { Heading } from '../components/heading';
 import { Code } from '../components/code';
 import { Link } from '../lib/router';
 import { ALL_COMPONENTS, CATEGORIES } from '../registry';
@@ -25,12 +26,12 @@ export const HomePage = () => (
     </div>
 
     <div className="grid gap-4 sm:grid-cols-3">
-      <StatCard title="Components" value={ALL_COMPONENTS.length} description="Documented pages" />
-      <StatCard title="Categories" value={CATEGORIES.length} description="Browse by area" />
+      <StatCard title="Components" value={ALL_COMPONENTS.length} hint="Documented pages" />
+      <StatCard title="Categories" value={CATEGORIES.length} hint="Browse by area" />
       <StatCard
         title="Prop tables"
         value={documented}
-        description="Generated from the sources at build time"
+        hint="Generated from the sources at build time"
       />
     </div>
 

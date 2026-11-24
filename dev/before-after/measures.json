@@ -48,7 +48,7 @@
         "fs": "16px"
       }
     },
-    "data-display/stat-card": {
+    "display/stat-card": {
       "stat card": {
         "h": 178,
         "fs": "16px"
@@ -93,7 +93,7 @@
         "fs": "14px"
       }
     },
-    "data-display/empty-state": {
+    "display/empty-state": {
       "empty state": {
         "h": 246,
         "fs": "16px"
@@ -105,63 +105,15 @@
         "fs": "14px"
       }
     },
-    "data-display/code-block": {
+    "display/code-block": {
       "code block": {
         "h": 89.8,
         "fs": "16px"
       }
     },
-    "data-display/progress": {
+    "display/progress": {
       "bar": {
         "h": 8,
-        "fs": "16px"
-      }
-    },
-    "data-display/usage-meter": {
-      "meter": {
-        "h": 34,
-        "fs": "16px"
-      }
-    },
-    "charts/gauge-card": {
-      "card": {
-        "h": 186,
-        "fs": "16px"
-      }
-    },
-    "charts/donut-card": {
-      "card": {
-        "h": 158,
-        "fs": "16px"
-      }
-    },
-    "charts/score-card": {
-      "card": {
-        "h": 157.4,
-        "fs": "16px"
-      }
-    },
-    "charts/funnel-card": {
-      "card": {
-        "h": 246,
-        "fs": "16px"
-      }
-    },
-    "charts/heatmap-card": {
-      "card": {
-        "h": 220,
-        "fs": "16px"
-      }
-    },
-    "charts/multi-stat-card": {
-      "card": {
-        "h": 148,
-        "fs": "16px"
-      }
-    },
-    "charts/ranked-list-card": {
-      "card": {
-        "h": 186,
         "fs": "16px"
       }
     },
@@ -179,7 +131,7 @@
         "fs": "14px"
       }
     },
-    "foundations/label": {
+    "forms/form-field": {
       "label": {
         "h": 14,
         "fs": "14px"
@@ -194,18 +146,6 @@
     "forms/radio-group": {
       "item": {
         "h": 16,
-        "fs": "14px"
-      }
-    },
-    "forms/slider": {
-      "slider": {
-        "h": 20,
-        "fs": "16px"
-      }
-    },
-    "forms/combobox": {
-      "trigger": {
-        "h": 36,
         "fs": "14px"
       }
     },
@@ -239,15 +179,9 @@
         "fs": "12px"
       }
     },
-    "overlays/modal": {
+    "overlays/dialog": {
       "modal": {
         "h": 348,
-        "fs": "16px"
-      }
-    },
-    "overlays/alert-dialog": {
-      "dialog": {
-        "h": 186,
         "fs": "16px"
       }
     },
@@ -257,21 +191,9 @@
         "fs": "16px"
       }
     },
-    "overlays/context-menu": {
-      "item": {
-        "h": 32,
-        "fs": "14px"
-      }
-    },
     "overlays/popover": {
       "popover": {
         "h": 78,
-        "fs": "16px"
-      }
-    },
-    "overlays/hover-card": {
-      "card": {
-        "h": 136,
         "fs": "16px"
       }
     },
@@ -283,22 +205,6 @@
       "item": {
         "h": 36,
         "fs": "14px"
-      }
-    },
-    "feedback/danger-zone": {
-      "zone": {
-        "h": 264,
-        "fs": "16px"
-      },
-      "action": {
-        "h": 77,
-        "fs": "16px"
-      }
-    },
-    "overlays/scroll-area": {
-      "area": {
-        "h": 160,
-        "fs": "16px"
       }
     },
     "overlays/resizable": {
@@ -317,12 +223,6 @@
         "fs": "14px"
       }
     },
-    "foundations/heading": {
-      "heading": {
-        "h": 62.4,
-        "fs": "16px"
-      }
-    },
     "foundations/prose": {
       "prose": {
         "h": 181.8,
@@ -335,65 +235,27 @@
         "fs": "10px"
       }
     },
-    "disclosure/collapsible": {
+    "display/collapsible": {
       "trigger": {
         "h": 36,
         "fs": "14px"
       }
     },
-    "disclosure/accordion": {
+    "display/accordion": {
       "trigger": {
         "h": 52,
         "fs": "14px"
       }
     },
-    "site/markdown": {
-      "markdown": {
-        "h": 251.3,
-        "fs": "14px"
-      }
-    },
-    "site/copy-button": {
+    "foundations/copy-button": {
       "button": {
         "h": 28,
         "fs": "12px"
       }
     },
-    "site/footer": {
-      "footer": {
-        "h": 265,
-        "fs": "16px"
-      },
-      "link": {
-        "h": 19,
-        "fs": "14px"
-      }
-    },
-    "site/top-bar": {
-      "bar": {
-        "h": 56,
-        "fs": "16px"
-      },
-      "nav item": {
-        "h": 32,
-        "fs": "14px"
-      }
-    },
-    "site/doc-sidebar": {
-      "item": {
-        "h": 28,
-        "fs": "14px"
-      }
-    },
     "foundations/skeleton-and-spinner": {
       "spinner": {
         "h": 21.9,
-        "fs": "16px"
-      }
-    },
-    "foundations/separator": {
-      "separator": {
-        "h": 1,
         "fs": "16px"
       }
     }
@@ -447,7 +309,7 @@
         "fs": "16px"
       }
     },
-    "data-display/stat-card": {
+    "display/stat-card": {
       "stat card": {
         "h": 139,
         "fs": "16px"
@@ -495,7 +357,7 @@
         "fs": "13px"
       }
     },
-    "data-display/empty-state": {
+    "display/empty-state": {
       "empty state": {
         "h": 217.5,
         "fs": "16px"
@@ -507,63 +369,15 @@
         "fs": "13px"
       }
     },
-    "data-display/code-block": {
+    "display/code-block": {
       "code block": {
         "h": 74.3,
         "fs": "16px"
       }
     },
-    "data-display/progress": {
+    "display/progress": {
       "bar": {
         "h": 8,
-        "fs": "16px"
-      }
-    },
-    "data-display/usage-meter": {
-      "meter": {
-        "h": 33.5,
-        "fs": "16px"
-      }
-    },
-    "charts/gauge-card": {
-      "card": {
-        "h": 177.5,
-        "fs": "16px"
-      }
-    },
-    "charts/donut-card": {
-      "card": {
-        "h": 151.5,
-        "fs": "16px"
-      }
-    },
-    "charts/score-card": {
-      "card": {
-        "h": 142.5,
-        "fs": "16px"
-      }
-    },
-    "charts/funnel-card": {
-      "card": {
-        "h": 239.5,
-        "fs": "16px"
-      }
-    },
-    "charts/heatmap-card": {
-      "card": {
-        "h": 209.5,
-        "fs": "16px"
-      }
-    },
-    "charts/multi-stat-card": {
-      "card": {
-        "h": 133.5,
-        "fs": "16px"
-      }
-    },
-    "charts/ranked-list-card": {
-      "card": {
-        "h": 179.5,
         "fs": "16px"
       }
     },
@@ -581,7 +395,7 @@
         "fs": "13px"
       }
     },
-    "foundations/label": {
+    "forms/form-field": {
       "label": {
         "h": 13,
         "fs": "13px"
@@ -596,18 +410,6 @@
     "forms/radio-group": {
       "item": {
         "h": 16,
-        "fs": "13px"
-      }
-    },
-    "forms/slider": {
-      "slider": {
-        "h": 20,
-        "fs": "16px"
-      }
-    },
-    "forms/combobox": {
-      "trigger": {
-        "h": 30,
         "fs": "13px"
       }
     },
@@ -641,15 +443,9 @@
         "fs": "12px"
       }
     },
-    "overlays/modal": {
+    "overlays/dialog": {
       "modal": {
         "h": 316,
-        "fs": "16px"
-      }
-    },
-    "overlays/alert-dialog": {
-      "dialog": {
-        "h": 167,
         "fs": "16px"
       }
     },
@@ -659,21 +455,9 @@
         "fs": "16px"
       }
     },
-    "overlays/context-menu": {
-      "item": {
-        "h": 28,
-        "fs": "13px"
-      }
-    },
     "overlays/popover": {
       "popover": {
         "h": 70,
-        "fs": "13px"
-      }
-    },
-    "overlays/hover-card": {
-      "card": {
-        "h": 122,
         "fs": "13px"
       }
     },
@@ -685,22 +469,6 @@
       "item": {
         "h": 32,
         "fs": "13px"
-      }
-    },
-    "feedback/danger-zone": {
-      "zone": {
-        "h": 246,
-        "fs": "16px"
-      },
-      "action": {
-        "h": 68,
-        "fs": "16px"
-      }
-    },
-    "overlays/scroll-area": {
-      "area": {
-        "h": 160,
-        "fs": "16px"
       }
     },
     "overlays/resizable": {
@@ -719,12 +487,6 @@
         "fs": "13px"
       }
     },
-    "foundations/heading": {
-      "heading": {
-        "h": 62.4,
-        "fs": "16px"
-      }
-    },
     "foundations/prose": {
       "prose": {
         "h": 181.9,
@@ -737,65 +499,27 @@
         "fs": "10px"
       }
     },
-    "disclosure/collapsible": {
+    "display/collapsible": {
       "trigger": {
         "h": 28,
         "fs": "13px"
       }
     },
-    "disclosure/accordion": {
+    "display/accordion": {
       "trigger": {
         "h": 40,
         "fs": "13px"
       }
     },
-    "site/markdown": {
-      "markdown": {
-        "h": 419.5,
-        "fs": "14px"
-      }
-    },
-    "site/copy-button": {
+    "foundations/copy-button": {
       "button": {
         "h": 28,
         "fs": "13px"
       }
     },
-    "site/footer": {
-      "footer": {
-        "h": 265,
-        "fs": "16px"
-      },
-      "link": {
-        "h": 19,
-        "fs": "14px"
-      }
-    },
-    "site/top-bar": {
-      "bar": {
-        "h": 56,
-        "fs": "16px"
-      },
-      "nav item": {
-        "h": 32,
-        "fs": "14px"
-      }
-    },
-    "site/doc-sidebar": {
-      "item": {
-        "h": 28,
-        "fs": "14px"
-      }
-    },
     "foundations/skeleton-and-spinner": {
       "spinner": {
         "h": 21.1,
-        "fs": "16px"
-      }
-    },
-    "foundations/separator": {
-      "separator": {
-        "h": 1,
         "fs": "16px"
       }
     }

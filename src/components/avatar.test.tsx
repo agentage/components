@@ -30,14 +30,12 @@ describe('Avatar', () => {
 });
 
 describe('avatarVariants', () => {
-  it('renders 22 and 28 px at xs and sm, and keeps the larger scale', () => {
+  it('renders the size scale', () => {
     const sizes = {
       xs: 'size-[22px]',
       sm: 'size-7',
       md: 'size-10',
       lg: 'size-12',
-      xl: 'size-16',
-      '2xl': 'size-20',
     } as const;
     for (const [size, cls] of Object.entries(sizes)) {
       const { container, unmount } = render(<Avatar size={size as keyof typeof sizes} name="A" />);
@@ -52,6 +50,13 @@ describe('avatarVariants', () => {
     expect(cls).toContain('size-7');
     expect(cls).toContain('font-semibold');
     expect(cls.endsWith('ring-2')).toBe(true);
+  });
+
+  it('tints a square icon tile with a meaning tone', () => {
+    const { container } = render(<Avatar shape="square" icon={<svg />} tone="success" />);
+    const cls = container.querySelector('[data-slot="avatar"]')?.className ?? '';
+    expect(cls).toContain('bg-success/10');
+    expect(cls).toContain('text-success');
   });
 
   it('paints the accent disc with tone primary', () => {

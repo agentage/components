@@ -1,14 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  DocSidebar,
-  DocSidebarItem,
-} from '../../src';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../src';
+import { DocSidebar, DocSidebarItem } from './doc-sidebar';
 import { useRoute } from '../lib/router';
-import { CATEGORIES, CORE_COMPONENTS, FOLDED, componentPath } from '../registry';
+import { CATEGORIES, CORE_COMPONENTS, componentPath } from '../registry';
 
 const STORAGE_KEY = 'ds-docs-open-groups';
 const CORE = 'core';
@@ -132,9 +127,7 @@ export const DocsNav = () => {
               onOpenChange={() => {
                 toggle(category.slug);
               }}
-              className={
-                category.slug === FOLDED[0] ? 'mb-1 mt-3 border-t border-border pt-3' : 'mb-1'
-              }
+              className="mb-1"
             >
               <CollapsibleTrigger chevron={false} className={TRIGGER}>
                 <Chevron open={isOpen} />

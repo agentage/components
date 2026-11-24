@@ -3,8 +3,8 @@ import { useState } from 'react';
 import {
   Button,
   DataView,
-  InspectorPanel,
   PageHeader,
+  Sheet,
   Tabs,
   TabsContent,
   TabsList,
@@ -84,29 +84,27 @@ export const Example = () => {
                   rows={INSTALLED}
                   columns={columns}
                   getRowId={(e) => e.key}
-                  rowLabel={(e) => `${e.name} on ${e.host === 'local' ? 'this machine' : 'cloud'}`}
-                  searchKeys={['name']}
-                  searchPlaceholder="Search packages"
-                  defaultGroupBy="host"
-                  rowLines={2}
-                  selection={admin ? 'multi' : 'single'}
-                  selectedIds={admin ? picked : current}
-                  onSelectionChange={admin ? setPicked : setCurrent}
-                  bulkActions={(rows) => (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        announce(`Turned off ${String(rows.length)} packages`);
-                        setPicked([]);
-                      }}
-                    >
-                      Turn off
-                    </Button>
-                  )}
-                  onRowOpen={show}
-                  rowMenu={packageMenu}
-                  rowMenuLabel={(e) => `Actions for ${e.name}`}
+                  defaultState={{ groupBy: 'host' }}
+                  state={{ selection: admin ? picked : current }}
+                  onStateChange={(s) => (admin ? setPicked : setCurrent)(s.selection)}
+                  actions={{
+                    open: show,
+                    menu: packageMenu,
+                    bulk: admin
+                      ? (rows) => (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              announce(`Turned off ${String(rows.length)} packages`);
+                              setPicked([]);
+                            }}
+                          >
+                            Turn off
+                          </Button>
+                        )
+                      : undefined,
+                  }}
                 />
               </TabsContent>
               <TabsContent value="catalog" className="mt-0 p-4 text-ui text-muted-foreground">
@@ -118,7 +116,8 @@ export const Example = () => {
             </Tabs>
           )}
         </div>
-        <InspectorPanel
+        <Sheet
+          mode="docked"
           open={open}
           onOpenChange={setOpen}
           title={item.name}
@@ -126,7 +125,7 @@ export const Example = () => {
           storageKey="ds-docs-catalog-inspector"
         >
           <PackageDetail e={item} />
-        </InspectorPanel>
+        </Sheet>
       </div>
     </Block>
   );

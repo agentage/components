@@ -2,9 +2,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Combobox } from '../components/combobox';
+import { Select } from '../components/select';
 import { DateRangePicker } from '../components/date-picker.range';
-import { InspectorPanel } from '../components/inspector-panel';
+import { Sheet } from '../components/sheet';
 import { Popover } from '../components/popover';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -59,15 +59,15 @@ const Inspector = ({ extra }: { extra?: React.ReactNode }) => {
       <button type="button" onClick={() => setOpen(true)}>
         Inspect
       </button>
-      <InspectorPanel open={open} onOpenChange={setOpen} title="Details">
+      <Sheet mode="docked" open={open} onOpenChange={setOpen} title="Details">
         <InPopover children={<DateRangePicker />} />
         {extra}
-      </InspectorPanel>
+      </Sheet>
     </>
   );
 };
 
-describe.each([false, true])('overlay stack: InspectorPanel (narrow %s) > Popover > range', (n) => {
+describe.each([false, true])('overlay stack: docked Sheet (narrow %s) > Popover > range', (n) => {
   it('Escape closes the range, the popover, then (as a dialog) the panel', async () => {
     narrow(n);
     const user = setup();
@@ -112,10 +112,10 @@ describe.each([false, true])('overlay stack: InspectorPanel (narrow %s) > Popove
     expectClean();
   });
 
-  it('Escape in an inline Combobox closes only the combobox', async () => {
+  it('Escape in an inline Select closes only the combobox', async () => {
     narrow(n);
     const user = setup();
-    render(<Inspector extra={<Combobox options={fruits} aria-label="Fruit" />} />);
+    render(<Inspector extra={<Select options={fruits} aria-label="Fruit" />} />);
     await user.click(btn('Inspect'));
     await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
     await user.keyboard('{Escape}');

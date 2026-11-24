@@ -10,7 +10,7 @@ import { DataTableHeadCell } from './data-table.parts';
 import { SELECT_COLUMN_WIDTH, SelectBox, useSelection } from './data-table.selection';
 import { sortRows, tableRows, useControlled } from './data-table.state';
 import type { DataTableProps } from './data-table.types';
-import { TableBody, TableCaption, TableCell, TableHeader, TableRow } from './table';
+import { TableBody, TableCell, TableHeader, TableRow } from './table';
 
 export type { SortDirection, SortState } from '../lib/table-sort';
 export type {
@@ -41,9 +41,10 @@ const useHeadOffset = (
  * roving focus. Non-goal: virtualization; paginate large sets instead.
  */
 export const DataTable = <T,>(props: DataTableProps<T>): React.JSX.Element => {
-  const { columns, density = 'dense', sticky = true, showHeader = true } = props;
+  const { columns, sticky = true, showHeader = true } = props;
+  const density = 'dense';
   const data = tableRows(props);
-  const { groupBy, caption, className, ref, selection } = props;
+  const { groupBy, className, ref, selection } = props;
   const [active, setSort] = useControlled(
     props.sort,
     props.defaultSort ?? null,
@@ -51,7 +52,7 @@ export const DataTable = <T,>(props: DataTableProps<T>): React.JSX.Element => {
   );
   const [collapsed, setCollapsed] = useControlled(
     props.collapsedGroups,
-    props.defaultCollapsedGroups ?? [],
+    [],
     props.onCollapsedGroupsChange
   );
   const keyless = selection !== undefined && !props.rowKey;
@@ -104,16 +105,10 @@ export const DataTable = <T,>(props: DataTableProps<T>): React.JSX.Element => {
       {css && <style>{css}</style>}
       <table
         ref={ref}
-        className={cn(
-          'group/table w-full caption-bottom text-ui data-[look=comfortable]:text-sm',
-          className
-        )}
+        className={cn('group/table w-full text-ui', className)}
         data-slot="data-table"
-        data-density={density}
-        data-look={density === 'default' || density === 'comfortable' ? 'comfortable' : 'dense'}
         data-selection={selection}
       >
-        {caption && <TableCaption>{caption}</TableCaption>}
         {showHeader && (
           <TableHeader ref={headRef}>
             <TableRow className="hover:bg-transparent">
@@ -144,11 +139,7 @@ export const DataTable = <T,>(props: DataTableProps<T>): React.JSX.Element => {
                 </DataTableHeadCell>
               ))}
               {hasActions && (
-                <DataTableHeadCell
-                  density={density}
-                  sticky={sticky}
-                  width={density === 'dense' ? '2.8125rem' : '2.5rem'}
-                />
+                <DataTableHeadCell density={density} sticky={sticky} width="2.8125rem" />
               )}
             </TableRow>
           </TableHeader>
@@ -164,7 +155,6 @@ export const DataTable = <T,>(props: DataTableProps<T>): React.JSX.Element => {
             <DataTableRows
               columns={columns}
               rowKey={keyOf}
-              rowHref={props.rowHref}
               onRowClick={props.onRowClick}
               isRowSelected={props.isRowSelected}
               rowActions={props.rowActions}
@@ -181,7 +171,6 @@ export const DataTable = <T,>(props: DataTableProps<T>): React.JSX.Element => {
               columnCount={columnCount}
               groupIcon={props.groupIcon}
               onAddToGroup={props.onAddToGroup}
-              addToGroupLabel={props.addToGroupLabel}
             />
           )}
         </TableBody>

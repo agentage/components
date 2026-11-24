@@ -20,26 +20,14 @@ export interface FilterMenuProps {
   value: Record<string, string[]>;
   onToggle: (group: string, value: string) => void;
   onClear: () => void;
-  label?: string;
-  clearLabel?: string;
   className?: string;
 }
 
 /** Filter button with the active count; a menu of groups with multi-select items and Clear all. */
 /** The ref and `className` land on the trigger button. */
 export const FilterMenu = React.forwardRef<HTMLButtonElement, FilterMenuProps>(
-  (
-    {
-      groups,
-      value,
-      onToggle,
-      onClear,
-      label = 'Filter',
-      clearLabel = 'Clear all filters',
-      className,
-    },
-    ref
-  ) => {
+  ({ groups, value, onToggle, onClear, className }, ref) => {
+    const label = 'Filter';
     const count = activeFilterCount(value);
     return (
       <DropdownMenu
@@ -83,7 +71,7 @@ export const FilterMenu = React.forwardRef<HTMLButtonElement, FilterMenuProps>(
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onClear} disabled={count === 0}>
-          {clearLabel}
+          Clear all filters
         </DropdownMenuItem>
       </DropdownMenu>
     );

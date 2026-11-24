@@ -149,51 +149,20 @@ describe('TreeSelect picking', () => {
   });
 });
 
-describe('TreeSelect open state, ref and expansion', () => {
-  it('supports defaultOpen and reports open changes', () => {
-    const onOpenChange = vi.fn();
+describe('TreeSelect open, ref and expansion', () => {
+  it('opens from the trigger and closes on Escape', () => {
     render(
       <TreeSelect
         nodes={NODES}
         title="Pick"
-        defaultOpen
-        onOpenChange={onOpenChange}
-        onValueChange={vi.fn()}
-        trigger={<button>Add folder</button>}
-      />
-    );
-    expect(screen.getByRole('dialog', { name: 'Pick' })).toBeTruthy();
-    fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Escape' });
-    expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(screen.queryByRole('dialog')).toBeNull();
-  });
-
-  it('is fully controlled with open', () => {
-    const onOpenChange = vi.fn();
-    const { rerender } = render(
-      <TreeSelect
-        nodes={NODES}
-        title="Pick"
-        open={false}
-        onOpenChange={onOpenChange}
         onValueChange={vi.fn()}
         trigger={<button>Add folder</button>}
       />
     );
     open();
-    expect(onOpenChange).toHaveBeenCalledWith(true);
-    expect(screen.queryByRole('dialog')).toBeNull();
-    rerender(
-      <TreeSelect
-        nodes={NODES}
-        title="Pick"
-        open
-        onOpenChange={onOpenChange}
-        onValueChange={vi.fn()}
-        trigger={<button>Add folder</button>}
-      />
-    );
     expect(screen.getByRole('dialog', { name: 'Pick' })).toBeTruthy();
+    fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('forwards the ref to the trigger, also while closed', () => {

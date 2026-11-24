@@ -1,11 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 import { Command, CommandItem } from '../components/command';
-import { ContextMenu, ContextMenuItem } from '../components/context-menu';
 import { DropdownMenu, DropdownMenuItem } from '../components/dropdown-menu';
-import { Modal } from '../components/modal';
+import { Dialog } from '../components/dialog';
 import { Tooltip } from '../components/tooltip';
 
 const btn = (name: string) => screen.getByRole('button', { name });
@@ -66,74 +65,6 @@ describe('overlay stack: Tooltip inside a DropdownMenu item', () => {
     expectClean();
   });
 });
-
-const TableInModal = () => {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <button type="button" onClick={() => setOpen(true)}>
-        Open modal
-      </button>
-      <Modal open={open} onOpenChange={setOpen} title="Items">
-        <table>
-          <tbody>
-            <ContextMenu
-              trigger={
-                <tr tabIndex={0} aria-label="Row one">
-                  <td>One</td>
-                </tr>
-              }
-            >
-              <ContextMenuItem>Open</ContextMenuItem>
-            </ContextMenu>
-          </tbody>
-        </table>
-      </Modal>
-    </>
-  );
-};
-
-describe('overlay stack: ContextMenu on a table row inside a Modal', () => {
-  const openMenu = async (user: ReturnType<typeof userEvent.setup>) => {
-    await user.click(btn('Open modal'));
-    const row = screen.getByRole('row', { name: 'Row one' });
-    row.focus();
-    fireEvent.contextMenu(row, { clientX: 10, clientY: 10 });
-    expect(focused()).toBe(screen.getByRole('menuitem', { name: 'Open' }));
-    return row;
-  };
-
-  it('Escape closes the menu to the row, then the modal to its opener', async () => {
-    const user = userEvent.setup();
-    render(<TableInModal />);
-    const row = await openMenu(user);
-    await user.keyboard('{Escape}');
-    expect(screen.queryByRole('menu')).toBeNull();
-    expect(focused()).toBe(row);
-    expect(screen.getByRole('dialog', { name: 'Items' })).toBeTruthy();
-    await user.keyboard('{Escape}');
-    expect(focused()).toBe(btn('Open modal'));
-    expectClean();
-  });
-
-  it('a press inside the modal closes only the menu; the backdrop then closes the modal', async () => {
-    const user = userEvent.setup();
-    render(<TableInModal />);
-    await openMenu(user);
-    await user.click(screen.getByRole('heading', { name: 'Items' }));
-    expect(screen.queryByRole('menu')).toBeNull();
-    expect(screen.getByRole('dialog', { name: 'Items' }).contains(focused())).toBe(true);
-    fireEvent.contextMenu(screen.getByRole('row', { name: 'Row one' }));
-    const backdrop = document.querySelector<HTMLElement>('[data-slot="dialog-backdrop"]')!;
-    await user.click(backdrop);
-    expect(screen.queryByRole('menu')).toBeNull();
-    expect(screen.getByRole('dialog', { name: 'Items' })).toBeTruthy();
-    await user.click(backdrop);
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    expectClean();
-  });
-});
-
 const ModalAndCommand = ({ closeModal = false }: { closeModal?: boolean }) => {
   const [m, setM] = useState(false);
   const [c, setC] = useState(false);
@@ -142,11 +73,11 @@ const ModalAndCommand = ({ closeModal = false }: { closeModal?: boolean }) => {
       <button type="button" onClick={() => setM(true)}>
         Open modal
       </button>
-      <Modal open={m && !closeModal} onOpenChange={setM} title="Settings">
+      <Dialog open={m && !closeModal} onOpenChange={setM} title="Settings">
         <button type="button" onClick={() => setC(true)}>
           Search
         </button>
-      </Modal>
+      </Dialog>
       <Command open={c} onOpenChange={setC}>
         <CommandItem onSelect={() => setC(false)}>Go home</CommandItem>
       </Command>
@@ -154,7 +85,7 @@ const ModalAndCommand = ({ closeModal = false }: { closeModal?: boolean }) => {
   );
 };
 
-describe('overlay stack: Command over an open Modal', () => {
+describe('overlay stack: Command over an open Dialog', () => {
   it('Escape and its backdrop close the palette first, then the modal', async () => {
     const user = userEvent.setup();
     render(<ModalAndCommand />);

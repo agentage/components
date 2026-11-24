@@ -1,33 +1,10 @@
 'use client';
 import { useState } from 'react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  DisclosureChevron,
-  useCollapsible,
-} from '../../src';
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../src';
 import { Block } from '../components/demo';
 
 const FAILED = ['Nightly backup', 'Weekly digest', 'Release notes'];
 const FRAME = 'max-w-md overflow-hidden rounded-lg border border-border p-1';
-
-const CustomTrigger = () => {
-  const { open, toggle, triggerId, contentId } = useCollapsible();
-  return (
-    <button
-      type="button"
-      id={triggerId}
-      aria-expanded={open}
-      aria-controls={contentId}
-      onClick={toggle}
-      className="focus-ring flex h-9 w-full items-center justify-between rounded-md px-2 text-ui font-semibold hover:bg-accent"
-    >
-      <span>Advanced options</span>
-      <DisclosureChevron open={open} />
-    </button>
-  );
-};
 
 export const Example = () => (
   <Block caption="A 28 px trigger with a turning chevron over a body that animates its height. The body is inert while shut, and instant under reduced motion.">
@@ -73,9 +50,13 @@ export const States = () => {
 };
 
 export const Composition = () => (
-  <Block caption="The collapsible hook gives a custom trigger the open state, toggle and aria ids.">
+  <Block caption="With asChild any control becomes the trigger and gets the open state and aria ids.">
     <Collapsible className={FRAME}>
-      <CustomTrigger />
+      <CollapsibleTrigger asChild>
+        <Button variant="outline" size="sm">
+          Advanced options
+        </Button>
+      </CollapsibleTrigger>
       <CollapsibleContent className="px-2 pb-2">
         <p className="text-ui text-muted-foreground">Any control can drive the same body.</p>
       </CollapsibleContent>

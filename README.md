@@ -1,10 +1,10 @@
 # @agentage/components
 
-![Agentage Components - OKLCH tokens + 60+ React components, ready to install](https://github.com/agentage/components/raw/master/docs/banner.svg)
+![Agentage Components - OKLCH tokens + React components, ready to install](https://github.com/agentage/components/raw/master/docs/banner.svg)
 
-OKLCH design tokens and 60+ accessible React 19 components in one package. Install it, import
-the theme, and you have a coherent dark/light UI kit - buttons through data tables, stat cards,
-command palettes and docs layouts.
+OKLCH design tokens and about 60 accessible React 19 components in one package. Install it, import
+the theme, and you have a coherent dark/light UI kit - buttons through data views, stat cards,
+dialogs and command palettes.
 
 Browse every component live at **[ds.agentage.io](https://ds.agentage.io)**.
 
@@ -19,9 +19,22 @@ Browse every component live at **[ds.agentage.io](https://ds.agentage.io)**.
    (`node_modules/@agentage/components/dist/**/*.js`). Subpaths keep their names.
 3. Expect the denser look: 28 px buttons, 30 px fields, 36 px rows, flat 12/14 px cards. The
    "Catalog review" page in the showcase lists every visual change.
-4. Every 0.20.2 export and prop still works. Deprecated names (`density`, `variant="flat"`,
-   Button `lg`, MiniBars `color` and others) are marked `@deprecated` in the types; replace them
-   when your editor flags them.
+4. The new package is smaller than 0.20.2: there are no deprecated names and no aliases. Replace
+   removed components as below; the "Catalog review" page lists every removed and renamed export.
+
+| 0.20.2                                                                                    | Use now                                                                                                                         |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `Modal`, `AlertDialog`, `ConfirmByTyping`, `DangerZone`                                   | `Dialog` (`onConfirm`, `tone="destructive"`, `confirmText`), in a `Card`                                                        |
+| `InspectorPanel`                                                                          | `<Sheet mode="docked">`                                                                                                         |
+| `Combobox`, the Radix `Select` parts                                                      | `Select` with `options` (`searchable` for the search box)                                                                       |
+| `DataTable`, `EntityCard`                                                                 | `DataView` (or `Table` parts); the Item card composition on the Card page                                                       |
+| `EntityList`                                                                              | `List`                                                                                                                          |
+| `StatCard` `period`, `comparison`, `chart`, `facts` and co.                               | `hint`, `trend`, and children: `Sparkline`, `DescriptionList variant="inline"`, `Progress`, `StatusBar`; `CardMeta` in `footer` |
+| `IconContainer`                                                                           | `<Avatar shape="square" icon tone>`                                                                                             |
+| Chart cards (Gauge, Donut, Score, Funnel, Heatmap and co.)                                | `StatCard` with `Sparkline` or `MiniBars`                                                                                       |
+| `FilterBar`, `NavLink`, `PageLayout`, `StatusDot`, `UsageMeter`                           | `ListToolbar`, `NavRow`, `PageHeader`, `StatusGlyph`, `Progress meter`                                                          |
+| `HoverCard`, `ContextMenu`, `Slider`, `QuotaBanner`, `ScrollArea`, `Separator`, `Heading` | `Popover`, `DropdownMenu`, `Input type="number"`, `Alert` with `Progress`, native overflow, a 1 px div, plain headings          |
+| `Footer`, `TopBar`, `DocSidebar`, `MarkdownRenderer`, the `./charts` and `./site` entries | removed (docs-site chrome); `CopyButton` stays                                                                                  |
 
 ## What is this?
 
@@ -77,7 +90,7 @@ export const Panel = () => (
     <CardHeader>
       <CardTitle>Storage</CardTitle>
     </CardHeader>
-    <StatCard title="Stored" value="12,480" progress={64} />
+    <StatCard title="Stored" value="12,480" hint="64% of the plan" />
     <Button>Open</Button>
   </Card>
 );
@@ -87,27 +100,24 @@ Full walkthrough: [ds.agentage.io/install](https://ds.agentage.io/install).
 
 ## What's in it
 
-100 documented component pages across eleven categories, each with props generated from the source.
-33 of them form the **Core** set: the pieces an app needs first (Button, Card, Table, DataTable, Tabs,
-Input, Modal, Toast and more). The Core pages sit at the top of the docs sidebar.
+59 documented component pages in seven categories plus 11 patterns, each with props generated from
+the source. The **Core** set (Button, Card, Input, Select, List, DataView, Dialog, Toast and more)
+sits at the top of the docs sidebar.
 
-| Category                                                            | What's there                                                                                                                                                      |
-| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Foundations](https://ds.agentage.io/components/foundations) (14)   | Button, IconButton, Badge, Chip, Avatar, Kbd, Separator, Skeleton and Spinner, status and priority glyphs, Heading, Prose, Label, accessibility hooks             |
-| [Forms](https://ds.agentage.io/components/forms) (13)               | Input and Textarea, SecretInput, Select, Combobox, TreeSelect, DatePicker, Checkbox and Switch, RadioGroup, Slider, ToggleGroup, FormField, Section, InlineEdit   |
-| [Navigation](https://ds.agentage.io/components/navigation) (7)      | NavRow and NavTree, Sidebar, Tabs, Breadcrumb, Pagination, SectionIndex, PageHeader                                                                               |
-| [Lists and tables](https://ds.agentage.io/components/lists) (6)     | List, Table, DataTable, DataView, ListToolbar, GroupHeader                                                                                                        |
-| [Data display](https://ds.agentage.io/components/data-display) (12) | Card, EntityCard, StatCard, DescriptionList, Progress, StatusBar, RelativeTime, LogView, DataTree, CodeBlock, ContentBlocks, EmptyState                           |
-| [Disclosure](https://ds.agentage.io/components/disclosure) (4)      | Collapsible, Accordion, StepList, CheckList                                                                                                                       |
-| [Overlays](https://ds.agentage.io/components/overlays) (13)         | Modal, Sheet, AlertDialog, InspectorPanel, Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Command palette, Resizable panels, ScrollArea, overlay portals |
-| [Feedback](https://ds.agentage.io/components/feedback) (7)          | Alert, Toast, DirtyBar, ActionBar, DangerZone, ConfirmByTyping, QuotaBanner                                                                                       |
-| [Patterns](https://ds.agentage.io/components/patterns) (11)         | List page, card grid, catalog with views, board, master and detail, detail view, history, settings form, logs explorer, file browser, monitoring                  |
-| [Charts](https://ds.agentage.io/components/charts) (8)              | Gauge, donut, score, funnel, heatmap, multi-stat and ranked-list cards, sparkline and stat parts                                                                  |
-| [Site](https://ds.agentage.io/components/site) (5)                  | Footer, TopBar, DocSidebar, MarkdownRenderer, CopyButton                                                                                                          |
+| Category                                                          | What's there                                                                                                                                                        |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Foundations](https://ds.agentage.io/components/foundations) (11) | Button, IconButton, Badge, Chip, Avatar, Kbd, Skeleton and Spinner, StatusGlyph and PriorityGlyph, Prose, CopyButton, hooks                                         |
+| [Forms](https://ds.agentage.io/components/forms) (11)             | Input and Textarea, SecretInput, Select, TreeSelect, DatePicker, Checkbox and Switch, RadioGroup, ToggleGroup, FormField and Label, Section, InlineEdit             |
+| [Navigation](https://ds.agentage.io/components/navigation) (7)    | NavRow and NavTree, Sidebar, Tabs, Breadcrumb, Pagination, SectionIndex, PageHeader                                                                                 |
+| [Lists and data](https://ds.agentage.io/components/lists) (6)     | List (with GroupHeader), Table, DataView, ListToolbar, LogView, DataTree                                                                                            |
+| [Display](https://ds.agentage.io/components/display) (13)         | Card, StatCard, Sparkline, DescriptionList, Progress, StatusBar, RelativeTime, CodeBlock, ContentBlocks, EmptyState, Collapsible, Accordion, StepList and CheckList |
+| [Overlays](https://ds.agentage.io/components/overlays) (7)        | Dialog, Sheet, Popover, Tooltip, DropdownMenu, Command palette, Resizable panels                                                                                    |
+| [Feedback](https://ds.agentage.io/components/feedback) (4)        | Alert, Toast, DirtyBar, ActionBar                                                                                                                                   |
+| [Patterns](https://ds.agentage.io/components/patterns) (11)       | List page, card grid, catalog with views, board, master and detail, detail view, history, settings form, logs explorer, file browser, monitoring                    |
 
-Beside the pages, composable parts (`CardHeader`, `TableRow`, `CommandItem` and friends) and
-focus-trap, scroll-lock and anchor-positioning hooks are exported too. Every module has a
-per-component subpath in the [exports map](./package.json).
+Beside the pages, composable parts (`CardHeader`, `TableRow`, `CommandItem` and friends) are
+exported too. Only the modules the barrel re-exports have a subpath in the
+[exports map](./package.json); parts files and helpers stay internal.
 
 ## Server components
 
@@ -117,7 +127,7 @@ Component - only the components you actually use that need the client runtime cr
 
 ```tsx
 import { Card } from '@agentage/components/card'; // server-safe
-import { Modal } from '@agentage/components/modal'; // 'use client', already declared
+import { Dialog } from '@agentage/components/dialog'; // 'use client', already declared
 ```
 
 No server-safe module transitively imports a client module, so importing `Card` never drags a

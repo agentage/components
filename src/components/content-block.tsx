@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useControlled } from '../lib/use-controlled';
 import { cn } from '../lib/utils';
 import { CopyButton } from './copy-button';
 import { Disclosure } from './disclosure';
@@ -21,15 +20,8 @@ export interface ContentBlockProps extends Omit<React.HTMLAttributes<HTMLElement
   source?: ContentBlockSource;
   /** Text the header copy button puts on the clipboard. */
   copyText?: string;
-  /** The header toggles the body; default true. */
-  collapsible?: boolean;
-  /** Controlled open state of a collapsible block. */
-  open?: boolean;
-  /** Uncontrolled start state; default true. */
+  /** The header toggles the body; open by default. */
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  /** Mono title, for file paths. */
-  mono?: boolean;
 }
 
 const LinkIcon = () => (
@@ -52,26 +44,11 @@ const ICON_BUTTON =
 /** Card frame of one content block: a 32 px header (toggle, icon, title, summary, link, copy). */
 export const ContentBlock = React.forwardRef<HTMLElement, ContentBlockProps>(
   (
-    {
-      title,
-      icon,
-      summary,
-      source,
-      copyText,
-      collapsible = true,
-      open: openProp,
-      defaultOpen = true,
-      onOpenChange,
-      mono = false,
-      className,
-      children,
-      ...props
-    },
+    { title, icon, summary, source, copyText, defaultOpen = true, className, children, ...props },
     ref
   ) => {
-    const [open, setOpen] = useControlled(openProp, defaultOpen, onOpenChange);
+    const [shown, setOpen] = React.useState(defaultOpen);
     const uid = React.useId();
-    const shown = !collapsible || open;
     const actions = (source || copyText !== undefined) && (
       <>
         {source && (
@@ -92,19 +69,18 @@ export const ContentBlock = React.forwardRef<HTMLElement, ContentBlockProps>(
     return (
       <section
         ref={ref}
-        aria-labelledby={`${uid}-title`}
+        aria-labelledby={`${uid}-body-toggle`}
         className={cn('min-w-0 overflow-hidden rounded-lg border border-border bg-card', className)}
         data-slot="content-block"
         data-state={shown ? 'open' : 'closed'}
         {...props}
       >
         <GroupHeader
-          triggerId={`${uid}-title`}
-          label={<span className={cn(mono && 'font-mono text-xs font-normal')}>{title}</span>}
+          label={title}
           icon={icon}
           summary={summary}
           open={shown}
-          onOpenChange={collapsible ? setOpen : undefined}
+          onOpenChange={setOpen}
           controls={`${uid}-body`}
           actions={actions}
           className={cn('pr-1', !shown && 'border-b-0')}

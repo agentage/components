@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-/** Data of one row; the same fields drive `ListRow` and the rows `EntityList` renders from `items`. */
+/** Data of one row `List` renders from `items`. */
 export interface ListItem {
   id: string;
   title: React.ReactNode;
@@ -56,14 +56,7 @@ export const Meta = ({ meta, alert }: Pick<ListItem, 'meta' | 'alert'>) =>
   ) : null;
 
 /** 54 px stacked body: dot, kind glyph, title and meta over the description. */
-export const StackedRowBody = ({
-  item,
-  end,
-}: {
-  item: Omit<ListItem, 'id'>;
-  /** Replaces the meta, for example meta with row actions. */
-  end?: React.ReactNode;
-}) => (
+export const StackedRowBody = ({ item }: { item: Omit<ListItem, 'id'> }) => (
   <>
     <span className="flex min-w-0 items-center gap-2">
       <span
@@ -81,7 +74,7 @@ export const StackedRowBody = ({
       >
         {item.title}
       </span>
-      {end ?? <Meta meta={item.meta} alert={item.alert} />}
+      <Meta meta={item.meta} alert={item.alert} />
     </span>
     {item.description !== undefined && (
       <span className="block truncate pl-11 text-xs text-muted-foreground">{item.description}</span>

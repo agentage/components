@@ -5,6 +5,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
+  CardMeta,
   CardTitle,
   DatePicker,
   IconButton,
@@ -76,9 +77,11 @@ export const Example = () => {
               key={p.id}
               state={p.state}
               minHeight={188}
-              error={{ message: 'This card could not be loaded.', reference: `req-${p.id}-7c1d` }}
-              onRetry={() => retry(p.id)}
-              empty="No data in this period."
+              fallback={{
+                error: { message: 'This card could not be loaded.', reference: `req-${p.id}-7c1d` },
+                onRetry: () => retry(p.id),
+                empty: 'No data in this period.',
+              }}
             >
               <CardHeader>
                 <CardTitle>{p.title}</CardTitle>
@@ -92,7 +95,9 @@ export const Example = () => {
                   cells={checkCells(24)}
                 />
               </CardContent>
-              <CardFooter source="Region: EU West" updatedAt={ago(p.state === 'stale' ? 180 : 2)} />
+              <CardFooter>
+                <CardMeta source="Region: EU West" updatedAt={ago(p.state === 'stale' ? 180 : 2)} />
+              </CardFooter>
             </Card>
           ))}
         </div>

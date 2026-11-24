@@ -13,20 +13,9 @@ import { ResizableSplitPrepaint, resizableSplitPrepaint } from './resizable-spli
 const KEY = 'ag.split.demo.nav';
 const VAR = resizableSplitVar(KEY);
 
-const renderSplit = (
-  onWidthChange?: (px: number) => void,
-  extra: Partial<ResizableSplitProps> = {}
-) =>
+const renderSplit = (extra: Partial<ResizableSplitProps> = {}) =>
   render(
-    <ResizableSplit
-      storageKey={KEY}
-      init={240}
-      min={160}
-      max={480}
-      onWidthChange={onWidthChange}
-      data-testid="split"
-      {...extra}
-    >
+    <ResizableSplit storageKey={KEY} init={240} min={160} max={480} data-testid="split" {...extra}>
       <p>nav</p>
       <p>main</p>
     </ResizableSplit>
@@ -93,8 +82,7 @@ describe('ResizableSplit', () => {
   });
 
   it('resizes with arrow keys, Shift, Home and End within the bounds', () => {
-    const onWidthChange = vi.fn();
-    renderSplit(onWidthChange);
+    renderSplit();
     fireEvent.keyDown(handle(), { key: 'ArrowRight' });
     expect(handle().getAttribute('aria-valuenow')).toBe('256');
     fireEvent.keyDown(handle(), { key: 'ArrowLeft', shiftKey: true });
@@ -105,7 +93,6 @@ describe('ResizableSplit', () => {
     expect(handle().getAttribute('aria-valuenow')).toBe('160');
     fireEvent.keyDown(handle(), { key: 'End' });
     expect(handle().getAttribute('aria-valuenow')).toBe('480');
-    expect(onWidthChange).toHaveBeenLastCalledWith(480);
     expect(window.localStorage.getItem(KEY)).toBe('480');
     expect(root().style.getPropertyValue(VAR)).toBe('480px');
   });
@@ -242,7 +229,7 @@ describe('storage key and prepaint script', () => {
 });
 
 describe('ResizableSplit vertical', () => {
-  const renderVertical = () => renderSplit(undefined, { orientation: 'vertical' });
+  const renderVertical = () => renderSplit({ orientation: 'vertical' });
 
   it('sizes the bottom pane in rows and exposes a horizontal separator', () => {
     renderVertical();
@@ -281,7 +268,7 @@ describe('ResizableSplit collapsible', () => {
       </button>
     );
   };
-  const renderCollapsible = (onCollapsedChange?: (c: boolean) => void) =>
+  const renderCollapsible = () =>
     render(
       <ResizableSplit
         storageKey={KEY}
@@ -289,7 +276,6 @@ describe('ResizableSplit collapsible', () => {
         min={160}
         max={480}
         collapsible
-        onCollapsedChange={onCollapsedChange}
         data-testid="split"
       >
         <Toggle />
@@ -299,8 +285,7 @@ describe('ResizableSplit collapsible', () => {
   const CVAR = resizableSplitCollapsedVar(KEY);
 
   it('toggles through the hook, persists, and remembers the last width', () => {
-    const onCollapsedChange = vi.fn();
-    renderCollapsible(onCollapsedChange);
+    renderCollapsible();
     fireEvent.keyDown(handle(), { key: 'ArrowRight' });
     const button = screen.getByRole('button', { name: 'nav toggle', hidden: true });
     fireEvent.click(button);
@@ -314,7 +299,6 @@ describe('ResizableSplit collapsible', () => {
     expect(window.localStorage.getItem(`${KEY}.collapsed`)).toBe('0');
     expect(root().style.getPropertyValue(VAR)).toBe('256px');
     expect(handle().getAttribute('aria-valuenow')).toBe('256');
-    expect(onCollapsedChange.mock.calls).toEqual([[true], [false]]);
   });
 
   it('restores the collapsed state on mount without the prepaint script', () => {
@@ -343,7 +327,7 @@ describe('ResizableSplit collapsible', () => {
 
   it('exposes the toggle through apiRef', () => {
     const ref = { current: null as null | ReturnType<typeof useResizableSplit> };
-    renderSplit(undefined, { collapsible: true, apiRef: ref });
+    renderSplit({ collapsible: true, apiRef: ref });
     act(() => ref.current?.collapse());
     expect(root().style.getPropertyValue(CVAR)).toBe('0px');
     act(() => ref.current?.expand());

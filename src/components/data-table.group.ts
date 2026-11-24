@@ -1,7 +1,7 @@
 import type * as React from 'react';
 
-/** @deprecated `dense` is the only look; `compact`, `comfortable` and `default` are older sizes. */
-export type DataTableDensity = 'dense' | 'compact' | 'comfortable' | 'default';
+/** The one dense look; kept as a type so the cell variants stay keyed. */
+export type DataTableDensity = 'dense';
 
 export interface DataTableGroup {
   key: string;

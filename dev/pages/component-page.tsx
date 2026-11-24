@@ -1,4 +1,5 @@
-import { Heading, InlineCode } from '../../src';
+import { InlineCode } from '../../src';
+import { Heading } from '../components/heading';
 import { Code } from '../components/code';
 import { PatternSources } from '../components/pattern-sources';
 import { AppThemeSwitch } from '../components/app-theme-switch';

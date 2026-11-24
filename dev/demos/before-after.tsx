@@ -69,12 +69,7 @@ const Row = ({ row }: { row: BeforeAfterRow }) => {
         {row.status === 'needs-a' && <Badge variant="warning">needs builder A</Badge>}
       </div>
       <p className="text-ui text-foreground">{row.change}</p>
-      {(row.props ?? row.old) && (
-        <p className="text-xs text-muted-foreground">
-          {row.props && <>New props: {row.props}. </>}
-          {row.old && <>Old look: {row.old}.</>}
-        </p>
-      )}
+      {row.props && <p className="text-xs text-muted-foreground">New props: {row.props}.</p>}
       <Numbers route={row.route} />
       <div className="space-y-3">
         <figure className="min-w-0 space-y-1">

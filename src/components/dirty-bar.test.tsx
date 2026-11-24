@@ -85,8 +85,7 @@ describe('DirtyBar', () => {
       <DirtyBar
         dirty
         {...handlers()}
-        message="2 fields changed"
-        saveLabel="Apply"
+        labels={{ message: '2 fields changed', save: 'Apply' }}
         aria-label="Pending edits"
         className="bottom-6"
       />

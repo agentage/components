@@ -1,6 +1,14 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, type CardState } from './card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardMeta,
+  CardTitle,
+  type CardState,
+} from './card';
 
 const FIVE_MIN_AGO = Date.now() - 5 * 60_000;
 
@@ -8,8 +16,7 @@ const Widget = ({ state, onRetry }: { state?: CardState; onRetry?: () => void })
   <Card
     state={state}
     minHeight={180}
-    onRetry={onRetry}
-    error={{ message: 'Could not load usage', reference: 'req_8f2a' }}
+    fallback={{ onRetry, error: { message: 'Could not load usage', reference: 'req_8f2a' } }}
     data-testid="card"
   >
     <CardHeader>
@@ -18,7 +25,9 @@ const Widget = ({ state, onRetry }: { state?: CardState; onRetry?: () => void })
     <CardContent>
       <span>1,204 requests</span>
     </CardContent>
-    <CardFooter source="Edge logs" updatedAt={FIVE_MIN_AGO} />
+    <CardFooter>
+      <CardMeta source="Edge logs" updatedAt={FIVE_MIN_AGO} />
+    </CardFooter>
   </Card>
 );
 
@@ -71,22 +80,30 @@ describe('Card states', () => {
     expect(screen.getByText('5 min ago')).toBeTruthy();
   });
 
-  it('announces a state change politely, not the first render', () => {
+  it('announces a state change politely, named by the card title, not the first render', () => {
     const { rerender } = render(<Widget state="ready" />);
     const region = document.querySelector('[data-ds-announcer="polite"]') as HTMLElement;
     act(() => vi.advanceTimersByTime(100));
     expect(region.textContent).toBe('');
     rerender(<Widget state="loading" />);
     act(() => vi.advanceTimersByTime(200));
-    expect(region.textContent).toBe('Loading');
+    expect(region.textContent).toBe('Usage: Loading');
   });
 
   it('merges cards that change together into one named message', () => {
     const Pair = ({ state }: { state: CardState }) => (
       <>
-        <Card state={state} announceLabel="Revenue" />
-        <Card state={state} announceLabel="Users" />
-        <Card state={state === 'loading' ? 'error' : state} announceLabel="Cost" />
+        <Card state={state}>
+          <CardHeader>
+            <CardTitle>Revenue</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card state={state}>
+          <CardTitle>Users</CardTitle>
+        </Card>
+        <Card state={state === 'loading' ? 'error' : state}>
+          <CardTitle>Cost</CardTitle>
+        </Card>
       </>
     );
     const { rerender } = render(<Pair state="ready" />);
@@ -98,12 +115,12 @@ describe('Card states', () => {
 
   it('keeps focus on Refresh while refreshing and ignores clicks until done', () => {
     const onRefresh = vi.fn();
-    const { rerender } = render(<CardFooter onRefresh={onRefresh} />);
+    const { rerender } = render(<CardMeta onRefresh={onRefresh} />);
     const button = screen.getByRole('button', { name: 'Refresh' });
     button.focus();
     fireEvent.click(button);
     expect(onRefresh).toHaveBeenCalledTimes(1);
-    rerender(<CardFooter onRefresh={onRefresh} refreshing />);
+    rerender(<CardMeta onRefresh={onRefresh} refreshing />);
     expect(document.activeElement).toBe(button);
     expect(button.getAttribute('aria-disabled')).toBe('true');
     expect(button.getAttribute('aria-busy')).toBe('true');

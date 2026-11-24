@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { Step, StepList } from './step-list';
 
 const detail = (name: string) =>
@@ -21,12 +21,9 @@ describe('StepList', () => {
   });
 
   it('expands and collapses the detail, inert while shut', () => {
-    const onOpenChange = vi.fn();
     render(
       <StepList>
-        <Step label="search" onOpenChange={onOpenChange}>
-          3 results
-        </Step>
+        <Step label="search">3 results</Step>
       </StepList>
     );
     const head = screen.getByRole('button', { name: /search/ });
@@ -37,7 +34,6 @@ describe('StepList', () => {
     expect(head.getAttribute('aria-expanded')).toBe('true');
     expect(detail('search').hasAttribute('inert')).toBe(false);
     expect(detail('search').className).toContain('grid-rows-[1fr]');
-    expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 
   it('marks an error step with an edge and text, not colour only', () => {
@@ -53,25 +49,6 @@ describe('StepList', () => {
     expect(row.className).toContain('linear-gradient(var(--color-destructive)');
     expect(screen.getByRole('button', { name: /post \(error\)/ })).toBeTruthy();
     expect(screen.getByText('403 from the API').className).toContain('text-destructive');
-  });
-
-  it('follows a controlled open prop', () => {
-    const { rerender } = render(
-      <StepList>
-        <Step label="x" open={false}>
-          d
-        </Step>
-      </StepList>
-    );
-    expect(screen.getByRole('button').getAttribute('aria-expanded')).toBe('false');
-    rerender(
-      <StepList>
-        <Step label="x" open>
-          d
-        </Step>
-      </StepList>
-    );
-    expect(screen.getByRole('button').getAttribute('aria-expanded')).toBe('true');
   });
 });
 

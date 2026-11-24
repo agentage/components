@@ -1,53 +1,54 @@
 import type * as React from 'react';
 import type { DragMove } from '../lib/use-drag-reorder';
 import type { ListControlsState } from '../lib/list-controls';
-import type { DataViewColumn, DataViewQuickToggle } from './data-view.config';
+import type { DataViewColumn } from './data-view.config';
 
 export type DataViewKind = 'table' | 'cards' | 'board';
 
+/** Everything a user can change in a DataView, as one object. */
+export interface DataViewState extends ListControlsState {
+  /** Selected row ids (`multi`), or the current row (`single`). */
+  selection: string[];
+  /** Collapsed group keys of the current Group by column. */
+  collapsed: string[];
+  /** Board: swimlanes by this column key. */
+  rowsBy: string | null;
+}
+
+/** What the user can do with rows. Each one is optional. */
+export interface DataViewActions<T> {
+  /** Click or Enter on a row or card. The opened row stays current unless `bulk` is set. */
+  open?: (row: T) => void;
+  /** DropdownMenu items of the 24 px row menu (also on cards). */
+  menu?: (row: T) => React.ReactNode;
+  /** Buttons of the bulk bar; setting it adds checkboxes, select all and Shift ranges. */
+  bulk?: (rows: T[]) => React.ReactNode;
+  /** Shows a "+" in each group header. */
+  add?: (groupKey: string) => void;
+  /** Board: drag and Alt + arrow moves report here; the view never changes `rows` itself. */
+  move?: (move: DragMove) => void;
+}
+
 export interface DataViewProps<T> {
   rows: T[];
+  /** Columns carry the filter, sort, group, search and visibility options. */
   columns: DataViewColumn<T>[];
   getRowId: (row: T) => string;
-  /** Column keys the search box matches; all columns by default. */
-  searchKeys?: string[];
-  searchPlaceholder?: string;
+  /** Default `['table']`; more than one adds a view switch. */
   views?: DataViewKind[];
-  /** Card of the cards and board views; by default an EntityCard and a compact board card. */
-  renderCard?: (row: T) => React.ReactNode;
-  defaultGroupBy?: string | null;
-  defaultSort?: { key: string; dir: 'asc' | 'desc' } | null;
-  quickToggles?: DataViewQuickToggle<T>[];
-  /** Controlled control state; pair with `onStateChange`. */
-  state?: ListControlsState;
-  onStateChange?: (state: ListControlsState) => void;
-  /** Uncontrolled: persist the control state and the collapsed groups in localStorage. */
+  /** Controlled keys of the state; keys left out stay internal. */
+  state?: Partial<DataViewState>;
+  /** Reports the whole state after every change. */
+  onStateChange?: (state: DataViewState) => void;
+  /** Start state of the uncontrolled keys, for example `{ groupBy: 'status' }`. */
+  defaultState?: Partial<DataViewState>;
+  /** Persist the controls and the collapsed groups in localStorage under this key. */
   storageKey?: string;
-  rowActions?: (row: T) => React.ReactNode;
-  /** DropdownMenu items of the 24 px row menu (also on cards). */
-  rowMenu?: (row: T) => React.ReactNode;
-  rowMenuLabel?: (row: T) => string;
-  /** Accessible name of a row for its select checkbox; the first column value by default. */
-  rowLabel?: (row: T) => string;
-  onRowOpen?: (row: T) => void;
-  isRowSelected?: (row: T) => boolean;
-  /** `single`: the opened row stays current. `multi`: checkboxes, select all, Shift ranges. */
-  selection?: 'single' | 'multi';
-  selectedIds?: string[];
-  defaultSelectedIds?: string[];
-  onSelectionChange?: (ids: string[]) => void;
-  /** Buttons of the bulk bar that replaces the result count while rows are selected. */
-  bulkActions?: (rows: T[]) => React.ReactNode;
-  /** Shows a "+" in each group header. */
-  onAddToGroup?: (groupKey: string) => void;
-  /** Board: drag and Alt + arrow moves report here; the view never changes `rows` itself. */
-  onMove?: (move: DragMove) => void;
-  /** Board: swimlanes by this column key. */
-  rowsBy?: string | null;
-  rowLines?: 1 | 2;
-  emptyState?: React.ReactNode;
-  /** Shows the table header row; a grouped list can hide it. */
-  showHeader?: boolean;
+  actions?: DataViewActions<T>;
+  /** Card of the cards and board views; an item card built from the columns by default. */
+  renderCard?: (row: T) => React.ReactNode;
+  /** Shown when no row matches. */
+  empty?: React.ReactNode;
   'aria-label'?: string;
   className?: string;
 }

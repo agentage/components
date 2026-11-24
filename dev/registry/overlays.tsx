@@ -1,58 +1,35 @@
 import type { CategoryEntry } from '../registry';
 import { sections } from './sections';
-import * as AlertDialog from '../demos/alert-dialog';
 import * as Command from '../demos/command';
-import * as ContextMenu from '../demos/context-menu';
+import * as Dialog from '../demos/dialog';
 import * as DropdownMenu from '../demos/dropdown-menu';
-import * as HoverCard from '../demos/hover-card';
-import * as InspectorPanel from '../demos/inspector-panel';
-import * as Modal from '../demos/modal';
-import * as OverlayPortals from '../demos/overlay-portals';
 import * as Popover from '../demos/popover';
 import * as Resizable from '../demos/resizable';
-import * as ScrollArea from '../demos/scroll-area';
 import * as Sheet from '../demos/sheet';
 import * as Tooltip from '../demos/tooltip';
 
 export const OVERLAYS: CategoryEntry = {
   slug: 'overlays',
   label: 'Overlays',
-  description: 'Surfaces above the page: dialogs, panels, popovers, menus.',
+  description: 'Dialogs, sheets, popovers, menus and split panes.',
   components: [
     {
-      slug: 'modal',
-      name: 'Modal',
+      slug: 'dialog',
+      name: 'Dialog',
       core: true,
-      description: 'A centred dialog with a title bar and a footer.',
-      exports: ['Modal', 'ModalFooter'],
-      parts: [],
-      demos: sections(Modal),
+      description: 'A centred modal dialog; with onConfirm, a confirm dialog with a safe default.',
+      exports: ['Dialog', 'DialogFooter'],
+      parts: ['Button', 'Input', 'Label'],
+      demos: sections(Dialog),
     },
     {
       slug: 'sheet',
       name: 'Sheet',
-      description: 'A dialog docked to the left or right edge.',
+      core: true,
+      description: 'A side panel: a modal overlay, or docked in the page and resizable.',
       exports: ['Sheet'],
-      parts: [],
-      demos: sections(Sheet),
-    },
-    {
-      slug: 'alert-dialog',
-      name: 'AlertDialog',
-      core: true,
-      description: 'A confirm dialog with a safe default and Button actions.',
-      exports: ['AlertDialog'],
-      parts: ['Button'],
-      demos: sections(AlertDialog),
-    },
-    {
-      slug: 'inspector-panel',
-      name: 'InspectorPanel',
-      core: true,
-      description: 'An in-page docked, resizable right panel for the selected item.',
-      exports: ['InspectorPanel'],
       parts: ['ResizableHandle', 'usePersistedState'],
-      demos: sections(InspectorPanel),
+      demos: sections(Sheet),
     },
     {
       slug: 'popover',
@@ -61,14 +38,6 @@ export const OVERLAYS: CategoryEntry = {
       exports: ['Popover'],
       parts: [],
       demos: sections(Popover),
-    },
-    {
-      slug: 'hover-card',
-      name: 'HoverCard',
-      description: 'A preview card on hover or focus.',
-      exports: ['HoverCard'],
-      parts: [],
-      demos: sections(HoverCard),
     },
     {
       slug: 'tooltip',
@@ -97,14 +66,6 @@ export const OVERLAYS: CategoryEntry = {
       demos: sections(DropdownMenu),
     },
     {
-      slug: 'context-menu',
-      name: 'ContextMenu',
-      description: 'The same menu at the pointer on right click.',
-      exports: ['ContextMenu', 'ContextMenuItem', 'ContextMenuLabel', 'ContextMenuSeparator'],
-      parts: [],
-      demos: sections(ContextMenu),
-    },
-    {
       slug: 'command',
       name: 'Command',
       core: true,
@@ -128,22 +89,6 @@ export const OVERLAYS: CategoryEntry = {
       ],
       parts: [],
       demos: sections(Resizable),
-    },
-    {
-      slug: 'scroll-area',
-      name: 'ScrollArea',
-      description: 'A scroll container with a focusable viewport.',
-      exports: ['ScrollArea'],
-      parts: [],
-      demos: sections(ScrollArea),
-    },
-    {
-      slug: 'overlay-portals',
-      name: 'Overlay portals',
-      description: 'Every floating surface portals to the body and stacks on the z-index scale.',
-      exports: ['Tooltip', 'DropdownMenu', 'Popover', 'HoverCard', 'Modal'],
-      parts: [],
-      demos: sections(OverlayPortals),
     },
   ],
 };

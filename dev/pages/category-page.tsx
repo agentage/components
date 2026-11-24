@@ -1,4 +1,5 @@
-import { EntityList, Heading, ListRow } from '../../src';
+import { List, ListRow } from '../../src';
+import { Heading } from '../components/heading';
 import { builtFrom } from '../lib/built-from';
 import { componentPath, type CategoryEntry, type ComponentEntry } from '../registry';
 
@@ -13,7 +14,7 @@ export const CategoryPage = ({ category }: { category: CategoryEntry }) => (
     <Heading as="h1" description={category.description}>
       {category.label}
     </Heading>
-    <EntityList>
+    <List>
       {category.components.map((component) => (
         <ListRow
           key={component.slug}
@@ -23,6 +24,6 @@ export const CategoryPage = ({ category }: { category: CategoryEntry }) => (
           meta={metaOf(component)}
         />
       ))}
-    </EntityList>
+    </List>
   </div>
 );

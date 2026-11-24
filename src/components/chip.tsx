@@ -68,7 +68,7 @@ const XIcon = ({ size = 10 }: { size?: number }): React.JSX.Element => (
 export interface ChipProps
   extends
     Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick'>,
-    Omit<VariantProps<typeof chipVariants>, 'pressed'> {
+    Omit<VariantProps<typeof chipVariants>, 'pressed' | 'interactive'> {
   /** Makes the chip a toggle button (`aria-pressed`), for example "Needs you". */
   pressed?: boolean;
   onRemove?: () => void;
@@ -83,7 +83,6 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
       variant,
       size,
       pressed,
-      interactive,
       children,
       onRemove,
       onClick,
@@ -93,7 +92,7 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
     },
     ref
   ) => {
-    const clickable = !!onClick || !!interactive;
+    const clickable = !!onClick;
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>): void => {
       onKeyDown?.(e);

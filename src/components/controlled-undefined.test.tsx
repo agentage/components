@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Checkbox } from './checkbox';
-import { Combobox } from './combobox';
+import { Select } from './select';
 import { Switch } from './switch';
 
 // 0.20 treated an explicit `undefined` as empty or unchecked, never as uncontrolled.
@@ -21,11 +21,11 @@ describe('explicit undefined stays controlled', () => {
     expect(screen.getByRole('switch', { name: 'On' }).getAttribute('aria-checked')).toBe('false');
   });
 
-  it('Combobox shows the placeholder again after a reset to undefined', async () => {
+  it('Select shows the placeholder again after a reset to undefined', async () => {
     const options = [{ value: 'red', label: 'Red' }];
-    const { rerender } = render(<Combobox options={options} value="red" />);
+    const { rerender } = render(<Select options={options} value="red" />);
     expect(screen.getByRole('combobox', { name: 'Select...' }).textContent).toContain('Red');
-    rerender(<Combobox options={options} value={undefined} />);
+    rerender(<Select options={options} value={undefined} />);
     fireEvent.click(screen.getByRole('combobox', { name: 'Select...' }));
     await act(() => new Promise((r) => setTimeout(r, 0)));
     fireEvent.click(screen.getByRole('option', { name: 'Red' }));
@@ -41,12 +41,12 @@ describe('explicit undefined stays controlled', () => {
   });
 });
 
-describe('Combobox list focus', () => {
+describe('Select list focus', () => {
   it('stays open when the list padding is pressed and closes when focus leaves', async () => {
     const options = Array.from({ length: 9 }, (_, i) => ({ value: `v${i}`, label: `Item ${i}` }));
     render(
       <>
-        <Combobox options={options} />
+        <Select options={options} searchable />
         <button type="button">After</button>
       </>
     );

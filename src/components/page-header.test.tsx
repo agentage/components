@@ -57,15 +57,8 @@ describe('PageHeader', () => {
   });
 
   it('renders the title as the page heading', () => {
-    render(<PageHeader title="Documents" subtitle="12 files" />);
+    render(<PageHeader title="Documents" description="12 files" />);
     expect(screen.getByRole('heading', { level: 1, name: 'Documents' })).toBeTruthy();
-  });
-
-  it('keeps the pre-0.21 52 px bar as size lg', () => {
-    const { container } = render(<PageHeader title="T" size="lg" />);
-    expect((container.querySelector('[data-slot="page-header"]') as HTMLElement).className).toBe(
-      'flex items-center justify-between gap-3 h-[52px]'
-    );
   });
 
   it('renders a ReactNode title, meta and tabs in the detail variant', () => {
@@ -73,7 +66,7 @@ describe('PageHeader', () => {
       <PageHeader
         variant="detail"
         title={<span>Release notes</span>}
-        subtitle="Drafts notes"
+        description="Drafts notes"
         meta={<span>Next update in 2 h</span>}
         tabs={<div role="tablist" aria-label="Sections" />}
       />
@@ -85,10 +78,8 @@ describe('PageHeader', () => {
 });
 
 describe('PageHeader description', () => {
-  it('renders description and keeps the deprecated subtitle working', () => {
-    const { rerender } = render(<PageHeader title="Billing" description="Plans and invoices" />);
+  it('renders the description under the title', () => {
+    render(<PageHeader title="Billing" description="Plans and invoices" />);
     expect(screen.getByText('Plans and invoices')).toBeTruthy();
-    rerender(<PageHeader title="Billing" subtitle="Older line" />);
-    expect(screen.getByText('Older line')).toBeTruthy();
   });
 });

@@ -5,69 +5,72 @@ import {
   CardAnnounce,
   CardMeta,
   CardStateBody,
-  type CardError,
-  type CardMetaProps,
+  type CardFallback,
   type CardState,
 } from './card-state';
-import type { CardProps } from './card.parts';
+import { CardTitle, type CardProps } from './card.parts';
 
-export type { CardError, CardState } from './card-state';
-
-export type CardVariant = 'default' | 'flat';
-
+export type { CardError, CardFallback, CardMetaProps, CardState } from './card-state';
+export { CardMeta } from './card-state';
 export { CardAction, CardDescription, CardHeader, CardTitle } from './card.parts';
 export type { CardProps } from './card.parts';
 
 export interface CardRootProps extends CardProps {
-  /** @deprecated Every card is the one flat surface now; `flat` renders the same. */
-  variant?: CardVariant;
   /** `sm` 12/14 padding (default), `md` 16/20 for a card that leads a page. */
   padding?: 'sm' | 'md';
   /** Hover border and a focus ring that follows a `[data-card-activator]` inside. */
   interactive?: boolean;
   selected?: boolean;
-  /** Widget state: `loading`, `empty` and `error` swap the body of a direct CardContent child; `stale` badges the footer. */
+  /** `loading`, `empty` and `error` swap the body of a direct CardContent child; `stale` badges the footer. */
   state?: CardState;
-  /** Loading placeholder in the shape of the content; three skeleton lines by default. */
-  skeleton?: React.ReactNode;
-  /** Empty body; a compact EmptyState by default. */
-  empty?: React.ReactNode;
-  /** Error body: a message and an optional copyable reference. */
-  error?: CardError | React.ReactNode;
-  /** Shows Retry in the error body. */
-  onRetry?: () => void;
+  /** Bodies for those states: loading placeholder, empty body, error with Retry. */
+  fallback?: CardFallback;
   /** Reserved height, so switching state never moves the layout. */
   minHeight?: number | string;
-  /** Card name in the polite state announcement ("Revenue: Loading"); the bare state by default. */
-  announceLabel?: string;
 }
 
-interface StateSwap {
-  state: CardState;
-  skeleton?: React.ReactNode;
-  empty?: React.ReactNode;
-  error?: CardError | React.ReactNode;
-  onRetry?: () => void;
-}
+type Child = React.ReactElement<{ children?: React.ReactNode }>;
+const isEl = (c: React.ReactNode): c is Child => React.isValidElement(c);
+
+/** Plain-text CardTitle inside a CardHeader child: the name in the state announcement. */
+const titleOf = (children: React.ReactNode): string | undefined => {
+  for (const child of React.Children.toArray(children)) {
+    if (!isEl(child)) continue;
+    if (child.type === CardTitle && typeof child.props.children === 'string')
+      return child.props.children;
+    const inner = titleOf(child.props.children);
+    if (inner) return inner;
+  }
+  return undefined;
+};
+
+const staleFooter = (footer: Child): Child => {
+  let meta = false;
+  const inner = React.Children.map(footer.props.children, (c) => {
+    if (!isEl(c) || c.type !== CardMeta) return c;
+    meta = true;
+    return React.cloneElement(c as React.ReactElement<{ stale?: boolean }>, { stale: true });
+  });
+  return React.cloneElement(footer, {}, inner, meta ? null : <CardMeta stale />);
+};
 
 // Server-safe on purpose: only the bodies below are client elements, the swap itself runs anywhere.
-const swapState = (children: React.ReactNode, swap: StateSwap): React.ReactNode => {
-  const { state, ...rest } = swap;
+const swapState = (children: React.ReactNode, state: CardState, fallback?: CardFallback) => {
   const body =
     state === 'loading' || state === 'empty' || state === 'error' ? (
-      <CardStateBody state={state} {...rest} />
+      <CardStateBody state={state} fallback={fallback} />
     ) : null;
   let content = false;
   let footer = false;
   const out = React.Children.map(children, (child) => {
-    if (!React.isValidElement<{ stale?: boolean; children?: React.ReactNode }>(child)) return child;
+    if (!isEl(child)) return child;
     if (child.type === CardContent && body) {
       content = true;
       return React.cloneElement(child, { children: body });
     }
     if (child.type === CardFooter && state === 'stale') {
       footer = true;
-      return React.cloneElement(child, { stale: true });
+      return staleFooter(child);
     }
     return child;
   });
@@ -85,17 +88,12 @@ export const Card = React.forwardRef<HTMLDivElement, CardRootProps>(
     {
       className,
       children,
-      variant = 'default',
       padding = 'sm',
       interactive = false,
       selected = false,
       state,
-      skeleton,
-      empty,
-      error,
-      onRetry,
+      fallback,
       minHeight,
-      announceLabel,
       style,
       ...props
     },
@@ -104,7 +102,6 @@ export const Card = React.forwardRef<HTMLDivElement, CardRootProps>(
     <div
       ref={ref}
       data-slot="card"
-      data-variant={variant}
       data-selected={selected || undefined}
       data-state={state}
       aria-busy={state === 'loading' || undefined}
@@ -117,10 +114,8 @@ export const Card = React.forwardRef<HTMLDivElement, CardRootProps>(
       )}
       {...props}
     >
-      {state === undefined
-        ? children
-        : swapState(children, { state, skeleton, empty, error, onRetry })}
-      {state !== undefined && <CardAnnounce state={state} label={announceLabel} />}
+      {state === undefined ? children : swapState(children, state, fallback)}
+      {state !== undefined && <CardAnnounce state={state} label={titleOf(children)} />}
     </div>
   )
 );
@@ -135,34 +130,17 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardProps>(
 );
 CardContent.displayName = 'CardContent';
 
-export interface CardFooterProps extends Omit<CardProps, 'children'>, CardMetaProps {
-  children?: React.ReactNode;
-}
-
-/** Footer; `source`, `updatedAt`, `stale` or `onRefresh` add the meta line. */
-export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, children, source, updatedAt, stale, onRefresh, refreshing, ...props }, ref) => {
-    const meta =
-      source !== undefined || updatedAt !== undefined || stale || onRefresh !== undefined;
-    return (
-      <div
-        ref={ref}
-        data-slot="card-footer"
-        className={cn('flex flex-col items-start gap-1.5', className)}
-        {...props}
-      >
-        {children}
-        {meta && (
-          <CardMeta
-            source={source}
-            updatedAt={updatedAt}
-            stale={stale}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-          />
-        )}
-      </div>
-    );
-  }
+/** Bottom row; put a `CardMeta` inside for source, last update, stale and refresh. */
+export const CardFooter = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="card-footer"
+      className={cn('flex flex-col items-start gap-1.5', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  )
 );
 CardFooter.displayName = 'CardFooter';

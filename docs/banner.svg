@@ -22,7 +22,7 @@
 
   <!-- headline -->
   <text x="80" y="176" font-size="62" font-weight="700" fill="#ffffff" letter-spacing="-1.2">Components</text>
-  <text x="80" y="228" font-size="26" fill="#8b949e">OKLCH tokens + 60+ React components, ready to install.</text>
+  <text x="80" y="228" font-size="26" fill="#8b949e">OKLCH tokens + React components, ready to install.</text>
 
   <!-- feature chips -->
   <g font-size="17" fill="#c9d1d9">

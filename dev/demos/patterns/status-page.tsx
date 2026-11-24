@@ -141,7 +141,7 @@ export const Example = () => {
           </CardHeader>
           <CardContent>
             <List
-              label="Recent incidents"
+              aria-label="Recent incidents"
               items={INCIDENTS.map((i) => ({
                 id: i.id,
                 leading: (

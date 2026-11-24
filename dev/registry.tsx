@@ -1,9 +1,6 @@
 import type { ComponentType } from 'react';
 
-import { CHARTS } from './registry/charts';
-import { DATA_DISPLAY } from './registry/data-display';
-import { DEPRECATED } from './registry/deprecated';
-import { DISCLOSURE } from './registry/disclosure';
+import { DISPLAY } from './registry/display';
 import { FEEDBACK } from './registry/feedback';
 import { FORMS } from './registry/forms';
 import { FOUNDATIONS } from './registry/foundations';
@@ -12,7 +9,6 @@ import { NAVIGATION } from './registry/navigation';
 import { OVERLAYS } from './registry/overlays';
 import { PATTERNS } from './registry/patterns';
 import { REVIEW } from './registry/review';
-import { SITE } from './registry/site';
 
 export interface DemoEntry {
   /** Section heading: Example, Variants, Sizes, States or Composition. */
@@ -50,14 +46,10 @@ export const CATEGORIES: CategoryEntry[] = [
   FORMS,
   NAVIGATION,
   LISTS,
-  DATA_DISPLAY,
-  DISCLOSURE,
+  DISPLAY,
   OVERLAYS,
   FEEDBACK,
   PATTERNS,
-  CHARTS,
-  SITE,
-  DEPRECATED,
   REVIEW,
 ];
 
@@ -74,9 +66,6 @@ export const ALL_COMPONENTS: ResolvedComponent[] = CATEGORIES.flatMap((category)
 export const CORE_COMPONENTS: ResolvedComponent[] = ALL_COMPONENTS.filter(
   ({ component }) => component.core
 );
-
-/** Categories folded at the end of the sidebar and the index (domain sets, not app basics). */
-export const FOLDED = ['charts', 'site'];
 
 export const componentPath = (categorySlug: string, componentSlug: string): string =>
   `/components/${categorySlug}/${componentSlug}`;

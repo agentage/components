@@ -34,10 +34,9 @@ describe('DataView selection and groups', () => {
     render(
       <DataView
         {...base}
-        selection="multi"
-        bulkActions={(rows) => (
-          <button onClick={() => archive(rows.map((r) => r.id))}>Archive</button>
-        )}
+        actions={{
+          bulk: (rows) => <button onClick={() => archive(rows.map((r) => r.id))}>Archive</button>,
+        }}
       />
     );
     expect(screen.getByText('3 items')).toBeTruthy();
@@ -53,7 +52,7 @@ describe('DataView selection and groups', () => {
 
   it('single: the opened row becomes current', () => {
     const open = vi.fn();
-    render(<DataView {...base} selection="single" onRowOpen={open} />);
+    render(<DataView {...base} actions={{ open }} />);
     fireEvent.click(screen.getByRole('button', { name: 'Fix login' }));
     expect(open).toHaveBeenCalledWith(ROWS[1]);
     expect(
@@ -64,7 +63,12 @@ describe('DataView selection and groups', () => {
   it('group headers take the value glyph, a "+" and persist collapse', () => {
     const add = vi.fn();
     const { unmount } = render(
-      <DataView {...base} defaultGroupBy="status" storageKey="dv-test" onAddToGroup={add} />
+      <DataView
+        {...base}
+        defaultState={{ groupBy: 'status' }}
+        storageKey="dv-test"
+        actions={{ add }}
+      />
     );
     expect(screen.getByTestId('glyph-todo')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Add to doing' }));
@@ -74,7 +78,7 @@ describe('DataView selection and groups', () => {
     fireEvent.click(toggles()[0]);
     expect(localStorage.getItem('dv-test.collapsed.status')).toBe('["todo"]');
     unmount();
-    render(<DataView {...base} defaultGroupBy="status" storageKey="dv-test" />);
+    render(<DataView {...base} defaultState={{ groupBy: 'status' }} storageKey="dv-test" />);
     expect(toggles().map((t) => t.getAttribute('aria-expanded'))).toEqual(['false', 'true']);
   });
 });

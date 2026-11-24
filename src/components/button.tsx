@@ -12,11 +12,8 @@ export interface ButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     Omit<VariantProps<typeof buttonVariants>, 'size'> {
-  /**
-   * md 28 px (default), sm 24 px; `icon` 28 and `icon-sm` 24 px squares. Deprecated values:
-   * `default` and `icon-md` (same as `md` and `icon`), `lg` and `icon-lg` (32 px, off the scale).
-   */
-  size?: 'sm' | 'md' | 'icon' | 'icon-sm' | 'default' | 'lg' | 'icon-md' | 'icon-lg' | null;
+  /** md 28 px (default), sm 24 px; `icon` 28 and `icon-sm` 24 px squares. */
+  size?: 'sm' | 'md' | 'icon' | 'icon-sm' | null;
   asChild?: boolean;
   /**
    * Work in flight: keeps focus (`aria-disabled`, clicks and submits blocked), sets `aria-busy`
@@ -41,7 +38,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       className,
       variant = 'default',
-      size = 'default',
+      size = 'md',
       asChild = false,
       pending = false,
       disabled,

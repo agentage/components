@@ -7,7 +7,6 @@ export const iconButtonVariants = cva('flex shrink-0 items-center justify-center
     size: {
       sm: 'size-6 [&_svg]:size-3.5',
       md: 'size-7 [&_svg]:size-4',
-      lg: 'size-8 [&_svg]:size-4',
     },
   },
   defaultVariants: {
@@ -19,8 +18,8 @@ export interface IconButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     Omit<VariantProps<typeof iconButtonVariants>, 'size'> {
-  /** sm 24 px with a 14 px icon, md 28 px (default). `lg` (32 px) is deprecated: use `md`. */
-  size?: 'sm' | 'md' | 'lg' | null;
+  /** sm 24 px with a 14 px icon, md 28 px (default). */
+  size?: 'sm' | 'md' | null;
   icon: React.ReactNode;
   onClick: (e: React.MouseEvent) => void;
   /** Toggle state: sets aria-pressed and keeps the accent surface on. */

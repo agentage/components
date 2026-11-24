@@ -11,6 +11,8 @@ export const packageColumns = (
     key: 'name',
     header: 'Package',
     grow: true,
+    searchable: true,
+    twoLine: true,
     sortable: true,
     cell: (e) => (
       <span className="flex min-w-0 items-center gap-3">
@@ -30,7 +32,7 @@ export const packageColumns = (
     header: 'Host',
     groupable: true,
     filter: 'multi',
-    defaultHidden: true,
+    visibility: 'optional',
     formatValue: (v) => HOST_LABEL[v as DemoPackage['host']],
     valueIcon: (v) => <UiIcon name={v === 'local' ? 'monitor' : 'cloud'} size={14} />,
   },

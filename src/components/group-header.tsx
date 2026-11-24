@@ -14,9 +14,8 @@ const rootVariants = cva('flex min-w-0 items-center text-ui font-semibold text-f
       group: 'h-8 border-b border-border bg-card pr-2',
       section: 'min-h-8',
     },
-    sticky: { true: 'sticky top-0 z-10', false: '' },
   },
-  defaultVariants: { variant: 'group', sticky: false },
+  defaultVariants: { variant: 'group' },
 });
 
 const toggleVariants = cva('flex h-full min-w-0 flex-1 items-center gap-2 text-left', {
@@ -41,18 +40,13 @@ export interface GroupHeaderProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   icon?: React.ReactNode;
   /** Right-aligned muted text inside the toggle. */
   summary?: React.ReactNode;
-  /** With `onOpenChange` the header is a collapse toggle with a chevron. */
+  /** With `onOpenChange` the header is a collapse toggle with a chevron; open by default. */
   open?: boolean;
-  /** Uncontrolled start state; `true` by default. */
-  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Id of the body the toggle controls. */
+  /** Id of the body the toggle controls; the toggle gets the id `${controls}-toggle`. */
   controls?: string;
-  /** Id of the toggle, so a body can be labelled by it. */
-  triggerId?: string;
   /** Buttons at the right edge, outside the toggle. */
   actions?: React.ReactNode;
-  sticky?: boolean;
   variant?: 'group' | 'section';
   /** Wraps the toggle in a heading of this level; the look stays the same. */
   level?: 2 | 3 | 4;
@@ -67,12 +61,9 @@ export const GroupHeader = React.forwardRef<HTMLDivElement, GroupHeaderProps>(
       icon,
       summary,
       open: openProp,
-      defaultOpen = true,
       onOpenChange,
       controls,
-      triggerId,
       actions,
-      sticky = false,
       variant = 'group',
       level,
       className,
@@ -80,7 +71,8 @@ export const GroupHeader = React.forwardRef<HTMLDivElement, GroupHeaderProps>(
     },
     ref
   ) => {
-    const [open, setOpen] = useControlled(openProp, defaultOpen, onOpenChange);
+    const [open, setOpen] = useControlled(openProp, true, onOpenChange);
+    const triggerId = controls && `${controls}-toggle`;
     const interactive = onOpenChange !== undefined;
     const inner = (
       <>
@@ -120,7 +112,7 @@ export const GroupHeader = React.forwardRef<HTMLDivElement, GroupHeaderProps>(
     return (
       <div
         ref={ref}
-        className={cn(rootVariants({ variant, sticky }), className)}
+        className={cn(rootVariants({ variant }), className)}
         data-slot="group-header"
         data-state={interactive ? (open ? 'open' : 'closed') : undefined}
         {...props}

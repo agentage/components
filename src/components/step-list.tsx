@@ -10,7 +10,6 @@ import {
   StepDetail,
   StepHead,
   StepListContext,
-  useOpen,
   type StepStatus,
 } from './step-list.parts';
 import { normalizeRowStatus } from './status-glyph.status';
@@ -76,9 +75,7 @@ export interface StepProps extends Omit<React.HTMLAttributes<HTMLLIElement>, 'ti
   /** `error` marks the edge, colours the row and adds `errorLabel` as text. */
   status?: StepStatus;
   errorLabel?: string;
-  open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
 }
 
 export const Step = React.forwardRef<HTMLLIElement, StepProps>(
@@ -91,9 +88,7 @@ export const Step = React.forwardRef<HTMLLIElement, StepProps>(
       mono = true,
       status: statusIn = 'ok',
       errorLabel = 'error',
-      open: controlledOpen,
       defaultOpen = false,
-      onOpenChange,
       className,
       children,
       ...props
@@ -101,7 +96,7 @@ export const Step = React.forwardRef<HTMLLIElement, StepProps>(
     ref
   ) => {
     const { size } = React.useContext(StepListContext);
-    const [open, toggle] = useOpen(controlledOpen, defaultOpen, onOpenChange);
+    const [open, setOpen] = React.useState(defaultOpen);
     const detailId = React.useId();
     const status = normalizeRowStatus(statusIn);
     const error = status === 'error';
@@ -134,7 +129,7 @@ export const Step = React.forwardRef<HTMLLIElement, StepProps>(
             )}
             aria-expanded={open}
             aria-controls={detailId}
-            onClick={toggle}
+            onClick={() => setOpen(!open)}
             data-slot="step-head"
           >
             <StepHead {...head} />

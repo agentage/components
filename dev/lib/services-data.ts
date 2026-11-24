@@ -1,9 +1,3 @@
-import {
-  applyListControls,
-  type ListApplyConfig,
-  type ListControlsState,
-  type ListFilterGroup,
-} from '../../src';
 import type { ResultStatus } from './result-status';
 
 /** Docs-only sample services and their recent events for the list pattern demos. */
@@ -335,54 +329,3 @@ export const dayOf = (ago: number): { key: string; label: string } =>
 
 export const needsAttention = (e: DemoEvent): boolean =>
   e.status === 'waiting-input' || e.status === 'waiting-permission' || e.outcome === 'needs-review';
-
-const STATUS_TEXT = { enabled: 'Enabled', paused: 'Paused' } as const;
-const owners = [...new Set(SERVICES.map((s) => s.owner))];
-
-/** Search, filters, sorts and groups of the services list, for `useListControls().apply`. */
-export const SERVICE_CONFIG: ListApplyConfig<DemoService> = {
-  search: (s) => `${s.name} ${s.description}`,
-  filters: {
-    status: (s) => (s.enabled ? 'enabled' : 'paused'),
-    trigger: (s) => s.trigger,
-    owner: (s) => s.owner,
-  },
-  sorts: {
-    name: (s) => s.name,
-    next: { compare: (a, b) => (a.nextIn ?? 1e9) - (b.nextIn ?? 1e9) },
-    last: { compare: (a, b) => (a.lastAgo ?? 1e9) - (b.lastAgo ?? 1e9) },
-  },
-  groups: {
-    status: (s) =>
-      s.enabled ? { key: 'enabled', label: 'Enabled' } : { key: 'paused', label: 'Paused' },
-    trigger: (s) => ({ key: s.trigger, label: TRIGGER_LABEL[s.trigger] }),
-    owner: (s) => ({ key: s.owner, label: s.owner }),
-  },
-};
-
-/** Filter groups with counts of the rows that pass the search and the other groups. */
-export const serviceFilters = (
-  rows: DemoService[],
-  state: ListControlsState
-): ListFilterGroup[] => {
-  const opts: Record<string, [string, string][]> = {
-    status: Object.entries(STATUS_TEXT),
-    trigger: Object.entries(TRIGGER_LABEL),
-    owner: owners.map((o) => [o, o]),
-  };
-  const label = { status: 'Status', trigger: 'Trigger', owner: 'Owner' } as Record<string, string>;
-  return Object.entries(opts).map(([id, list]) => {
-    const others = { ...state, filters: { ...state.filters, [id]: [] }, groupBy: null };
-    const kept = applyListControls(rows, others, SERVICE_CONFIG).rows;
-    const of = SERVICE_CONFIG.filters?.[id];
-    return {
-      id,
-      label: label[id],
-      options: list.map(([value, text]) => ({
-        value,
-        label: text,
-        count: kept.filter((r) => of?.(r) === value).length,
-      })),
-    };
-  });
-};

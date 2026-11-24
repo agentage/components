@@ -1,72 +1,23 @@
 import * as React from 'react';
-import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+import type { StatCardSentiment, StatCardTrend } from './stat-card.types';
 
-// `up`/`down` are direction aliases kept for compat; the rest is the canonical status vocabulary.
-export const TREND_TONE = {
-  up: 'text-success',
-  down: 'text-destructive',
-  default: 'text-muted-foreground',
-  success: 'text-success',
-  warning: 'text-warning',
-  destructive: 'text-destructive',
-  info: 'text-info',
-} as const;
+// Hover is a border change only: in-page cards carry no shadow and never move.
+export const STAT_CARD =
+  'flex flex-col gap-2 rounded-lg border border-border bg-card px-3.5 py-3 transition-colors duration-fast hover:border-muted-foreground';
+export const STAT_CARD_PRESSABLE =
+  'relative cursor-pointer text-left has-[[data-card-activator]:focus-visible]:outline-2 has-[[data-card-activator]:focus-visible]:outline-ring has-[[data-card-activator]:focus-visible]:-outline-offset-2';
 
-export type TrendTone = keyof typeof TREND_TONE;
+const TONE = { good: 'text-success', bad: 'text-destructive', neutral: 'text-muted-foreground' };
 
-export const statCardTrendVariants = cva(
-  'flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium border border-border bg-muted/30',
-  {
-    variants: { tone: TREND_TONE },
-    defaultVariants: { tone: 'up' },
-  }
-);
-
-/** Whether a rise is good news: drives the trend colour; the arrow always shows the direction. */
-export type StatCardSentiment = 'up-is-good' | 'down-is-good' | 'neutral';
-
-export interface StatCardTrend {
-  value: string;
-  up: boolean;
-  /** Overrides the colour derived from `up` and `sentiment`. */
-  tone?: TrendTone;
-  /** `up-is-good` (default) draws a rise green; `down-is-good` draws it red; `neutral` muted. */
-  sentiment?: StatCardSentiment;
-}
-
-/** The tone of a change: `tone` wins, then direction read through the sentiment. */
-export const trendTone = (
-  up: boolean,
-  sentiment: StatCardSentiment = 'up-is-good',
-  tone?: TrendTone
-): TrendTone => {
-  if (tone) return tone;
-  if (sentiment === 'neutral') return 'default';
-  return up === (sentiment === 'up-is-good') ? 'up' : 'down';
+/** The colour of a change: its direction read through the sentiment. */
+export const trendTone = (up: boolean, sentiment: StatCardSentiment = 'up-is-good') => {
+  if (sentiment === 'neutral') return TONE.neutral;
+  return up === (sentiment === 'up-is-good') ? TONE.good : TONE.bad;
 };
 
-export const statCardVariants = cva(
-  // Hover is a border change only: in-page cards carry no shadow and never move.
-  'flex flex-col rounded-lg border border-border bg-card transition-colors duration-fast hover:border-muted-foreground',
-  {
-    variants: {
-      pressable: {
-        true: 'relative cursor-pointer text-left has-[[data-card-activator]:focus-visible]:outline-2 has-[[data-card-activator]:focus-visible]:outline-ring has-[[data-card-activator]:focus-visible]:-outline-offset-2',
-        false: '',
-      },
-      /** compact: 12/14 padding, 8 px gaps (default); comfortable is the deprecated p-5 card. */
-      density: {
-        compact: 'gap-2 px-3.5 py-3',
-        comfortable: 'p-5',
-      },
-    },
-    defaultVariants: { pressable: false, density: 'compact' },
-  }
-);
-
 /** Rising or falling arrow, so the direction reads without colour. */
-export const TrendIcon = ({ up = true }: { up?: boolean }): React.JSX.Element => (
+const TrendIcon = ({ up }: { up: boolean }): React.JSX.Element => (
   <svg
     width="12"
     height="12"
@@ -78,29 +29,24 @@ export const TrendIcon = ({ up = true }: { up?: boolean }): React.JSX.Element =>
     strokeLinejoin="round"
     aria-hidden="true"
   >
-    {up ? (
-      <>
-        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-        <polyline points="16 7 22 7 22 13" />
-      </>
-    ) : (
-      <>
-        <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
-        <polyline points="16 17 22 17 22 11" />
-      </>
-    )}
+    <polyline points={up ? '22 7 13.5 15.5 8.5 10.5 2 17' : '22 17 13.5 8.5 8.5 13.5 2 7'} />
+    <polyline points={up ? '16 7 22 7 22 13' : '16 17 22 17 22 11'} />
   </svg>
 );
 
-export const Trend = ({ trend, compact }: { trend: StatCardTrend; compact: boolean }) => (
-  <div
-    className={cn(
-      statCardTrendVariants({ tone: trendTone(trend.up, trend.sentiment, trend.tone) }),
-      compact && 'h-5 px-1.5 py-0'
-    )}
-  >
-    <TrendIcon up={trend.up} />
-    <span className="sr-only">{trend.up ? 'Trending up' : 'Trending down'}</span>
-    <span>{trend.value}</span>
-  </div>
-);
+export const Trend = ({ trend }: { trend: StatCardTrend }) => {
+  const up = trend.direction === 'up';
+  return (
+    <div
+      className={cn(
+        'flex h-5 items-center gap-1 rounded-md border border-border bg-muted/30 px-1.5 text-2xs font-medium',
+        trendTone(up, trend.sentiment)
+      )}
+      data-slot="stat-card-trend"
+    >
+      <TrendIcon up={up} />
+      <span className="sr-only">{up ? 'Trending up' : 'Trending down'}</span>
+      <span>{trend.value}</span>
+    </div>
+  );
+};

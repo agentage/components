@@ -21,7 +21,7 @@ const Board = ({ rows }: { rows: Item[] }) => (
     columns={COLUMNS}
     getRowId={(r) => r.id}
     views={['board']}
-    defaultGroupBy="status"
+    defaultState={{ groupBy: 'status' }}
   />
 );
 

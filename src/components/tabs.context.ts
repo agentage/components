@@ -21,7 +21,7 @@ export const TabsContext = React.createContext<TabsContextValue>({
   value: '',
   onValueChange: () => {},
   instanceId: '',
-  variant: 'default',
+  variant: 'pill',
   hasActive: true,
   firstValue: null,
   registerTrigger: () => () => {},

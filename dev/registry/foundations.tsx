@@ -1,18 +1,16 @@
 import type { CategoryEntry } from '../registry';
-import { sections } from './sections';
+import { more, sections } from './sections';
 import * as A11yHooks from '../demos/a11y-hooks';
 import * as Avatar from '../demos/avatar';
 import * as Badge from '../demos/badge';
 import * as Button from '../demos/button';
 import * as Chip from '../demos/chip';
-import * as Heading from '../demos/heading';
+import * as CopyButton from '../demos/copy-button';
 import * as IconButton from '../demos/icon-button';
 import * as Kbd from '../demos/kbd';
-import * as Label from '../demos/label';
 import * as Loading from '../demos/loading';
 import * as PriorityGlyph from '../demos/priority-glyph';
 import * as Prose from '../demos/prose';
-import * as Separator from '../demos/separator';
 import * as StatusGlyph from '../demos/status-glyph';
 
 export const FOUNDATIONS: CategoryEntry = {
@@ -63,7 +61,7 @@ export const FOUNDATIONS: CategoryEntry = {
       core: true,
       description:
         'Initials, image or glyph in a circle or rounded square; IconContainer for tinted icon tiles.',
-      exports: ['Avatar', 'IconContainer'],
+      exports: ['Avatar'],
       parts: [],
       demos: sections(Avatar),
     },
@@ -75,14 +73,6 @@ export const FOUNDATIONS: CategoryEntry = {
       exports: ['Kbd'],
       parts: [],
       demos: sections(Kbd),
-    },
-    {
-      slug: 'separator',
-      name: 'Separator',
-      description: 'A 1 px horizontal or vertical rule.',
-      exports: ['Separator'],
-      parts: [],
-      demos: sections(Separator),
     },
     {
       slug: 'skeleton-and-spinner',
@@ -97,26 +87,10 @@ export const FOUNDATIONS: CategoryEntry = {
       name: 'StatusGlyph',
       core: true,
       description:
-        'The status indicator: 14 px shapes in a tone, with a breathing pulse for live states.',
-      exports: ['StatusGlyph'],
+        'The status indicator: 14 px shapes in a tone with a pulse for live states; PriorityGlyph draws priority bars.',
+      exports: ['StatusGlyph', 'PriorityGlyph'],
       parts: [],
-      demos: sections(StatusGlyph),
-    },
-    {
-      slug: 'priority-glyph',
-      name: 'PriorityGlyph',
-      description: 'Priority as signal bars, with an urgent mark.',
-      exports: ['PriorityGlyph'],
-      parts: [],
-      demos: sections(PriorityGlyph),
-    },
-    {
-      slug: 'heading',
-      name: 'Heading',
-      description: 'Page and section titles with an optional description.',
-      exports: ['Heading'],
-      parts: [],
-      demos: sections(Heading),
+      demos: [...sections(StatusGlyph), ...more('PriorityGlyph', PriorityGlyph)],
     },
     {
       slug: 'prose',
@@ -128,25 +102,19 @@ export const FOUNDATIONS: CategoryEntry = {
       demos: sections(Prose),
     },
     {
-      slug: 'label',
-      name: 'Label',
-      description: 'The visible name of a form control.',
-      exports: ['Label'],
+      slug: 'copy-button',
+      name: 'CopyButton',
+      description:
+        'Copies a text to the clipboard and confirms it in place, with a label or icon only.',
+      exports: ['CopyButton'],
       parts: [],
-      demos: sections(Label),
+      demos: sections(CopyButton),
     },
     {
       slug: 'hooks',
       name: 'Hooks',
-      description:
-        'Accessibility and state hooks the components share: roving focus, announce, scroll spy, persisted state.',
-      exports: [
-        'useRovingFocus',
-        'useAnnounce',
-        'useScrollSpy',
-        'useControlled',
-        'usePersistedState',
-      ],
+      description: 'Accessibility hooks for screens: announce to screen readers and scroll spy.',
+      exports: ['useAnnounce', 'useScrollSpy'],
       parts: [],
       demos: sections(A11yHooks),
     },

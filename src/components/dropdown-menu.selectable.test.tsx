@@ -65,19 +65,11 @@ describe('DropdownMenu selectable items', () => {
     expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: 'Close me' }));
   });
 
-  it('defaults to the small size and keeps md available', () => {
-    const { unmount } = render(<Checks />);
+  it('renders the 28 px item and the 210 px surface', () => {
+    render(<Checks />);
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     expect(screen.getByRole('menu').className).toContain('min-w-52.5');
     expect(screen.getByRole('menuitem').className).toContain('h-7');
-    unmount();
-    render(
-      <DropdownMenu size="md" trigger={<button type="button">Open</button>}>
-        <DropdownMenuItem>One</DropdownMenuItem>
-      </DropdownMenu>
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
-    expect(screen.getByRole('menuitem').className).not.toContain('h-7');
   });
 
   it('keeps plain items open with closeOnSelect false', () => {

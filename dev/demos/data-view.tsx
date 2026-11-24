@@ -100,6 +100,7 @@ const COLUMNS: DataViewColumn<Doc>[] = [
   {
     key: 'title',
     header: 'Title',
+    searchable: true,
     sortable: true,
     grow: true,
     cell: (d) => <span className="truncate font-medium">{d.title}</span>,
@@ -107,6 +108,7 @@ const COLUMNS: DataViewColumn<Doc>[] = [
   {
     key: 'id',
     header: 'ID',
+    searchable: true,
     nowrap: true,
     hideBelow: 640,
     cell: (d) => <span className="font-mono text-xs text-muted-foreground">{d.id}</span>,
@@ -138,10 +140,18 @@ const COLUMNS: DataViewColumn<Doc>[] = [
     sortable: true,
     nowrap: true,
     align: 'right',
-    defaultHidden: true,
+    visibility: 'optional',
     cell: (d) => <span className="text-xs text-muted-foreground">{d.due}</span>,
   },
 ];
+
+/** A toggle that is never a table column: `filter: 'toggle'` with `visibility: 'none'`. */
+const MINE: DataViewColumn<Doc> = {
+  key: 'mine',
+  header: 'Mine',
+  filter: 'toggle',
+  visibility: 'none',
+};
 
 const FRAME = 'overflow-hidden rounded-lg border border-border';
 
@@ -165,11 +175,9 @@ export const Example = () => (
       rows={DOCS}
       columns={COLUMNS}
       getRowId={(d) => d.id}
-      searchKeys={['title', 'id']}
-      searchPlaceholder="Search documents"
-      defaultSort={{ key: 'title', dir: 'asc' }}
-      rowMenu={menu}
-      emptyState={empty}
+      defaultState={{ sort: { key: 'title', dir: 'asc' } }}
+      actions={{ menu }}
+      empty={empty}
     />
   </Block>
 );
@@ -186,10 +194,10 @@ export const Variants = () => (
       columns={COLUMNS}
       getRowId={(d) => d.id}
       views={['table', 'cards', 'board']}
-      defaultGroupBy="state"
+      defaultState={{ groupBy: 'state' }}
       storageKey="ds-docs-data-view"
-      rowMenu={menu}
-      emptyState={empty}
+      actions={{ menu }}
+      empty={empty}
     />
   </Block>
 );
@@ -207,15 +215,16 @@ export const States = () => {
         rows={DOCS}
         columns={COLUMNS}
         getRowId={(d) => d.id}
-        selection="multi"
-        selectedIds={ids}
-        onSelectionChange={setIds}
-        bulkActions={(rows) => (
-          <Button size="sm" variant="outline">
-            Archive {rows.length}
-          </Button>
-        )}
-        emptyState={empty}
+        state={{ selection: ids }}
+        onStateChange={(s) => setIds(s.selection)}
+        actions={{
+          bulk: (rows) => (
+            <Button size="sm" variant="outline">
+              Archive {rows.length}
+            </Button>
+          ),
+        }}
+        empty={empty}
       />
     </Block>
   );
@@ -223,20 +232,18 @@ export const States = () => {
 
 export const Composition = () => (
   <Block
-    caption="Quick toggles, two-line rows and a grouped list together: the Mine toggle filters rows, and each group header keeps its count."
+    caption="A toggle column and a grouped list together: the Mine toggle filters rows, and each group header keeps its count."
     className={FRAME}
   >
     <DataView
       aria-label="Grouped documents"
       className="h-[400px]"
       rows={DOCS}
-      columns={COLUMNS}
+      columns={[...COLUMNS, MINE]}
       getRowId={(d) => d.id}
-      defaultGroupBy="priority"
-      quickToggles={[{ key: 'mine', label: 'Mine', predicate: (d) => d.mine }]}
-      rowLines={2}
-      rowMenu={menu}
-      emptyState={empty}
+      defaultState={{ groupBy: 'priority' }}
+      actions={{ menu }}
+      empty={empty}
     />
   </Block>
 );

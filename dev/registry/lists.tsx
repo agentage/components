@@ -1,16 +1,17 @@
 import type { CategoryEntry } from '../registry';
-import { sections } from './sections';
-import * as DataTable from '../demos/data-table';
+import { more, sections } from './sections';
+import * as DataTree from '../demos/data-tree';
 import * as DataView from '../demos/data-view';
-import * as EntityList from '../demos/entity-list';
 import * as GroupHeader from '../demos/group-header';
+import * as ListDemo from '../demos/list';
 import * as ListToolbar from '../demos/list-toolbar';
+import * as LogView from '../demos/log-view';
 import * as Table from '../demos/table';
 
 export const LISTS: CategoryEntry = {
   slug: 'lists',
-  label: 'Lists and tables',
-  description: 'Rows of items: lists, tables, the data view and their toolbar.',
+  label: 'Lists and data',
+  description: 'Rows, tables, the DataView, their toolbar, logs and data trees.',
   components: [
     {
       slug: 'list',
@@ -18,9 +19,9 @@ export const LISTS: CategoryEntry = {
       core: true,
       description:
         'Rows of items: a frame for ListRows, or a grouped, selectable, keyboard list from `items`.',
-      exports: ['EntityList', 'List', 'ListRow'],
-      parts: ['rowVariants', 'GroupHeader', 'Disclosure', 'useRovingFocus', 'useControlled'],
-      demos: sections(EntityList),
+      exports: ['List', 'ListRow', 'GroupHeader', 'Disclosure'],
+      parts: ['GroupHeader', 'Disclosure', 'useRovingFocus'],
+      demos: [...sections(ListDemo), ...more('Group header', GroupHeader)],
     },
     {
       slug: 'table',
@@ -40,22 +41,13 @@ export const LISTS: CategoryEntry = {
       demos: sections(Table),
     },
     {
-      slug: 'data-table',
-      name: 'DataTable',
-      core: true,
-      description: 'Typed columns with sort, grouping, selection and row actions.',
-      exports: ['DataTable'],
-      parts: ['Table', 'GroupHeader', 'Disclosure', 'useRovingFocus', 'useControlled'],
-      demos: sections(DataTable),
-    },
-    {
       slug: 'data-view',
       name: 'DataView',
       core: true,
       description:
-        'A DataTable or cards behind one ListToolbar: search, filter, group, views, bulk bar.',
+        'The one data component: a table, cards or a board behind one toolbar, set up by its columns.',
       exports: ['DataView'],
-      parts: ['DataTable', 'EntityCard', 'ListToolbar'],
+      parts: ['Table', 'Card', 'ListToolbar', 'GroupHeader'],
       demos: sections(DataView),
     },
     {
@@ -86,13 +78,21 @@ export const LISTS: CategoryEntry = {
       demos: sections(ListToolbar),
     },
     {
-      slug: 'group-header',
-      name: 'GroupHeader',
+      slug: 'log-view',
+      name: 'LogView',
       description:
-        'The 32 px group header and 42 px section header every list, table and stack uses.',
-      exports: ['GroupHeader', 'Disclosure', 'DisclosureChevron', 'Count'],
-      parts: ['DisclosureChevron', 'Count'],
-      demos: sections(GroupHeader),
+        'Windowed mono log: level glyphs, live tail, search marks and expandable fields.',
+      exports: ['LogView'],
+      parts: ['DataTree', 'RelativeTime', 'StatusGlyph'],
+      demos: sections(LogView),
+    },
+    {
+      slug: 'data-tree',
+      name: 'DataTree',
+      description: 'JSON as NavTree rows: type colours, search, copy path and value, paged arrays.',
+      exports: ['DataTree'],
+      parts: ['NavTree', 'NavRow', 'CopyButton'],
+      demos: sections(DataTree),
     },
   ],
 };

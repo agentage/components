@@ -5,17 +5,17 @@ import {
   ActiveFilters,
   applyListControls,
   FilterMenu,
-  InspectorPanel,
   List,
   ListToolbar,
   ListToolbarEnd,
   ResizableSplit,
+  Sheet,
   ToolbarSearch,
   ToolbarToggle,
-  useAnnounce,
-  useListControls,
   type ListApplyConfig,
   type ListFilterGroup,
+  useAnnounce,
+  useListControls,
 } from '../../../src';
 import { Block } from '../../components/demo';
 import {
@@ -131,7 +131,7 @@ export const Example = () => {
                 </ListToolbarEnd>
               </ListToolbar>
               <List
-                label="Requests"
+                aria-label="Requests"
                 variant="stacked"
                 className="min-h-0 flex-1 overflow-auto"
                 items={s.shown.map(toListItem)}
@@ -161,14 +161,15 @@ export const Example = () => {
             </div>
           </ResizableSplit>
         </div>
-        <InspectorPanel
+        <Sheet
+          mode="docked"
           open={s.details}
           onOpenChange={s.setDetails}
           title="Details"
           storageKey="ds-docs-requests-inspector"
         >
           <RequestDetails it={s.current} />
-        </InspectorPanel>
+        </Sheet>
       </div>
     </Block>
   );

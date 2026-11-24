@@ -34,7 +34,7 @@ export const Example = () => (
       <PageHeader
         icon={<ServerIcon />}
         title="Services"
-        subtitle="Everything installed on your machines"
+        description="Everything installed on your machines"
         actions={[{ icon: <EditIcon />, title: 'New service', onClick: () => {} }]}
       />
     </Bar>
@@ -55,7 +55,7 @@ export const Variants = () => {
           <PageHeader
             variant="detail"
             title="Nightly backup"
-            subtitle="Copies every folder to cold storage and posts a report when it finishes."
+            description="Copies every folder to cold storage and posts a report when it finishes."
             meta={
               <>
                 <span className="flex items-center gap-1.5">
@@ -102,7 +102,7 @@ export const States = () => (
       <PageHeader
         icon={<InfoIcon />}
         title="Report 2048"
-        subtitle="Created by Ada Lovelace"
+        description="Created by Ada Lovelace"
         actions={[
           { icon: <InfoIcon />, title: 'Details', onClick: () => {} },
           { icon: <EditIcon />, title: 'Edit', onClick: () => {}, disabled: true },

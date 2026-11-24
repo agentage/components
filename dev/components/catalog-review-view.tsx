@@ -98,10 +98,10 @@ export const CatalogList = () => {
   const count = (slug: string): number =>
     groups.find((g) => g.slug === slug)?.components.length ?? 0;
   const figures = [
-    ['Public', rows.length - count('patterns') - count('deprecated')],
+    ['Public pages', rows.length - count('patterns')],
     ['Core', rows.filter((r) => r.c.core).length],
     ['Patterns', count('patterns')],
-    ['Deprecated', count('deprecated')],
+    ['Categories', groups.length - 1],
   ] as const;
   return (
     <div className="space-y-3">

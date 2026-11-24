@@ -2,9 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
-import { AlertDialog } from '../components/alert-dialog';
 import { DropdownMenu, DropdownMenuItem } from '../components/dropdown-menu';
-import { Modal } from '../components/modal';
+import { Dialog } from '../components/dialog';
 import { Popover } from '../components/popover';
 
 const btn = (name: string) => screen.getByRole('button', { name });
@@ -40,7 +39,7 @@ const Stack = () => {
       <button type="button" onClick={() => setM(true)}>
         Open modal
       </button>
-      <Modal open={m} onOpenChange={setM} title="Settings">
+      <Dialog open={m} onOpenChange={setM} title="Settings">
         <Popover
           open={p}
           onOpenChange={setP}
@@ -56,7 +55,7 @@ const Stack = () => {
             </DropdownMenu>
           }
         />
-      </Modal>
+      </Dialog>
     </>
   );
 };
@@ -68,7 +67,7 @@ const openStack = async (user: ReturnType<typeof userEvent.setup>) => {
   expect(screen.getByRole('menu')).toBeTruthy();
 };
 
-describe('overlay stack: Modal > Popover > DropdownMenu', () => {
+describe('overlay stack: Dialog > Popover > DropdownMenu', () => {
   it('Escape closes one layer per press and focus walks back down', async () => {
     const user = userEvent.setup();
     render(<Stack />);
@@ -128,17 +127,17 @@ const ModalAndAlert = () => {
       <button type="button" onClick={() => setM(true)}>
         Open modal
       </button>
-      <Modal open={m} onOpenChange={setM} title="Settings">
+      <Dialog open={m} onOpenChange={setM} title="Settings">
         <button type="button" onClick={() => setA(true)}>
           Delete
         </button>
-        <AlertDialog open={a} onOpenChange={setA} title="Delete item?" onConfirm={() => {}} />
-      </Modal>
+        <Dialog open={a} onOpenChange={setA} title="Delete item?" onConfirm={() => {}} />
+      </Dialog>
     </>
   );
 };
 
-describe('overlay stack: AlertDialog over Modal', () => {
+describe('overlay stack: confirm Dialog over Dialog', () => {
   it('Escape and the alert backdrop close the alert only; the lock holds until the modal closes', async () => {
     const user = userEvent.setup();
     render(<ModalAndAlert />);

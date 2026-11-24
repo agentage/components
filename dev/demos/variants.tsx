@@ -3,13 +3,13 @@ import { useState, type ReactNode } from 'react';
 import {
   Avatar,
   Checkbox,
-  DataTable,
+  DataView,
   StatusGlyph,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-  type DataTableColumn,
+  type DataViewColumn,
 } from '../../src';
 import { Block, Row } from '../components/demo';
 import { UiIcon } from '../lib/ui-icons';
@@ -25,7 +25,7 @@ const HOSTS: Host[] = [
   { id: 'h3', name: 'charlie', region: 'us' },
   { id: 'h4', name: 'backup', region: 'us' },
 ];
-const COLS: DataTableColumn<Host>[] = [
+const COLS: DataViewColumn<Host>[] = [
   { key: 'name', header: 'Host', sortable: true, grow: true },
   { key: 'region', header: 'Region', width: 80 },
 ];
@@ -89,27 +89,28 @@ export const Example = () => {
         </Row>
       </Block>
       <div className="grid gap-4 md:grid-cols-2">
-        <Block caption='DataTable with selection="single": click a row.'>
+        <Block caption="DataView with an open action: the opened row stays current.">
           <Framed>
-            <DataTable
+            <DataView
+              aria-label="Hosts"
               columns={COLS}
               rows={HOSTS}
-              rowKey={(h) => h.id}
-              selection="single"
-              defaultSelectedKeys={['h1']}
+              getRowId={(h) => h.id}
+              defaultState={{ selection: ['h1'] }}
+              actions={{ open: () => undefined }}
             />
           </Framed>
         </Block>
         <Block caption="Multi selection: select all shows mixed, and Shift-click picks a range.">
           <Framed>
-            <DataTable
+            <DataView
+              aria-label="Selectable hosts"
               columns={COLS}
               rows={HOSTS}
-              rowKey={(h) => h.id}
-              rowLabel={(h) => h.name}
-              selection="multi"
-              selectedKeys={multi}
-              onSelectedKeysChange={setMulti}
+              getRowId={(h) => h.id}
+              state={{ selection: multi }}
+              onStateChange={(st) => setMulti(st.selection)}
+              actions={{ bulk: () => null }}
             />
           </Framed>
         </Block>

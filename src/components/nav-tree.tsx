@@ -62,9 +62,8 @@ export interface NavRowProps extends React.HTMLAttributes<HTMLDivElement> {
   count?: React.ReactNode;
   /** Loud trailing badge, for example the number of items that need attention. */
   pill?: React.ReactNode;
-  /** Shows a small dot and adds `dirtyLabel` to the accessible name. */
+  /** Shows a small dot and adds "Unsaved changes" to the accessible name. */
   dirty?: boolean;
-  dirtyLabel?: string;
 }
 
 const Chevron = ({ expanded }: { expanded?: boolean }) => (
@@ -98,12 +97,12 @@ const useRowKeys = (expanded: boolean | undefined, onToggle?: () => void) =>
     [expanded, onToggle]
   );
 
-const NavRowTrail = ({ count, pill, dirty, dirtyLabel }: NavRowProps) => (
+const NavRowTrail = ({ count, pill, dirty }: NavRowProps) => (
   <>
     {dirty && (
       <>
         <span className="size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-        <span className="sr-only">{dirtyLabel}</span>
+        <span className="sr-only">Unsaved changes</span>
       </>
     )}
     {count !== undefined && <span className={navRowCountVariants()}>{count}</span>}
@@ -123,7 +122,6 @@ export const NavRow = React.forwardRef<HTMLDivElement, NavRowProps>(
       count,
       pill,
       dirty,
-      dirtyLabel = 'Unsaved changes',
       className,
       style,
       children,
@@ -164,7 +162,7 @@ export const NavRow = React.forwardRef<HTMLDivElement, NavRowProps>(
           </span>
         )}
         <span className="min-w-0 flex-1 truncate">{children}</span>
-        <NavRowTrail count={count} pill={pill} dirty={dirty} dirtyLabel={dirtyLabel} />
+        <NavRowTrail count={count} pill={pill} dirty={dirty} />
       </div>
     );
   }

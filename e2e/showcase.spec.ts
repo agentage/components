@@ -7,14 +7,10 @@ const CATEGORIES = [
   'forms',
   'navigation',
   'lists',
-  'data-display',
-  'disclosure',
+  'display',
   'overlays',
   'feedback',
   'patterns',
-  'charts',
-  'site',
-  'deprecated',
   'review',
 ] as const;
 
@@ -114,31 +110,33 @@ const group = (page: Page, label: string) =>
 
 test.describe('docs navigation', () => {
   test('only the current route group is expanded on a deep link', async ({ page }) => {
-    await open(page, '/components/forms/slider');
+    await open(page, '/components/forms/tree-select');
     await expect(group(page, 'Forms')).toHaveAttribute('aria-expanded', 'true');
-    for (const other of ['Foundations', 'Charts', 'Overlays', 'Site']) {
+    for (const other of ['Foundations', 'Display', 'Overlays', 'Feedback']) {
       await expect(group(page, other)).toHaveAttribute('aria-expanded', 'false');
     }
-    await expect(rail(page).getByRole('link', { name: 'Slider', exact: true })).toBeInViewport();
+    await expect(
+      rail(page).getByRole('link', { name: 'TreeSelect', exact: true })
+    ).toBeInViewport();
   });
 
   test('a group toggles from the keyboard and persists for the session', async ({ page }) => {
     await open(page, '/install');
-    await group(page, 'Charts').focus();
+    await group(page, 'Display').focus();
     await page.keyboard.press('Enter');
-    await expect(group(page, 'Charts')).toHaveAttribute('aria-expanded', 'true');
-    await expect(rail(page).getByRole('link', { name: 'GaugeCard', exact: true })).toBeVisible();
+    await expect(group(page, 'Display')).toHaveAttribute('aria-expanded', 'true');
+    await expect(rail(page).getByRole('link', { name: 'Sparkline', exact: true })).toBeVisible();
 
     await page.reload();
-    await expect(group(page, 'Charts')).toHaveAttribute('aria-expanded', 'true');
+    await expect(group(page, 'Display')).toHaveAttribute('aria-expanded', 'true');
 
-    await group(page, 'Charts').click();
-    await expect(group(page, 'Charts')).toHaveAttribute('aria-expanded', 'false');
-    await expect(rail(page).getByRole('link', { name: 'GaugeCard', exact: true })).toBeHidden();
+    await group(page, 'Display').click();
+    await expect(group(page, 'Display')).toHaveAttribute('aria-expanded', 'false');
+    await expect(rail(page).getByRole('link', { name: 'Sparkline', exact: true })).toBeHidden();
   });
 
   test('the rail is the only scroller in the aside', async ({ page }) => {
-    await open(page, '/components/forms/slider');
+    await open(page, '/components/forms/select');
     const nested = await rail(page).evaluate(
       (el) =>
         [...el.querySelectorAll('*')].filter(
@@ -166,20 +164,21 @@ test.describe('routing', () => {
 
   test('back and forward restore the previous route', async ({ page }) => {
     await open(page, '/components/forms');
-    await page.getByRole('link', { name: 'Slider', exact: true }).first().click();
-    await expect(page).toHaveURL('/components/forms/slider');
+    await page.getByRole('link', { name: 'Select', exact: true }).first().click();
+    await expect(page).toHaveURL('/components/forms/select');
 
     await page.goBack();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Forms');
 
     await page.goForward();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Slider');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Select');
   });
 
   test('old and merged routes land on the page that holds them now', async ({ page }) => {
     const moved: [string, string, string][] = [
-      ['/components/feedback/modal', '/components/overlays/modal', 'Modal'],
-      ['/components/cards/gauge-card', '/components/charts/gauge-card', 'GaugeCard'],
+      ['/components/feedback/modal', '/components/overlays/dialog', 'Dialog'],
+      ['/components/cards/gauge-card', '/components/display/stat-card', 'StatCard'],
+      ['/components/data-display/entity-card', '/components/display/card', 'Card'],
       ['/components/patterns/secrets', '/components/patterns/settings-form', 'Settings form'],
     ];
     for (const [from, to, title] of moved) {
@@ -192,8 +191,8 @@ test.describe('routing', () => {
   test('a pattern page links to the components it is built from', async ({ page }) => {
     await open(page, '/components/patterns/card-grid');
     const built = section(page, 'Built from');
-    await built.getByRole('link', { name: 'EntityCard' }).click();
-    await expect(page).toHaveURL(/\/components\/data-display\/entity-card$/);
+    await built.getByRole('link', { name: 'PageHeader' }).click();
+    await expect(page).toHaveURL(/\/components\/navigation\/page-header$/);
   });
 
   test('an unknown route renders the empty state', async ({ page }) => {
@@ -204,10 +203,10 @@ test.describe('routing', () => {
   test('the command palette jumps to a component', async ({ page }) => {
     await open(page, '/');
     await page.getByRole('button', { name: 'Search' }).click();
-    await page.getByRole('combobox').fill('conversion funnel');
-    await page.getByRole('option', { name: 'FunnelCard' }).click();
-    await expect(page).toHaveURL('/components/charts/funnel-card');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('FunnelCard');
+    await page.getByRole('combobox').fill('trend line');
+    await page.getByRole('option', { name: 'Sparkline' }).click();
+    await expect(page).toHaveURL('/components/display/sparkline');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sparkline');
   });
 });
 
@@ -233,12 +232,12 @@ test.describe('syntax highlighting', () => {
 
 test.describe('props tables', () => {
   test('render generated rows', async ({ page }) => {
-    await open(page, '/components/data-display/stat-card');
+    await open(page, '/components/display/stat-card');
     const props = section(page, 'Props');
     await expect(props.getByRole('cell', { name: /^title/ })).toBeVisible();
-    await expect(props.getByRole('cell', { name: 'progressLabel' })).toBeVisible();
+    await expect(props.getByRole('cell', { name: 'hint' })).toBeVisible();
     await expect(
-      props.getByText('Accessible name for the progress bar; defaults to the card title.')
+      props.getByText('The one muted line under the value: a description or the earlier figure.')
     ).toBeVisible();
   });
 });
@@ -254,30 +253,27 @@ test.describe('showcase visuals', () => {
     await expect(page).toHaveScreenshot('category-index.png', { fullPage: true });
   });
 
-  test('entity list', async ({ page }) => {
+  test('list', async ({ page }) => {
     await open(page, '/components/lists/list');
-    await expect(section(page, 'Example')).toHaveScreenshot('entity-list.png');
+    await expect(section(page, 'Example')).toHaveScreenshot('list.png');
   });
 
-  test('data table', async ({ page }) => {
-    await open(page, '/components/lists/data-table');
-    await expect(section(page, 'Example')).toHaveScreenshot('data-table-compact.png');
+  test('data view', async ({ page }) => {
+    await open(page, '/components/lists/data-view');
+    await expect(section(page, 'Example')).toHaveScreenshot('data-view.png');
   });
 
-  test('context menu open', async ({ page }) => {
-    await open(page, '/components/overlays/context-menu');
-    await section(page, 'Example')
-      .locator('[data-slot="context-menu"]')
-      .first()
-      .click({ button: 'right' });
-    const menu = page.locator('[data-slot="context-menu-content"]');
+  test('dropdown menu open', async ({ page }) => {
+    await open(page, '/components/overlays/dropdown-menu');
+    await section(page, 'Example').getByRole('button').first().click();
+    const menu = page.locator('[data-slot="dropdown-menu-content"]');
     await expect(menu).toBeVisible();
-    await expect(menu).toHaveScreenshot('context-menu-open.png');
+    await expect(menu).toHaveScreenshot('dropdown-menu-open.png');
   });
 
-  test('usage meter', async ({ page }) => {
-    await open(page, '/components/deprecated/usage-meter');
-    await expect(section(page, 'Example')).toHaveScreenshot('usage-meter.png');
+  test('stat card', async ({ page }) => {
+    await open(page, '/components/display/stat-card');
+    await expect(section(page, 'Example')).toHaveScreenshot('stat-card.png');
   });
 
   test('resizable panels', async ({ page }) => {
@@ -285,12 +281,12 @@ test.describe('showcase visuals', () => {
     await expect(section(page, 'Example')).toHaveScreenshot('resizable-panels.png');
   });
 
-  test('confirm by typing dialog', async ({ page }) => {
-    await open(page, '/components/feedback/confirm-by-typing');
-    await section(page, 'Example').getByRole('button').first().click();
-    const dialog = page.locator('[data-slot="alert-dialog-content"]');
+  test('typed confirm dialog', async ({ page }) => {
+    await open(page, '/components/overlays/dialog');
+    await section(page, 'States').getByRole('button').first().click();
+    const dialog = page.locator('[data-slot="dialog-content"]');
     await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveScreenshot('confirm-by-typing.png');
+    await expect(dialog).toHaveScreenshot('dialog-confirm-text.png');
   });
 
   test('command palette open', async ({ page }) => {

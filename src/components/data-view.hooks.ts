@@ -1,76 +1,145 @@
 'use client';
 
 import * as React from 'react';
-import {
-  useListControls,
-  type ListControls,
-  type ListControlsState,
-} from '../lib/use-list-controls';
+import { EMPTY_LIST_CONTROLS, type ListControlsState } from '../lib/list-controls';
+import { readListControls, writeListControls } from '../lib/list-controls-storage';
+import { useListControls, type ListControls } from '../lib/use-list-controls';
 import { readPersisted, useRestoring, writePersisted } from '../lib/use-persisted-state';
+import type { DataViewState } from './data-view.types';
 
-export interface ControlsSeed {
-  views?: string[];
-  columns?: { key: string; groupable?: boolean; sortable?: boolean }[];
-  defaultGroupBy?: string | null;
-  defaultSort?: { key: string; dir: 'asc' | 'desc' } | null;
-  state?: ListControlsState;
-  onStateChange?: (state: ListControlsState) => void;
+export interface StateSeed {
+  views: string[];
+  columns: { key: string; groupable?: boolean; sortable?: boolean }[];
+  state?: Partial<DataViewState>;
+  defaultState?: Partial<DataViewState>;
+  onStateChange?: (state: DataViewState) => void;
   storageKey?: string;
 }
 
-type Col = NonNullable<ControlsSeed['columns']>[number];
+const LIST_KEYS = ['query', 'filters', 'view', 'sort', 'groupBy', 'flags'] as const;
+const pickList = (s: Partial<DataViewState> = {}): Partial<ListControlsState> =>
+  Object.fromEntries(LIST_KEYS.filter((k) => s[k] !== undefined).map((k) => [k, s[k]]));
+
+const NO_IDS: string[] = [];
+type Col = StateSeed['columns'][number];
 const known = (cols: Col[], key: string, flag: 'groupable' | 'sortable'): boolean =>
   cols.some((col) => col.key === key && col[flag]);
 
-export const useDataViewControls = (seed: ControlsSeed): ListControls => {
-  const [initial] = React.useState(() => ({
-    view: seed.views?.[0] ?? 'table',
-    groupBy: seed.defaultGroupBy ?? null,
-    sort: seed.defaultSort ?? null,
+/** Seeds from `defaultState`, then a stored state; a restored column that is gone falls back. */
+const useListPart = (seed: StateSeed, report: (list: ListControlsState) => void) => {
+  const [initial] = React.useState<ListControlsState>(() => ({
+    ...EMPTY_LIST_CONTROLS,
+    view: seed.views[0] ?? 'table',
+    ...pickList(seed.defaultState),
   }));
-  const c = useListControls(initial, {
-    state: seed.state,
-    onStateChange: seed.onStateChange,
-    storageKey: seed.storageKey,
-  });
-  const { groupBy, sort } = c.state;
-  const { columns: cols, storageKey } = seed;
-  const own = seed.state === undefined;
-  // A restored group or sort column that no longer exists falls back to the default.
+  const [inner, setInner] = React.useState(initial);
+  const [restoring, setRestoring] = useRestoring();
+  const { storageKey, columns } = seed;
   React.useLayoutEffect(() => {
-    if (!storageKey || !own || !cols?.length) return;
-    if (groupBy !== initial.groupBy && groupBy !== null && !known(cols, groupBy, 'groupable'))
-      c.setGroupBy(initial.groupBy);
-    if (sort && sort.key !== initial.sort?.key && !known(cols, sort.key, 'sortable'))
-      c.setSort(initial.sort);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- checks each restored value once
-  }, [groupBy, sort?.key]);
-  return c;
+    if (!storageKey) return;
+    const stored = readListControls(storageKey);
+    if (!stored) return;
+    const next = { ...initial, ...stored };
+    if (next.groupBy !== null && next.groupBy !== initial.groupBy)
+      if (!known(columns, next.groupBy, 'groupable')) next.groupBy = initial.groupBy;
+    if (next.sort && next.sort.key !== initial.sort?.key)
+      if (!known(columns, next.sort.key, 'sortable')) next.sort = initial.sort;
+    // Storage is read after hydration, so server and client render the same first tree.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInner(next);
+    if (next.groupBy !== stored.groupBy || next.sort !== stored.sort)
+      writeListControls(storageKey, next);
+    setRestoring(true);
+    // Restore once per key; later changes write, they never re-read.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+  const own = seed.state ?? {};
+  const state = React.useMemo(
+    () => ({ ...inner, ...pickList(own) }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the controlled keys, not the wrapper
+    [inner, own.query, own.filters, own.view, own.sort, own.groupBy, own.flags]
+  );
+  const c = useListControls(initial, {
+    state,
+    onStateChange: (next) => {
+      setInner(next);
+      if (storageKey) writeListControls(storageKey, next);
+      report(next);
+    },
+  });
+  return [c, restoring] as const;
 };
 
 const isStrings = (v: unknown): v is string[] =>
   Array.isArray(v) && v.every((s) => typeof s === 'string');
 
 /** Collapsed group keys, kept per Group by column under `<storageKey>.collapsed.<column>`. */
-export const useCollapsedGroups = (storageKey: string | undefined, groupBy: string | null) => {
+const useCollapsedGroups = (storageKey: string | undefined, groupBy: string | null) => {
   const key = storageKey && groupBy ? `${storageKey}.collapsed.${groupBy}` : null;
   const [byGroup, setByGroup] = React.useState<Record<string, string[]>>({});
   const [restoring, setRestoring] = useRestoring();
-  const known = groupBy !== null && byGroup[groupBy] !== undefined;
+  const seen = groupBy !== null && byGroup[groupBy] !== undefined;
   React.useLayoutEffect(() => {
-    if (!key || !groupBy || known) return;
+    if (!key || !groupBy || seen) return;
     const stored = readPersisted<string[]>(key, [], isStrings);
     if (typeof stored === 'symbol' || stored.length === 0) return;
     // Storage is read after hydration, so server and client render the same first tree.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setByGroup((m) => ({ ...m, [groupBy]: stored }));
     setRestoring(true);
-  }, [key, groupBy, known, setRestoring]);
-  const current = groupBy ? (byGroup[groupBy] ?? []) : [];
+  }, [key, groupBy, seen, setRestoring]);
+  const current = groupBy ? (byGroup[groupBy] ?? NO_IDS) : NO_IDS;
   const set = (next: string[]): void => {
     if (!groupBy) return;
     setByGroup((m) => ({ ...m, [groupBy]: next }));
     if (key) writePersisted(key, next);
   };
   return [current, set, restoring] as const;
+};
+
+export interface DataViewControls {
+  c: ListControls;
+  state: DataViewState;
+  setSelection: (ids: string[]) => void;
+  setCollapsed: (keys: string[]) => void;
+  restoring: boolean;
+}
+
+/** One state object: each key given in `state` is controlled, the rest is kept here. */
+export const useDataViewState = (seed: StateSeed): DataViewControls => {
+  const own = seed.state ?? {};
+  const [selection, setOwnSelection] = React.useState(seed.defaultState?.selection ?? NO_IDS);
+  const latest = React.useRef<DataViewState | null>(null);
+  const report = (patch: Partial<DataViewState>) => {
+    if (latest.current) seed.onStateChange?.({ ...latest.current, ...patch });
+  };
+  const [c, listRestoring] = useListPart(seed, (list) => report(list));
+  const [collapsedOwn, setCollapsedOwn, collapseRestoring] = useCollapsedGroups(
+    seed.storageKey,
+    c.state.groupBy
+  );
+  const sel = own.selection ?? selection;
+  const collapsed = own.collapsed ?? collapsedOwn;
+  const rowsBy = own.rowsBy !== undefined ? own.rowsBy : (seed.defaultState?.rowsBy ?? null);
+  // One stable object per change, so the row and filter memos downstream can hit.
+  const state = React.useMemo<DataViewState>(
+    () => ({ ...c.state, selection: sel, collapsed, rowsBy }),
+    [c.state, sel, collapsed, rowsBy]
+  );
+  React.useLayoutEffect(() => {
+    latest.current = state;
+  });
+  return {
+    c,
+    state,
+    setSelection: (ids) => {
+      setOwnSelection(ids);
+      report({ selection: ids });
+    },
+    setCollapsed: (keys) => {
+      setCollapsedOwn(keys);
+      report({ collapsed: keys });
+    },
+    restoring: listRestoring || collapseRestoring,
+  };
 };

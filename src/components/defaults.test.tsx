@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Checkbox } from './checkbox';
-import { Combobox } from './combobox';
+import { Select } from './select';
 import { DescriptionList } from './description-list';
 import { Switch } from './switch';
 import { ToggleGroup } from './toggle-group';
@@ -27,9 +27,9 @@ describe('uncontrolled defaults and new props', () => {
     expect(sw.getAttribute('aria-checked')).toBe('true');
   });
 
-  it('Combobox shows its defaultValue', () => {
+  it('Select shows its defaultValue', () => {
     render(
-      <Combobox
+      <Select
         defaultValue="b"
         options={[
           { value: 'a', label: 'Alpha' },

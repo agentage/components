@@ -5,15 +5,9 @@ import { cn } from '../lib/utils';
 const PILL = 'gap-1 rounded-full border bg-transparent px-2 font-normal';
 
 export const badgeVariants = cva(
-  'inline-flex items-center whitespace-nowrap rounded-md text-xs font-medium transition-colors',
+  'inline-flex h-5 items-center whitespace-nowrap rounded-md px-1.5 text-xs leading-none font-medium transition-colors',
   {
     variants: {
-      size: {
-        /** 20 px, the one badge size. */
-        sm: 'h-5 px-1.5 leading-none',
-        /** @deprecated The pre-0.21 22 px badge; use the default `sm`. */
-        md: 'px-2 py-0.5',
-      },
       variant: {
         default: 'bg-primary/10 text-primary-emphasis border border-primary/20',
         secondary: 'bg-secondary text-secondary-foreground border border-border',
@@ -36,7 +30,6 @@ export const badgeVariants = cva(
     },
     defaultVariants: {
       variant: 'default',
-      size: 'sm',
     },
   }
 );
@@ -50,13 +43,13 @@ export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> &
   };
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, size, count, max = 99, children, ...props }, ref) => {
+  ({ className, variant, count, max = 99, children, ...props }, ref) => {
     if (count !== undefined && count <= 0) return null;
     return (
       <span
         ref={ref}
         className={cn(
-          badgeVariants({ variant: variant ?? (count !== undefined ? 'solid' : undefined), size }),
+          badgeVariants({ variant: variant ?? (count !== undefined ? 'solid' : undefined) }),
           className
         )}
         data-slot="badge"

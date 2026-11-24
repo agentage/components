@@ -6,9 +6,8 @@ import type { DataTableProps } from './data-table.types';
 
 const EMPTY: never[] = [];
 
-/** `rows` wins over the deprecated `data`; a stable empty array keeps the memos warm. */
-export const tableRows = <T>(props: Pick<DataTableProps<T>, 'rows' | 'data'>): T[] =>
-  props.rows ?? props.data ?? EMPTY;
+/** A stable empty array keeps the memos warm. */
+export const tableRows = <T>(props: Pick<DataTableProps<T>, 'rows'>): T[] => props.rows ?? EMPTY;
 
 const fieldValue = <T>(row: T, key: string): SortableValue =>
   (row as Record<string, SortableValue>)[key];

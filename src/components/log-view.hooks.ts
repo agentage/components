@@ -8,7 +8,6 @@ import { countAfter, indexAt, isAtBottom, lineText, type LogLine } from './log-v
 
 export interface FollowOptions {
   follow?: boolean;
-  defaultFollow?: boolean;
   onFollowChange?: (follow: boolean) => void;
   /** Every line, before the filter: the new count survives a filter change and a capped buffer. */
   lines: LogLine[];
@@ -21,11 +20,7 @@ export interface FollowOptions {
 
 /** Live tail: follows the bottom, pauses on scroll up and counts lines after the last one seen. */
 export const useFollow = (o: FollowOptions) => {
-  const [following, setFollowing] = useControlled(
-    o.follow,
-    o.defaultFollow ?? false,
-    o.onFollowChange
-  );
+  const [following, setFollowing] = useControlled(o.follow, false, o.onFollowChange);
   const { lines, passes, shown, offsets } = o;
   const last = lines.length > 0 ? lines[lines.length - 1].id : null;
   const [seen, setSeen] = React.useState(last);

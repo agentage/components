@@ -13,11 +13,13 @@ export const REVIEW: CategoryEntry = {
     {
       slug: 'catalog-review',
       name: 'Catalog review',
-      description: 'The final component list, suggestions, 0.21 release notes and known limits.',
+      description:
+        'The final component list, the simplification pass in numbers, suggestions, 0.21 release notes and known limits.',
       exports: [],
       parts: [],
       demos: [
         { title: 'Components', Component: CatalogReview.Catalog },
+        { title: 'Simplification pass', Component: CatalogReview.Pass },
         { title: 'Suggestions', Component: CatalogReview.Suggestions },
         { title: 'Release notes 0.21', Component: CatalogReview.ReleaseNotes },
         { title: 'Known limits', Component: CatalogReview.KnownLimits },
@@ -35,7 +37,7 @@ export const REVIEW: CategoryEntry = {
       slug: 'variants',
       name: 'New variants',
       description: 'Variants added on existing components.',
-      exports: ['Tabs', 'Avatar', 'Checkbox', 'StatusGlyph', 'DataTable'],
+      exports: ['Tabs', 'Avatar', 'Checkbox', 'StatusGlyph', 'DataView'],
       parts: [],
       demos: sections(Variants),
     },

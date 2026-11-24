@@ -74,7 +74,7 @@ describe('Sheet', () => {
   });
 });
 
-// Frozen pre-CVA output of the side ternary.
+// Frozen panel classes; the look must not drift.
 const SHEET_BASE =
   'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-[var(--shadow-popover)] outline-none';
 
@@ -105,40 +105,40 @@ describe('Sheet class parity', () => {
   });
 });
 
-describe('Sheet header slot', () => {
-  it('renders header content in the title bar', () => {
+describe('Sheet actions slot', () => {
+  it('renders actions in the title bar', () => {
     render(
       <Sheet
         open
         onOpenChange={vi.fn()}
         title="Ada Lovelace"
         description="Owner"
-        header={<span>admin</span>}
+        actions={<span>admin</span>}
       >
         content
       </Sheet>
     );
-    const header = document.querySelector('[data-slot="sheet-header"]') as HTMLElement;
-    expect(header.textContent).toBe('admin');
+    const actions = document.querySelector('[data-slot="sheet-actions"]') as HTMLElement;
+    expect(actions.textContent).toBe('admin');
     expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
   });
 
-  it('renders the title bar for a header with no title', () => {
+  it('renders the title bar for actions with no title', () => {
     render(
-      <Sheet open onOpenChange={vi.fn()} header={<span>admin</span>}>
+      <Sheet open onOpenChange={vi.fn()} actions={<span>admin</span>}>
         content
       </Sheet>
     );
-    expect(document.querySelector('[data-slot="sheet-header"]')).toBeTruthy();
+    expect(document.querySelector('[data-slot="sheet-actions"]')).toBeTruthy();
     expect(screen.getByRole('dialog').getAttribute('aria-labelledby')).toBeNull();
   });
 
-  it('omits the header wrapper when no header is given', () => {
+  it('omits the actions wrapper when no actions are given', () => {
     render(
       <Sheet open onOpenChange={vi.fn()} title="Filters">
         content
       </Sheet>
     );
-    expect(document.querySelector('[data-slot="sheet-header"]')).toBeNull();
+    expect(document.querySelector('[data-slot="sheet-actions"]')).toBeNull();
   });
 });

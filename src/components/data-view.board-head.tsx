@@ -71,8 +71,7 @@ export const BoardColumnHead = ({
       open
       onOpenChange={onToggle}
       level={3}
-      sticky
-      className="rounded-lg border-0 bg-background"
+      className="sticky top-0 z-10 rounded-lg border-0 bg-background"
       style={{ gridColumn: index + 1, gridRow: 1 }}
       actions={
         onAdd && (

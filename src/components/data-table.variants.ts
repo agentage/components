@@ -7,22 +7,16 @@ const ALIGN = {
   right: 'text-right',
 };
 
-// `default` is the old name of `comfortable`; both keep the Table primitive spacing.
-const DENSITY_KEYS = { dense: '', compact: '', comfortable: '', default: '' };
-
 /** Column gap 10 px (5 + 5) and 16 px row padding at the outer edges. */
 const DENSE_X = 'px-[5px] first:pl-4 last:pr-4';
 
-// `compact` mirrors the density admin kept its own table for: tighter rows, nothing wrapping.
 export const dataTableHeadVariants = cva('', {
   variants: {
     density: {
-      ...DENSITY_KEYS,
       dense: [
         'z-30 h-8 bg-background text-xs font-normal normal-case tracking-normal whitespace-nowrap',
         DENSE_X,
       ],
-      compact: 'h-auto py-2 whitespace-nowrap',
     },
     align: ALIGN,
   },
@@ -35,9 +29,7 @@ export const dataTableHeadVariants = cva('', {
 export const dataTableCellVariants = cva('', {
   variants: {
     density: {
-      ...DENSITY_KEYS,
       dense: ['py-0 text-ui whitespace-nowrap', DENSE_X],
-      compact: 'px-4 py-2',
     },
     align: ALIGN,
     nowrap: {

@@ -3,17 +3,23 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../lib/utils';
-import { useControlled } from '../lib/use-controlled';
 import { Button } from './button';
 import { fieldVariants } from './control.variants';
 import { menuLabelVariants } from './menu.variants';
 import { Truncate } from './truncate';
 import { NavTree } from './nav-tree';
 import { Popover } from './popover';
-import { defaultPath, findPath, visibleRows, type TreeSelectNode } from './tree-select.model';
+import {
+  defaultPath,
+  findPath,
+  TREE_SELECT_LABELS,
+  visibleRows,
+  type TreeSelectLabels,
+  type TreeSelectNode,
+} from './tree-select.model';
 import { TreeRows, useExpanded } from './tree-select.rows';
 
-export type { TreeSelectNode } from './tree-select.model';
+export type { TreeSelectLabels, TreeSelectNode } from './tree-select.model';
 
 export interface TreeSelectProps {
   nodes: TreeSelectNode[];
@@ -23,19 +29,14 @@ export interface TreeSelectProps {
   title: string;
   /** `single` picks on click or Enter and closes; `multi` toggles and confirms in the footer. */
   mode?: 'single' | 'multi';
-  /** Controlled open state. */
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
   /** The picked ids: one in `single` mode, the confirmed set in `multi`. */
   onValueChange: (ids: string[]) => void;
   /** Already chosen ids: shown, but not pickable. */
   disabledIds?: string[];
-  disabledLabel?: string;
   /** Ids open at first; by default every root, applied once nodes arrive. */
   defaultExpanded?: string[];
-  searchPlaceholder?: string;
-  confirmLabel?: (count: number) => string;
+  /** Copy overrides, for example a translation. */
+  labels?: Partial<TreeSelectLabels>;
   formatPath?: (path: TreeSelectNode[]) => string;
   /** Classes of the picker panel. */
   className?: string;
@@ -48,22 +49,18 @@ export const TreeSelect = React.forwardRef<HTMLElement, TreeSelectProps>(
       nodes,
       trigger,
       title,
-      open: openProp,
-      defaultOpen = false,
-      onOpenChange,
       mode = 'single',
       onValueChange,
       disabledIds = [],
-      disabledLabel = 'Added',
       defaultExpanded,
-      searchPlaceholder = 'Search',
-      confirmLabel = (n) => (n === 1 ? 'Add 1' : `Add ${String(n)}`),
+      labels,
       formatPath = defaultPath,
       className,
     },
     ref
   ) => {
-    const [open, setOpen] = useControlled(openProp, defaultOpen, onOpenChange);
+    const l = { ...TREE_SELECT_LABELS, ...labels };
+    const [open, setOpen] = React.useState(false);
     const [query, setQuery] = React.useState('');
     const [picked, setPicked] = React.useState<string[]>([]);
     const [active, setActive] = React.useState<string | null>(null);
@@ -112,8 +109,8 @@ export const TreeSelect = React.forwardRef<HTMLElement, TreeSelectProps>(
             e.preventDefault();
             treeRef.current?.querySelector<HTMLElement>('[tabindex="0"]')?.focus();
           }}
-          placeholder={searchPlaceholder}
-          aria-label={searchPlaceholder}
+          placeholder={l.search}
+          aria-label={l.search}
           className={cn(
             fieldVariants({ size: 'sm' }),
             'mx-1 mb-1 w-auto bg-background text-foreground'
@@ -126,7 +123,7 @@ export const TreeSelect = React.forwardRef<HTMLElement, TreeSelectProps>(
           className="max-h-[300px] overflow-auto"
         >
           {rows.length === 0 && (
-            <p className="m-0 px-2 py-1.5 text-ui text-muted-foreground">No match</p>
+            <p className="m-0 px-2 py-1.5 text-ui text-muted-foreground">{l.noMatch}</p>
           )}
           <TreeRows
             rows={rows}
@@ -134,7 +131,7 @@ export const TreeSelect = React.forwardRef<HTMLElement, TreeSelectProps>(
             expanded={expanded}
             picked={picked}
             disabledIds={disabledIds}
-            disabledLabel={disabledLabel}
+            disabledLabel={l.added}
             onToggle={toggle}
             onChoose={choose}
             onFocusRow={setActive}
@@ -157,7 +154,7 @@ export const TreeSelect = React.forwardRef<HTMLElement, TreeSelectProps>(
                 close();
               }}
             >
-              {confirmLabel(picked.length)}
+              {l.confirm(picked.length)}
             </Button>
           )}
         </div>
@@ -166,8 +163,8 @@ export const TreeSelect = React.forwardRef<HTMLElement, TreeSelectProps>(
 
     return (
       <Popover
-        isOpen={open}
-        onClose={() => close(false)}
+        open={open}
+        onOpenChange={(next) => (next ? setOpen(true) : close(false))}
         side="bottom"
         aria-label={title}
         className="min-w-0 p-1"

@@ -34,8 +34,6 @@ export interface ResizableSplitProps extends Omit<
   collapsible?: boolean;
   /** Accessible name of the separator. */
   label?: string;
-  onWidthChange?: (px: number) => void;
-  onCollapsedChange?: (collapsed: boolean) => void;
   /** Imperative toggle for a control outside the split. */
   apiRef?: Ref<ResizableSplitApi>;
   /** Two panes in visual order: start/end (horizontal) or top/bottom (vertical). */
@@ -55,8 +53,6 @@ export const ResizableSplit = ({
   orientation = 'horizontal',
   collapsible = false,
   label = 'Resize panes',
-  onWidthChange,
-  onCollapsedChange,
   apiRef,
   children,
   className,
@@ -75,8 +71,6 @@ export const ResizableSplit = ({
     min,
     max,
     collapsible,
-    onWidthChange,
-    onCollapsedChange,
     apiRef,
   });
   const { width, collapsed } = api;

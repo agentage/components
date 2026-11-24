@@ -4,7 +4,6 @@ import {
   Card,
   CodeBlock,
   DataTree,
-  MarkdownRenderer,
   NavRow,
   Table,
   TableBody,
@@ -13,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../src';
+import { MarkdownRenderer } from '../components/markdown';
 import {} from '../components/demo';
 import { type FileNode } from './files-data';
 import { UiIcon } from './ui-icons';

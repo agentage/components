@@ -131,24 +131,17 @@ describe('ContentBlocks stable rows', () => {
   });
 });
 
-describe('ContentBlock controlled open', () => {
-  it('follows open and reports toggles through onOpenChange', async () => {
+describe('ContentBlock', () => {
+  it('starts shut with defaultOpen false and toggles from the header', async () => {
     const { ContentBlock } = await import('./content-block');
-    const onOpenChange = vi.fn();
-    const { rerender } = render(
-      <ContentBlock title="Body" open={false} onOpenChange={onOpenChange}>
+    render(
+      <ContentBlock title="Body" defaultOpen={false}>
         Inside
       </ContentBlock>
     );
     const toggle = screen.getByRole('button', { expanded: false });
     fireEvent.click(toggle);
-    expect(onOpenChange).toHaveBeenCalledWith(true);
-    expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    rerender(
-      <ContentBlock title="Body" open onOpenChange={onOpenChange}>
-        Inside
-      </ContentBlock>
-    );
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('region', { name: 'Body' })).toBeTruthy();
   });
 });

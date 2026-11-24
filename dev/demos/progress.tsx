@@ -49,10 +49,10 @@ export const States = () => (
       <Progress value={2} max={7} label="2 of 7 done" showValue size="sm" variant="info" />
     </Block>
     <Block
-      caption="Indeterminate is for unknown progress: it animates a full bar."
+      caption="Without a value the progress is unknown: it animates a full bar."
       className="max-w-md"
     >
-      <Progress indeterminate label="Preparing" />
+      <Progress label="Preparing" />
     </Block>
   </div>
 );
@@ -71,10 +71,8 @@ const Meters = () => (
     {QUOTAS.map((q) => (
       <Progress
         key={q.label}
-        role="meter"
-        labelPosition="top"
+        meter
         showValue
-        thresholds={{}}
         label={q.label}
         value={q.value}
         max={q.max}

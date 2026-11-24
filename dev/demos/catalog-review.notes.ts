@@ -1,30 +1,26 @@
 import type { Note } from '../components/catalog-review-view';
 
-// Release notes 0.21, from the 0.20.2 comparison. Append rows per group.
+// Release notes 0.21 (the first release as @agentage/components), from the 0.20.2 comparison.
 export const NOTES_LOOK: Note[] = [
-  ['Controls', 'Button md 28 px, sm 24 px, 13 px text, radius 8 px; lg is 32 px and deprecated.'],
+  ['Controls', 'Button md 28 px, sm 24 px, 13 px text, radius 8 px; the 32 px size is gone.'],
   [
     'Fields',
-    'Input, Select, Combobox, DatePicker trigger: md 30 px (was 36), sm 26 px, radius 6 px, no tinted fill.',
+    'Input, Select, DatePicker trigger: md 30 px (was 36), sm 26 px, radius 6 px, no tinted fill.',
   ],
   [
     'Card',
     'One flat surface with 12/14 padding (was shadowed); `variant="flat"` renders the same.',
   ],
   [
-    'Table, DataTable',
+    'Table, DataView',
     '32 px header in regular 12 px muted text (was 40 px uppercase), 36 px rows (was about 49).',
   ],
   ['Chart and stat cards', 'Compact 12/14 padding (was p-4 or p-5).'],
   ['Alert', '12 px padding and 13 px text.'],
   ['Avatar', 'Default size is sm 28 px (was md 40 px); sm shrank from 32 to 28, xs from 24 to 22.'],
   ['Badge, Chip, Kbd', 'Badge 20 px (was 22), Chip 24 px, Kbd 20 px.'],
-  ['StatusDot', 'Draws a StatusGlyph; 7, 9 and 11 px boxes; the pulse stops under reduced motion.'],
-  [
-    'PageHeader, Sidebar, NavLink',
-    'Header 48 px (lg keeps 52); rows 28 px (comfortable keeps 36).',
-  ],
-  ['Section', 'Open form section by default; the boxed look is `variant="boxed"`.'],
+  ['PageHeader, Sidebar', 'Header 48 px; rows 28 px.'],
+  ['Section', 'An open form section: a rule and air between siblings, no box.'],
   ['Tabs', '38 px list with a 2 px accent bar (line) or a 34 px tray (pill).'],
   ['Menus', '210 px wide, 28 px items, 13 px text; `size="md"` keeps the old menu.'],
   [
@@ -35,7 +31,7 @@ export const NOTES_LOOK: Note[] = [
   ['Focus', 'One inset accent outline replaces the old ring on every control.'],
   [
     'Overlays',
-    'Popover, Tooltip, Sheet, Modal, Toast: new popover shadow and a short fade-and-drop entrance.',
+    'Popover, Tooltip, Sheet, Dialog, Toast: new popover shadow and a short fade-and-drop entrance.',
   ],
   [
     'Copy buttons',
@@ -67,7 +63,7 @@ export const NOTES_NEW: Note[] = [
 // New props, one row per component (from the release notes).
 export const NOTES_NEW_PROPS: Note[] = [
   ['Accordion', '`value`, `onValueChange`, `storageKey`, `variant`, `level`'],
-  ['Alert', '`title`, `actions`, `density`, `variant="primary"`'],
+  ['Alert', '`title`, `actions`, `variant="primary"`'],
   ['Avatar', '`icon`, `shape`, `tone`, size `2xs`'],
   ['Badge', '`count`, `max`, `size`, solid and outline-tone variants'],
   ['Button', '`pending`, `variant="outline-primary"`'],
@@ -78,84 +74,105 @@ export const NOTES_NEW_PROPS: Note[] = [
   ['Checkbox, Switch', '`defaultChecked`, `size`'],
   ['Chip', '`pressed`, `size`'],
   ['Collapsible trigger', '`chevron`, `count`'],
-  ['Combobox', '`defaultValue`, `size`'],
-  ['ContextMenu', '`open`, `size`, item `icon`'],
-  ['DataTable', 'grouping, selection, row menu, `showHeader`, `rowLines`, `overflowX`'],
+  ['Select', '`searchable`, `defaultValue`, `size`, `labels`'],
+  ['DataView', '`state`, `defaultState`, `actions`, column `searchable`, `visibility`, `twoLine`'],
   ['DatePicker', '`mode="range"`, `presets`, `defaultValue`, `size`'],
   ['DropdownMenu', '`open`, `defaultOpen`, `onOpenChange`, `closeOnSelect`, `size`'],
   ['EmptyState', '`align`'],
   ['FormField', '`layout`, `preview`'],
   ['Input, Textarea', '`mono`, `size`; Textarea `autoGrow`'],
   ['ListRow', '`selected`, `kind`, `icon`, `alert`'],
-  ['MarkdownRenderer', '`size`'],
   ['PageHeader', '`meta`, `tabs`, `variant`, `size`'],
   ['Popover', '`label`, `side`'],
-  [
-    'Progress',
-    '`showValue`, `formatValue`, `thresholds`, `segments`, `legend`, `size`, `labelPosition`',
-  ],
-  ['Section', '`variant`, `headingAs`'],
+  ['Progress', '`showValue`, `formatValue`, `meter`, `segments`, `legend`, `size`'],
   [
     'StatCard',
-    '`footer`, `indicator`, `period`, `comparison`, `chart`, `chartLabel`, `facts`, `breakdown`, `history`, `state`, `skeleton`, `empty`, `error`, `onRetry`, footer meta `source`, `updatedAt`, `stale`, `onRefresh`, `refreshing`, `trend.sentiment`',
+    '`hint`, `icon`, `state`, `fallback`, `footer` (with `CardMeta`), `children` under the value, `trend.sentiment`',
   ],
   ['Tabs trigger', '`count`, `dirty`'],
   ['ToggleButton', '`variant`, `iconOnly`'],
   ['ToggleGroup', '`disabled`, `variant="segmented"`'],
-  ['StatusDot', 'variants `paused`, `running`'],
-  ['AlertDialog', '`pending`'],
-  ['ContentBlock', '`open`, `onOpenChange` (controlled open)'],
+  ['Dialog', '`pending`, `confirmText`, `tone`'],
   ['MiniBars', '`tone`'],
-  ['IconContainer, HeatmapCard', '`tone`'],
-  ['DataTable', '`rows`'],
+  ['Avatar', 'meaning `tone` values on the square tile'],
   ['DatePicker range', '`expression` on the value, resolved by `resolveDateRange(range, now)`'],
 ];
 
 export const NOTES_RENAMED: Note[] = [
   [
-    'Modal, Popover',
-    '`isOpen` and `onClose` are now `open` and `onOpenChange`; Popover `align` left and right are `start` and `end`.',
+    'Modal, AlertDialog, ConfirmByTyping',
+    'Now one `Dialog`: `onConfirm` makes it a confirm dialog, `tone="destructive"` colours Confirm, `confirmText` asks to retype a phrase. `ModalFooter` is `DialogFooter`.',
   ],
-  ['ToggleGroup', '`onChange` is now `onValueChange`.'],
-  ['PageHeader', '`subtitle` is now `description`.'],
-  ['Select trigger', '`compact` is now `size="sm"`.'],
-  ['NavLink', 'Now NavRow (or `navRowVariants`).'],
+  ['InspectorPanel', 'Now `<Sheet mode="docked">`; Sheet `header` is `actions`.'],
   [
-    'FilterBar parts',
-    'Now ListToolbar, FilterMenu, ToolbarToggle, DisplayMenu, ToolbarSearch, ActiveFilters, ListToolbarEnd.',
+    'Combobox, Select parts',
+    'Now one `Select` with `options`; `searchable` adds the search box. `ComboboxOption` is `SelectOption`.',
   ],
-  ['Tabs variants', '`default` renders pill, `underline` renders line.'],
+  ['EntityList', 'Now `List` (it was an alias); `label` is the native `aria-label`.'],
   [
-    'DataTable density',
-    '`default`, `compact`, `comfortable` keep the old spacing; `dense` is the new default.',
+    'Popover, ToggleGroup, PageHeader',
+    '`isOpen`/`onClose` are `open`/`onOpenChange`; `onChange` is `onValueChange`; `subtitle` is `description`. No aliases.',
   ],
   [
-    'UsageMeter',
-    'Now Progress with `role="meter"`, `labelPosition="top"`, `showValue`, `thresholds`.',
+    'StatCard',
+    '`description` and `comparison` are one `hint` line; `trend.up` is `trend.direction`; `pressable` is implied by `onClick`; `indicator` is `icon`.',
   ],
-  ['EntityList', 'Also exported under a preferred name (see List).'],
-  ['PageLayout', 'Compose PageHeader and your own container.'],
-  ['DataTable', '`data` is now `rows`; `data` still works.'],
-  ['IconContainer, HeatmapCard, MiniBars', '`color` is now `tone`; `color` still works.'],
+  [
+    'Card, StatCard states',
+    '`skeleton`, `empty`, `error`, `onRetry` are one `fallback` object `{ loading, empty, error, onRetry }`.',
+  ],
+  [
+    'CardFooter meta',
+    '`source`, `updatedAt`, `stale`, `onRefresh`, `refreshing` moved to the `CardMeta` part, placed inside the footer.',
+  ],
+  [
+    'DataView',
+    'See the DataView row under Removed: the state, selection and action props are now `state`, `defaultState` and `actions`.',
+  ],
+  ['DirtyBar, TreeSelect', 'The per-button label props are one `labels` object.'],
+  [
+    'Progress',
+    '`role="meter"`, `labelPosition` and `thresholds` are one `meter` flag; a missing `value` is indeterminate.',
+  ],
+  ['MiniBars, Heatmap', '`color` is `tone` only.'],
 ];
 
 export const NOTES_DEPRECATED: Note[] = [
   [
-    'Props',
-    'Card `variant="flat"`, Button `size="lg"` and `size="icon"`, IconButton 32 px, Badge `size="md"`, Table and ListRow comfortable density, Select `compact`, menu `size="md"`.',
-  ],
-  ['Components', 'StatusDot (use StatusGlyph), PageLayout, NavLink, FilterBar family, UsageMeter.'],
-  [
-    'Class helpers',
-    'The 0.20 StatusDot classes, the old chart card class (use `cardSurface()`), the AlertDialog confirm class.',
+    'Deprecated family',
+    'FilterBar and its parts (use ListToolbar), NavLink (NavRow), PageLayout (PageHeader), StatusDot (StatusGlyph), UsageMeter (Progress `meter`).',
   ],
   [
-    'Density props',
-    '`density` on DataTable, Table, Alert, ListRow, NavLink, StatCard, PageHeader `size` and the chart cards: the dense look is the only look; values keep working.',
+    'StatCard parts',
+    'StatBreakdown (Progress `segments` + `legend`), StatProgress (Progress), StatComparison (the `hint` line + `trend`).',
   ],
   [
-    'Button sizes',
-    '`size` values `default` (same as `md`), `icon-md` (same as `icon`), `lg` and `icon-lg`.',
+    'Site parts',
+    'Footer, TopBar, DocSidebar, MarkdownRenderer and the `./site` entry: docs-site chrome, now in the docs code. CopyButton stays in Foundations.',
+  ],
+  [
+    'Unused',
+    'HoverCard (Popover), Slider, QuotaBanner (Alert + Progress), ContextMenu (DropdownMenu), ScrollArea (native overflow), Separator (a 1 px div), Heading (plain h1-h4), DangerZone (a Card with a destructive Dialog, on the Dialog page).',
+  ],
+  [
+    'Folded',
+    'IconContainer is `<Avatar shape="square" icon tone>`; EntityCard is internal (DataView cards and board; the Item card composition on the Card page); DataTable is internal (use DataView or Table).',
+  ],
+  [
+    'Internal now',
+    'ContentBlock, InlineText, Count, DisclosureChevron, RowMenu, ListToolbarIcons, every `*Variants` helper except `buttonVariants`, `useControlled`, `usePersistedState`, `useRovingFocus`, `useCollapsible`, `compareValues`, `nextSortState`, `cardSurface`. Only modules the barrel re-exports get a subpath.',
+  ],
+  [
+    'DataView props',
+    '`searchKeys` (column `searchable`), `searchPlaceholder` (from `aria-label`), `rowLabel`, `rowMenuLabel` (from the id and title columns), `quickToggles` (a `filter: "toggle"` column with `visibility: "none"`), `rowLines` (column `twoLine`), `showHeader` (shown when a column has a header), `defaultHidden` (`visibility: "optional"`), `selection`, `selectedIds`, `defaultSelectedIds`, `onSelectionChange`, `isRowSelected`, `rowActions`, `defaultGroupBy`, `defaultSort`, `rowsBy`, `onRowOpen`, `rowMenu`, `bulkActions`, `onAddToGroup`, `onMove`, `emptyState`.',
+  ],
+  [
+    'Sizes and looks',
+    'Button `default`/`lg`/`icon-md`/`icon-lg`, IconButton `lg`, Badge `md`, menu `md` and the DropdownMenu `size`, Tabs `default`/`underline`, Card `variant`, Section `boxed`, Avatar `xl`/`2xl`, Dialog `size`, PageHeader `size`, every `density` prop.',
+  ],
+  [
+    'Dependencies',
+    '`@radix-ui/react-select` is gone; `react-markdown`, `remark-gfm`, `rehype-raw` are docs-only.',
   ],
 ];
 
@@ -169,17 +186,9 @@ export const NOTES_BEHAVIOUR: Note[] = [
     'No size gives 28 px (pass `size="md"` for 40); with no image it has `role="img"` and the name as label.',
   ],
   ['Progress', '`aria-valuenow` clamps to 0..max; max 0 renders 0 percent; adds `aria-valuetext`.'],
+  ['DataView sort', 'Descending order puts empty values last; still stable and client side.'],
   [
-    'UsageMeter',
-    'Renders through Progress; the default value text is still `value / max`, but the DOM and the `usageMeter*Variants` helpers moved. Do not rely on old class names.',
-  ],
-  ['DataTable sort', 'Descending order puts empty values last; still stable and client side.'],
-  [
-    'DataTable density',
-    '`density="default"` keeps the old roomy spacing; only an unset density gets the dense look.',
-  ],
-  [
-    'Modal, Sheet',
+    'Dialog, Sheet',
     'Escape closes only the top overlay; scroll lock is counted across nested overlays.',
   ],
   [
@@ -188,7 +197,7 @@ export const NOTES_BEHAVIOUR: Note[] = [
   ],
   ['Tooltip', 'Escape closes only the tooltip, not an overlay behind it.'],
   [
-    'AlertDialog',
+    'Dialog confirm',
     'A promise from `onConfirm` keeps it open until it resolves; a rejection keeps it open.',
   ],
   ['Toast', 'Hover and focus pause the timer; `duration` 0 or less keeps it until dismissed.'],
@@ -198,16 +207,12 @@ export const NOTES_BEHAVIOUR: Note[] = [
     'Focus returns to the trigger on close; checkbox and radio items stay open on select.',
   ],
   [
-    'StatusDot',
-    'No variant draws offline; the accessible name is the variant when there is no label.',
-  ],
-  [
-    'Checkbox, Switch, Combobox',
+    'Checkbox, Switch, Select',
     '`checked={undefined}` or `value={undefined}` stays controlled and empty, as in 0.20.2 (locked by tests).',
   ],
   [
     'StatCard',
-    '`pressable`: unchanged API; the footer link is not nested in the stretched title control.',
+    'With `onClick` the title is the stretched control; the footer link is not nested in it.',
   ],
   ['Chip', '`pressed` adds `aria-pressed`; without it a clickable chip keeps button semantics.'],
   [
@@ -230,10 +235,7 @@ export const NOTES_BEHAVIOUR: Note[] = [
     'Toast',
     'Error toasts sit in their own group above the others; the polite live region moved inside the container.',
   ],
-  [
-    'StatCard',
-    'A `pressable` card root is a `div`, so `ref` points to the card, not to the button.',
-  ],
+  ['StatCard', 'A pressable card root is a `div`, so `ref` points to the card, not to the button.'],
   [
     'StatCard',
     'A falling `trend` draws a falling arrow (it always rose before); the colour follows `trend.sentiment`.',
@@ -247,11 +249,11 @@ export const NOTES_BEHAVIOUR: Note[] = [
     'Relative picks keep an `expression`; resolve it at read time so "Last 24 hours" moves with the clock.',
   ],
   [
-    'InspectorPanel',
+    'Sheet docked',
     'List its `storageKey` in `ResizableSplitPrepaint` and the server HTML already has the stored width.',
   ],
   [
-    'Combobox',
+    'Select',
     'The trigger has `role="combobox"` (tests that query a button break); `id` and `aria-*` field props go to the trigger, so a FormField label names it.',
   ],
   [
@@ -263,7 +265,7 @@ export const NOTES_BEHAVIOUR: Note[] = [
     'DataView board',
     'Tab follows the columns (lane, column, position); a keyboard move keeps focus on the card.',
   ],
-  ['InspectorPanel', 'Close returns focus to where it was opened from.'],
+  ['Sheet docked', 'Close returns focus to where it was opened from.'],
 ];
 
 // What this round did not verify. Append rows.

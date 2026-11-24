@@ -63,9 +63,4 @@ describe('Alert primary variant', () => {
     expect(screen.getByText('Needs attention').className).toContain('text-primary-emphasis');
     expect(screen.getByRole('button', { name: 'Approve' })).toBeTruthy();
   });
-
-  it('keeps the pre-0.21 padding as density comfortable', () => {
-    render(<Alert density="comfortable">Note</Alert>);
-    expect(screen.getByRole('alert').className).toContain('p-4');
-  });
 });

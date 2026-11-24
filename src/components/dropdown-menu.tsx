@@ -9,7 +9,7 @@ import { useControlled } from '../lib/use-controlled';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 import { dropdownMenuContentVariants } from './dropdown-menu.variants';
-import { focusMenuItem, handleMenuKeyDown, MenuCloseContext, type MenuSize } from './menu.parts';
+import { focusMenuItem, handleMenuKeyDown, MenuCloseContext } from './menu.parts';
 
 export { dropdownMenuContentVariants, dropdownMenuItemVariants } from './dropdown-menu.variants';
 
@@ -22,8 +22,6 @@ export interface DropdownMenuProps extends React.HTMLAttributes<HTMLDivElement> 
   children: ReactNode;
   align?: 'start' | 'center' | 'end';
   side?: 'bottom' | 'top';
-  /** `sm` (default): 28 px items, 13 px text, 210 px minimum width. `md` is deprecated. */
-  size?: MenuSize;
   /** Plain items close the menu on click; checkbox and radio items never do by default. */
   closeOnSelect?: boolean;
   open?: boolean;
@@ -36,7 +34,6 @@ export const DropdownMenu = ({
   children,
   align = 'end',
   side = 'bottom',
-  size = 'sm',
   closeOnSelect = true,
   open: openProp,
   defaultOpen = false,
@@ -48,7 +45,6 @@ export const DropdownMenu = ({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
-  const autoFocusRef = useRef(false);
   const mounted = useMounted();
   const menuId = `${useId()}-menu`;
   const showing = open && mounted;
@@ -56,8 +52,8 @@ export const DropdownMenu = ({
   const { top, left } = useAnchorPosition(wrapperRef, menuRef, showing, {
     side,
     align,
-    offset: size === 'sm' ? 6 : 4,
-    margin: size === 'sm' ? 4 : 8,
+    offset: 6,
+    margin: 4,
   });
 
   const closeMenu = useCallback(
@@ -77,30 +73,27 @@ export const DropdownMenu = ({
     onOutside: () => closeMenu(false),
   });
 
-  const openMenu = (autoFocus: boolean): void => {
+  const openMenu = (): void => {
     // Focus returns to the trigger, even when a click did not focus it (Safari, tests).
     openerRef.current =
       wrapperRef.current?.querySelector<HTMLElement>('[data-slot="dropdown-menu-trigger"]') ??
       (document.activeElement as HTMLElement | null);
-    autoFocusRef.current = autoFocus;
     setOpen(true);
   };
 
   useEffect(() => {
     if (!showing) return;
     // The prototype focuses the checked item, else the first one, however the menu opened.
-    if (autoFocusRef.current || size === 'sm') {
-      const checked = menuRef.current?.querySelector<HTMLElement>('[aria-checked="true"]');
-      if (checked) checked.focus();
-      else focusMenuItem(menuRef.current, 0);
-    }
-  }, [showing, size]);
+    const checked = menuRef.current?.querySelector<HTMLElement>('[aria-checked="true"]');
+    if (checked) checked.focus();
+    else focusMenuItem(menuRef.current, 0);
+  }, [showing]);
 
   const handleTriggerKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === 'ArrowDown' || (!open && (e.key === 'Enter' || e.key === ' '))) {
       e.preventDefault();
       if (open) focusMenuItem(menuRef.current, 0);
-      else openMenu(true);
+      else openMenu();
     } else if (e.key === 'Escape' && open && isTopLayer(layer)) {
       e.preventDefault();
       e.stopPropagation();
@@ -113,7 +106,7 @@ export const DropdownMenu = ({
   const TriggerComp = asSlot ? Slot : 'button';
 
   return (
-    <MenuCloseContext.Provider value={{ close: closeMenu, size, closeOnSelect }}>
+    <MenuCloseContext.Provider value={{ close: closeMenu, closeOnSelect }}>
       <div ref={wrapperRef} className="relative inline-flex" data-slot="dropdown-menu">
         <TriggerComp
           {...(asSlot ? {} : { type: 'button' as const })}
@@ -123,7 +116,7 @@ export const DropdownMenu = ({
           data-slot="dropdown-menu-trigger"
           onClick={() => {
             if (open) closeMenu(false);
-            else openMenu(false);
+            else openMenu();
           }}
           onKeyDown={handleTriggerKeyDown}
         >
@@ -139,7 +132,7 @@ export const DropdownMenu = ({
                 tabIndex={-1}
                 onKeyDown={(e) => handleMenuKeyDown(e, closeMenu, layer)}
                 style={{ position: 'fixed', top, left }}
-                className={cn(dropdownMenuContentVariants({ size }), className)}
+                className={cn(dropdownMenuContentVariants(), className)}
                 data-slot="dropdown-menu-content"
                 {...props}
               >

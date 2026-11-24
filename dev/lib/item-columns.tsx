@@ -41,6 +41,7 @@ export const itemColumns = (): DataViewColumn<DemoItem>[] => [
   {
     key: 'id',
     cardSlot: 'id',
+    searchable: true,
     header: 'ID',
     className: 'min-w-18',
     nowrap: true,
@@ -63,6 +64,7 @@ export const itemColumns = (): DataViewColumn<DemoItem>[] => [
   {
     key: 'title',
     cardSlot: 'title',
+    searchable: true,
     header: 'Title',
     grow: true,
     sortable: true,

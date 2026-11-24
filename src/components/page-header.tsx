@@ -32,13 +32,8 @@ export const pageHeaderVariants = cva('', {
       /** Detail header: 20/700 title, a muted description, a meta line and a tabs slot. */
       detail: 'flex flex-col pt-4',
     },
-    size: {
-      md: '',
-      lg: '',
-    },
   },
-  compoundVariants: [{ variant: 'bar', size: 'lg', className: 'h-[52px]' }],
-  defaultVariants: { variant: 'bar', size: 'md' },
+  defaultVariants: { variant: 'bar' },
 });
 
 export interface PageHeaderAction {
@@ -52,18 +47,11 @@ export interface PageHeaderAction {
 export interface PageHeaderProps
   extends
     Omit<React.HTMLAttributes<HTMLElement>, 'title'>,
-    Omit<VariantProps<typeof pageHeaderVariants>, 'size'> {
-  /**
-   * Deprecated: The 48 px bar is the only look; `lg` is the pre-0.21 52 px bar.
-   * @deprecated The 48 px bar is the only look; `lg` is the pre-0.21 52 px bar.
-   */
-  size?: 'md' | 'lg' | null;
+    VariantProps<typeof pageHeaderVariants> {
   icon?: React.ReactNode;
   title: React.ReactNode;
   /** One muted line under the title (two lines in the detail variant). */
   description?: React.ReactNode;
-  /** @deprecated Use `description`. */
-  subtitle?: React.ReactNode;
   /** Detail variant: a 12 px fact line under the description, usually `MetaItem`s; wraps between items. */
   meta?: React.ReactNode;
   /** Detail variant: a tab list docked at the bottom of the header. */
@@ -92,7 +80,7 @@ const Actions = ({ actions, children }: Pick<PageHeaderProps, 'actions' | 'child
   </div>
 );
 
-const IconBox = ({ icon, large }: { icon: React.ReactNode; large: boolean }) => (
+const IconBox = ({ icon, large = false }: { icon: React.ReactNode; large?: boolean }) => (
   <div
     aria-hidden="true"
     className={cn(
@@ -106,28 +94,14 @@ const IconBox = ({ icon, large }: { icon: React.ReactNode; large: boolean }) => 
 
 export const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
   (
-    {
-      icon,
-      title,
-      description,
-      subtitle: legacySubtitle,
-      meta,
-      tabs,
-      actions,
-      variant,
-      size,
-      children,
-      className,
-      ...props
-    },
+    { icon, title, description, meta, tabs, actions, variant, children, className, ...props },
     ref
   ) => {
     const detail = variant === 'detail';
-    const subtitle = description ?? legacySubtitle;
     return (
       <header
         ref={ref}
-        className={cn(pageHeaderVariants({ variant, size }), className)}
+        className={cn(pageHeaderVariants({ variant }), className)}
         data-slot="page-header"
         data-variant={detail ? 'detail' : 'bar'}
         {...props}
@@ -143,9 +117,9 @@ export const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
                 <Actions actions={actions}>{children}</Actions>
               </div>
             </div>
-            {subtitle && (
+            {description && (
               <p className="mt-1 line-clamp-2 max-w-[760px] text-ui leading-5 text-muted-foreground">
-                {subtitle}
+                {description}
               </p>
             )}
             {meta && (
@@ -161,10 +135,12 @@ export const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
         ) : (
           <>
             <div className="flex min-w-0 items-center gap-2.5">
-              {icon && <IconBox icon={icon} large={size === 'lg'} />}
+              {icon && <IconBox icon={icon} />}
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-semibold text-foreground">{title}</h1>
-                {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
+                {description && (
+                  <p className="truncate text-xs text-muted-foreground">{description}</p>
+                )}
               </div>
             </div>
             <Actions actions={actions}>{children}</Actions>

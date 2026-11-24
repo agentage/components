@@ -1,6 +1,5 @@
 import {
   Alert,
-  Heading,
   InlineCode,
   Table,
   TableBody,
@@ -10,6 +9,7 @@ import {
   TableRow,
 } from '../../src';
 import { Code } from '../components/code';
+import { Heading } from '../components/heading';
 import { Example as ColorPrimitivesDemo } from '../demos/color-primitives';
 import { Example as SemanticColorsDemo } from '../demos/semantic-colors';
 import { Example as TypographyDemo } from '../demos/typography';

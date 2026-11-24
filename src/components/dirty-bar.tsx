@@ -7,7 +7,7 @@ import { Button } from './button';
 export interface DirtyBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Shows the bar. It overlays the bottom of the nearest positioned ancestor. */
   dirty: boolean;
-  /** Save is in flight: actions are blocked but keep focus, and Save is announced as `pendingLabel`. */
+  /** Save is in flight: actions are blocked but keep focus, and Save is announced as `labels.pending`. */
   pending?: boolean;
   onSave: () => void;
   onDiscard: () => void;
@@ -16,16 +16,32 @@ export interface DirtyBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   onStay?: () => void;
   /** Leave and drop the changes. */
   onLeave?: () => void;
-  message?: React.ReactNode;
-  leaveMessage?: React.ReactNode;
-  saveLabel?: string;
-  discardLabel?: string;
-  pendingLabel?: string;
-  stayLabel?: string;
-  leaveLabel?: string;
-  /** Save label in leave mode; Save then calls `onSave` and the caller continues the navigation. */
-  saveAndLeaveLabel?: string;
+  /** Copy overrides, for example a translation. */
+  labels?: Partial<DirtyBarLabels>;
 }
+
+export interface DirtyBarLabels {
+  message: React.ReactNode;
+  leaveMessage: React.ReactNode;
+  save: string;
+  discard: string;
+  pending: string;
+  stay: string;
+  leave: string;
+  /** Save in leave mode; it calls `onSave` and the caller continues the navigation. */
+  saveAndLeave: string;
+}
+
+const LABELS: DirtyBarLabels = {
+  message: 'Unsaved changes',
+  leaveMessage: 'Leave without saving?',
+  save: 'Save',
+  discard: 'Discard',
+  pending: 'Saving',
+  stay: 'Stay',
+  leave: 'Discard and leave',
+  saveAndLeave: 'Save and leave',
+};
 
 const SHOWN = 'translate-y-0 opacity-100 [transition:opacity_160ms,translate_160ms]';
 // Visibility flips after the fade so the bar animates out instead of vanishing.
@@ -85,14 +101,7 @@ export const DirtyBar = React.forwardRef<HTMLDivElement, DirtyBarProps>(
       leaving = false,
       onStay,
       onLeave,
-      message = 'Unsaved changes',
-      leaveMessage = 'Leave without saving?',
-      saveLabel = 'Save',
-      discardLabel = 'Discard',
-      pendingLabel = 'Saving',
-      stayLabel = 'Stay',
-      leaveLabel = 'Discard and leave',
-      saveAndLeaveLabel = 'Save and leave',
+      labels,
       className,
       'aria-label': ariaLabel,
       ...props
@@ -100,6 +109,7 @@ export const DirtyBar = React.forwardRef<HTMLDivElement, DirtyBarProps>(
     ref
   ) => {
     const shown = dirty || leaving;
+    const l = { ...LABELS, ...labels };
     const stayRef = useFocusOnLeave(leaving);
     const { bar, save, handlers } = useKeepFocus(shown, leaving);
     React.useImperativeHandle(ref, () => bar.current as HTMLDivElement);
@@ -127,12 +137,12 @@ export const DirtyBar = React.forwardRef<HTMLDivElement, DirtyBarProps>(
       >
         <span className="size-2 shrink-0 rounded-full bg-primary" aria-hidden="true" />
         <span className={cn('min-w-0 flex-1', leaving && 'font-semibold')}>
-          {leaving ? leaveMessage : message}
+          {leaving ? l.leaveMessage : l.message}
         </span>
         {leaving ? (
           <>
             <Button key="stay" ref={stayRef} variant="outline" size="md" onClick={onStay}>
-              {stayLabel}
+              {l.stay}
             </Button>
             <Button
               key="leave"
@@ -141,16 +151,16 @@ export const DirtyBar = React.forwardRef<HTMLDivElement, DirtyBarProps>(
               onClick={pending ? undefined : onLeave}
               aria-disabled={pending || undefined}
             >
-              {leaveLabel}
+              {l.leave}
             </Button>
             <Button
               key="save-leave"
               size="md"
               onClick={onSave}
               pending={pending}
-              aria-label={pending ? pendingLabel : undefined}
+              aria-label={pending ? l.pending : undefined}
             >
-              {saveAndLeaveLabel}
+              {l.saveAndLeave}
             </Button>
           </>
         ) : (
@@ -163,7 +173,7 @@ export const DirtyBar = React.forwardRef<HTMLDivElement, DirtyBarProps>(
               onClick={pending ? undefined : onDiscard}
               aria-disabled={pending || undefined}
             >
-              {discardLabel}
+              {l.discard}
             </Button>
             <Button
               key="save"
@@ -171,9 +181,9 @@ export const DirtyBar = React.forwardRef<HTMLDivElement, DirtyBarProps>(
               size="md"
               onClick={onSave}
               pending={pending}
-              aria-label={pending ? pendingLabel : undefined}
+              aria-label={pending ? l.pending : undefined}
             >
-              {saveLabel}
+              {l.save}
             </Button>
           </>
         )}

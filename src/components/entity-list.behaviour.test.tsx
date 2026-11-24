@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { EntityList, ListRow, type ListItem } from './entity-list';
+import { List, ListRow, type ListItem } from './entity-list';
 
 interface Item extends ListItem {
   group: string;
@@ -21,14 +21,9 @@ afterEach(() => {
 });
 
 describe('ListRow behaviour', () => {
-  it('keeps actions and children in the stacked layout', () => {
+  it('keeps actions and children beside the title', () => {
     render(
-      <ListRow
-        variant="stacked"
-        title="Row"
-        meta="2 min"
-        actions={<button type="button">Menu</button>}
-      >
+      <ListRow title="Row" meta="2 min" actions={<button type="button">Menu</button>}>
         <span>extra</span>
       </ListRow>
     );
@@ -48,9 +43,9 @@ describe('ListRow behaviour', () => {
   });
 });
 
-describe('EntityList behaviour', () => {
+describe('List behaviour', () => {
   it('group body ids hold no spaces, so aria-controls resolves', () => {
-    render(<EntityList items={ITEMS} groupBy={byGroup} />);
+    render(<List items={ITEMS} groupBy={byGroup} />);
     const head = screen.getByRole('button', { name: /In progress/ });
     const id = head.getAttribute('aria-controls') ?? '';
     expect(id).not.toMatch(/\s/);
@@ -58,7 +53,7 @@ describe('EntityList behaviour', () => {
   });
 
   it('Ctrl or Cmd + K is left to the page', () => {
-    render(<EntityList items={ITEMS} />);
+    render(<List items={ITEMS} />);
     const bravo = screen.getByRole('button', { name: 'Bravo' });
     bravo.focus();
     fireEvent.keyDown(bravo, { key: 'k', ctrlKey: true });
@@ -67,8 +62,8 @@ describe('EntityList behaviour', () => {
   });
 
   it('Tab lands on the current selection, not a stale tab stop', () => {
-    const { rerender } = render(<EntityList items={ITEMS} value="a" />);
-    rerender(<EntityList items={ITEMS} value="b" />);
+    const { rerender } = render(<List items={ITEMS} value="a" />);
+    rerender(<List items={ITEMS} value="b" />);
     expect(screen.getByRole('button', { name: 'Bravo' }).tabIndex).toBe(0);
     expect(screen.getByRole('button', { name: 'Alpha' }).tabIndex).toBe(-1);
   });
@@ -77,7 +72,7 @@ describe('EntityList behaviour', () => {
     'ignores stored %s of the wrong shape',
     (raw) => {
       localStorage.setItem('el', raw);
-      render(<EntityList items={ITEMS} groupBy={byGroup} storageKey="el" />);
+      render(<List items={ITEMS} groupBy={byGroup} storageKey="el" />);
       expect(
         screen.getByRole('button', { name: /In progress/ }).getAttribute('aria-expanded')
       ).toBe('true');
@@ -86,7 +81,7 @@ describe('EntityList behaviour', () => {
 
   it('hydrates with stored collapsed groups and no hydration error', () => {
     localStorage.setItem('el', '["Done"]');
-    const ui = <EntityList items={ITEMS} groupBy={byGroup} storageKey="el" />;
+    const ui = <List items={ITEMS} groupBy={byGroup} storageKey="el" />;
     const host = document.createElement('div');
     vi.spyOn(Storage.prototype, 'getItem').mockImplementationOnce(() => {
       throw new Error('no storage on the server');

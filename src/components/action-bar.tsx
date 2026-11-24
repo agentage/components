@@ -38,7 +38,6 @@ export interface ActionBarProps extends Omit<React.HTMLAttributes<HTMLDivElement
   hotkeys?: boolean;
   /** Element whose key presses trigger the actions, for example the pane; keeps keys local. */
   hotkeyScope?: React.RefObject<HTMLElement | null>;
-  moreLabel?: string;
 }
 
 const MoreIcon = () => (
@@ -68,19 +67,7 @@ const item = (a: ActionBarAction, hotkeys: boolean) => (
  * action move into a More menu; the row never wraps.
  */
 export const ActionBar = React.forwardRef<HTMLDivElement, ActionBarProps>(
-  (
-    {
-      actions,
-      menu,
-      tail = [],
-      hotkeys = false,
-      hotkeyScope,
-      moreLabel = 'More',
-      className,
-      ...props
-    },
-    ref
-  ) => {
+  ({ actions, menu, tail = [], hotkeys = false, hotkeyScope, className, ...props }, ref) => {
     const inner = React.useRef<HTMLDivElement>(null);
     React.useImperativeHandle(ref, () => inner.current as HTMLDivElement);
     // Labels are in the key too: "Approve" growing to "Approving..." must measure again.
@@ -146,9 +133,9 @@ export const ActionBar = React.forwardRef<HTMLDivElement, ActionBarProps>(
           {(folded.length > 0 || (menu && level >= 3)) && (
             <DropdownMenu
               side="top"
-              aria-label={moreLabel}
+              aria-label="More"
               trigger={
-                <Button variant="ghost" size="icon" aria-label={moreLabel} title={moreLabel}>
+                <Button variant="ghost" size="icon" aria-label="More" title="More">
                   <MoreIcon />
                 </Button>
               }

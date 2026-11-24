@@ -104,14 +104,20 @@ describe('DataView storage', () => {
       { key: 'title', header: 'Title' },
       { key: 'rank', header: 'Rank', sortable: true, value: (r) => r.rank * 10 },
     ];
-    render(ui({ columns: cols, storageKey: undefined, defaultSort: { key: 'rank', dir: 'asc' } }));
+    render(
+      ui({
+        columns: cols,
+        storageKey: undefined,
+        defaultState: { sort: { key: 'rank', dir: 'asc' } },
+      })
+    );
     expect(titles()).toEqual(['Ship release', 'Write docs', 'Fix login']);
     expect(screen.getByText('30')).toBeTruthy();
   });
 
   it('bulk actions get only the selected rows a search leaves visible', () => {
     const bulk = vi.fn(() => null);
-    render(ui({ storageKey: undefined, selection: 'multi', bulkActions: bulk }));
+    render(ui({ storageKey: undefined, actions: { bulk } }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select Write docs' }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select Fix login' }));
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'docs' } });

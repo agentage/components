@@ -4,16 +4,16 @@ import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-/** The one extended size scale in the library; every other component uses sm | md. */
-export type AvatarSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type AvatarSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string;
   src?: string;
   alt?: string;
-  /** Default `sm` (28 px); `xs` is 22 px. `md` (40 px) was the default before 0.21. */
+  /** Default `sm` (28 px); `2xs` 18, `xs` 22, `md` 40, `lg` 48 px. */
   size?: AvatarSize;
-  tone?: 'muted' | 'primary';
+  /** `muted` and `primary` colour initials; the meaning tones tint a square icon tile. */
+  tone?: 'muted' | 'primary' | 'success' | 'warning' | 'destructive' | 'info';
   /** `square`: a rounded square, for services, teams and other non-people. */
   shape?: 'circle' | 'square';
   /** Glyph drawn instead of the initials, sized to 62% of the avatar. */
@@ -34,19 +34,28 @@ export const avatarVariants = cva(
         sm: 'size-7 text-xs',
         md: 'size-10 text-sm',
         lg: 'size-12 text-base',
-        xl: 'size-16 text-lg',
-        '2xl': 'size-20 text-xl',
       },
       tone: {
         muted: 'bg-muted text-muted-foreground',
         /** Accent disc with background-coloured bold initials. */
         primary: 'bg-primary text-primary-foreground font-bold',
+        success: 'bg-success/10 text-success',
+        warning: 'bg-warning/10 text-warning',
+        destructive: 'bg-destructive/10 text-destructive',
+        info: 'bg-info/10 text-info',
       },
       shape: {
         circle: 'rounded-full',
         square: 'rounded-md border border-border',
       },
     },
+    compoundVariants: [
+      {
+        shape: 'square',
+        tone: ['success', 'warning', 'destructive', 'info'],
+        className: 'border-transparent',
+      },
+    ],
     defaultVariants: {
       size: 'sm',
       tone: 'muted',

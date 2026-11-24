@@ -13,17 +13,17 @@ const options: ToggleOption<'day' | 'week' | 'month'>[] = [
 const setup = (
   props: { value?: 'day' | 'week' | 'month'; columns?: 1 | 2 | 3 | 4 | 5 | 6 } = {}
 ) => {
-  const onChange = vi.fn();
+  const onValueChange = vi.fn();
   const { container } = render(
     <ToggleGroup
       aria-label="Range"
       options={options}
       value={props.value ?? 'day'}
       columns={props.columns}
-      onChange={onChange}
+      onValueChange={onValueChange}
     />
   );
-  return { onChange, group: container.firstElementChild as HTMLElement };
+  return { onValueChange, group: container.firstElementChild as HTMLElement };
 };
 
 const buttons = (): HTMLElement[] => screen.getAllByRole('radio');
@@ -35,43 +35,43 @@ describe('ToggleGroup', () => {
   });
 
   it('falls back to the first option when the value matches nothing', () => {
-    render(<ToggleGroup options={options} value={'none' as 'day'} onChange={vi.fn()} />);
+    render(<ToggleGroup options={options} value={'none' as 'day'} onValueChange={vi.fn()} />);
     expect(buttons().map((b) => b.getAttribute('tabindex'))).toEqual(['0', '-1', '-1']);
   });
 
   it('moves focus and selection with the arrow keys, wrapping at both ends', () => {
-    const { onChange } = setup({ value: 'day' });
+    const { onValueChange } = setup({ value: 'day' });
     const [day, week, month] = buttons();
     day.focus();
 
     fireEvent.keyDown(day, { key: 'ArrowRight' });
-    expect(onChange).toHaveBeenLastCalledWith('week');
+    expect(onValueChange).toHaveBeenLastCalledWith('week');
     expect(document.activeElement).toBe(week);
 
     fireEvent.keyDown(week, { key: 'ArrowDown' });
-    expect(onChange).toHaveBeenLastCalledWith('month');
+    expect(onValueChange).toHaveBeenLastCalledWith('month');
 
     fireEvent.keyDown(month, { key: 'ArrowRight' });
-    expect(onChange).toHaveBeenLastCalledWith('day');
+    expect(onValueChange).toHaveBeenLastCalledWith('day');
     fireEvent.keyDown(day, { key: 'ArrowLeft' });
-    expect(onChange).toHaveBeenLastCalledWith('month');
+    expect(onValueChange).toHaveBeenLastCalledWith('month');
   });
 
   it('jumps to the ends with Home and End', () => {
-    const { onChange } = setup({ value: 'week' });
+    const { onValueChange } = setup({ value: 'week' });
     const [, week] = buttons();
     week.focus();
 
     fireEvent.keyDown(week, { key: 'End' });
-    expect(onChange).toHaveBeenLastCalledWith('month');
+    expect(onValueChange).toHaveBeenLastCalledWith('month');
     fireEvent.keyDown(week, { key: 'Home' });
-    expect(onChange).toHaveBeenLastCalledWith('day');
+    expect(onValueChange).toHaveBeenLastCalledWith('day');
   });
 
   it('ignores keys that do not navigate', () => {
-    const { onChange, group } = setup();
+    const { onValueChange, group } = setup();
     fireEvent.keyDown(group, { key: 'a' });
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onValueChange).not.toHaveBeenCalled();
   });
 
   it('derives the column count from the options instead of always using three', () => {
@@ -90,7 +90,7 @@ describe('ToggleGroup', () => {
       value: `v${String(i)}`,
       label: `L${String(i)}`,
     }));
-    const { container } = render(<ToggleGroup options={many} value="v0" onChange={vi.fn()} />);
+    const { container } = render(<ToggleGroup options={many} value="v0" onValueChange={vi.fn()} />);
     const group = container.firstElementChild as HTMLElement;
     expect(group.className).not.toContain('grid-cols-');
     expect(group.style.gridTemplateColumns).toBe('repeat(7, minmax(0px, 1fr))');
@@ -104,20 +104,20 @@ describe('ToggleGroup class strings', () => {
   ];
 
   it('renders the default grid with className last', () => {
-    render(<ToggleGroup value="a" onChange={() => {}} options={two} className="mt-4" />);
+    render(<ToggleGroup value="a" onValueChange={() => {}} options={two} className="mt-4" />);
     expect(screen.getByRole('radiogroup').className).toBe('grid gap-1.5 grid-cols-2 mt-4');
   });
 
   it('falls back to an inline grid template past six columns', () => {
     const many = 'abcdefg'.split('').map((v) => ({ value: v, label: v.toUpperCase() }));
-    render(<ToggleGroup value="a" onChange={() => {}} options={many} />);
+    render(<ToggleGroup value="a" onValueChange={() => {}} options={many} />);
     const root = screen.getByRole('radiogroup');
     expect(root.className).toBe('grid gap-1.5');
     expect(root.style.gridTemplateColumns).toBe('repeat(7, minmax(0px, 1fr))');
   });
 
   it('renders 28 px buttons: solid when selected, bordered when not', () => {
-    render(<ToggleGroup value="a" onChange={() => {}} options={two} />);
+    render(<ToggleGroup value="a" onValueChange={() => {}} options={two} />);
     const buttons = screen.getAllByRole('radio');
     expect(buttons[0].className).toContain('h-7');
     expect(buttons[0].className).toContain('bg-primary text-primary-foreground');
@@ -140,7 +140,7 @@ describe('ToggleGroup class strings', () => {
       <ToggleGroup
         variant="segmented"
         value="list"
-        onChange={() => {}}
+        onValueChange={() => {}}
         aria-label="View"
         options={[
           { value: 'list', label: 'List', icon: <svg />, iconOnly: true },
@@ -158,13 +158,15 @@ describe('ToggleGroup class strings', () => {
   });
 
   it('marks the group invalid and outlines the buttons on error', () => {
-    render(<ToggleGroup value="a" onChange={() => {}} options={two} error aria-label="View" />);
+    render(
+      <ToggleGroup value="a" onValueChange={() => {}} options={two} error aria-label="View" />
+    );
     expect(screen.getByRole('radiogroup').getAttribute('aria-invalid')).toBe('true');
     expect(screen.getAllByRole('radio')[0].className).toContain('border-destructive');
   });
 
   it('spreads unknown props onto the group', () => {
-    render(<ToggleGroup value="a" onChange={() => {}} options={two} data-testid="tg" />);
+    render(<ToggleGroup value="a" onValueChange={() => {}} options={two} data-testid="tg" />);
     expect(screen.getByTestId('tg')).toBe(screen.getByRole('radiogroup'));
   });
 });

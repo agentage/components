@@ -14,7 +14,7 @@ export interface SectionIndexSection {
   icon?: React.ReactNode;
   /** Quiet trailing number, as on a NavRow. */
   count?: React.ReactNode;
-  /** Unsaved edits in the section: a small dot plus `dirtyLabel` for screen readers. */
+  /** Unsaved edits in the section: a small dot plus "Unsaved changes" for screen readers. */
   dirty?: boolean;
 }
 
@@ -24,22 +24,10 @@ export interface SectionIndexProps extends Omit<React.HTMLAttributes<HTMLElement
   activeId?: string;
   /** Called on click. Call `event.preventDefault()` to replace the default jump to `#id`. */
   onSelect?: (id: string, event: React.MouseEvent<HTMLAnchorElement>) => void;
-  dirtyLabel?: string;
 }
 
 export const SectionIndex = React.forwardRef<HTMLElement, SectionIndexProps>(
-  (
-    {
-      sections,
-      activeId,
-      onSelect,
-      dirtyLabel = 'Unsaved changes',
-      className,
-      'aria-label': ariaLabel,
-      ...props
-    },
-    ref
-  ) => (
+  ({ sections, activeId, onSelect, className, 'aria-label': ariaLabel, ...props }, ref) => (
     <nav
       ref={ref}
       aria-label={ariaLabel ?? 'Sections'}
@@ -70,7 +58,7 @@ export const SectionIndex = React.forwardRef<HTMLElement, SectionIndexProps>(
                       className="size-1.5 shrink-0 rounded-full bg-primary"
                       aria-hidden="true"
                     />
-                    <span className="sr-only">{dirtyLabel}</span>
+                    <span className="sr-only">Unsaved changes</span>
                   </>
                 )}
                 {count !== undefined && <span className={navRowCountVariants()}>{count}</span>}

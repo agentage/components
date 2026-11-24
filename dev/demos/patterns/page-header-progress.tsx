@@ -29,7 +29,7 @@ export const Example = () => {
             variant="detail"
             icon={<GroupDot k="web" />}
             title="Website"
-            subtitle="The public website: the status page, sign-in, the help pages and the release notes."
+            description="The public website: the status page, sign-in, the help pages and the release notes."
             className="border-0 p-0"
             meta={
               <>

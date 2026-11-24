@@ -10,7 +10,7 @@ export const SUGGEST_ADD: Suggestion[] = [
   },
   {
     item: 'Tag input',
-    rec: 'Multi-value Combobox: chips in the field, Backspace removes the last one.',
+    rec: 'Multi-value Select: chips in the field, Backspace removes the last one.',
     effort: 'medium',
     context: 'label and filter editing on detail views',
   },
@@ -46,57 +46,7 @@ export const SUGGEST_ADD: Suggestion[] = [
   },
 ];
 
-export const SUGGEST_REMOVE: Suggestion[] = [
-  {
-    item: 'Deprecated set',
-    rec: 'Remove FilterBar, NavLink, PageLayout, StatusDot, UsageMeter and the renamed props at the next major.',
-    effort: 'medium',
-    context: 'apps that still import them or pass the old prop names',
-  },
-  {
-    item: 'Charts and Site',
-    rec: 'Own entries now (/charts, /site); move to a separate package at the next major.',
-    effort: 'medium',
-    context: 'barrel imports of chart cards and site parts',
-  },
-  {
-    item: 'Accordion and Collapsible',
-    rec: 'Checked: no duplicated logic, both render the shared Disclosure body. Keep both.',
-    effort: 'small',
-    context: 'nothing',
-  },
-  {
-    item: 'HoverCard',
-    rec: 'No consumer in src or patterns. Deprecate in 0.22, remove at the next major.',
-    effort: 'small',
-    context: 'apps that use it; Popover or Tooltip replace it',
-  },
-  {
-    item: 'Slider',
-    rec: 'No consumer in src or patterns. Keep as a generic form control; review at the next major.',
-    effort: 'small',
-    context: 'range fields in settings forms',
-  },
-  {
-    item: 'Combobox',
-    rec: 'No pattern consumer. Keep: it is the base of the tag input.',
-    effort: 'small',
-    context: 'nothing',
-  },
-  {
-    item: 'useDragReorder export',
-    rec: 'Done in 0.21: internal, no barrel export (one consumer, the DataView board). The subpath stays.',
-    effort: 'small',
-    context: 'nothing released (new in 0.21)',
-  },
-];
-
 export const SUGGEST_UPDATE: Suggestion[] = [
-  {
-    item: 'Prop naming leftovers',
-    rec: 'Sweep for isOpen, onClose, onChange, subtitle and compact outside the aliased set; one name per idea.',
-    effort: 'small',
-  },
   {
     item: 'Light theme review',
     rec: 'Page-by-page pass in light and App theme; the dark theme got the most review.',
@@ -107,27 +57,17 @@ export const SUGGEST_UPDATE: Suggestion[] = [
     rec: 'Regenerate the screenshot baselines in the container image after the look changes.',
     effort: 'small',
   },
-  {
-    item: 'Highlight subpath',
-    rec: 'Internal module with its own subpath; rename it to a parts file or skip it in the exports generator.',
-    effort: 'small',
-  },
 ];
 
 export const SUGGEST_RESTRUCTURE: Suggestion[] = [
-  {
-    item: 'index.ts by category',
-    rec: 'Barrel sections in the docs category order, one heading comment each.',
-    effort: 'small',
-  },
   {
     item: 'Docs Core first',
     rec: 'Done in this round: Core leads the sidebar and the index; pages keep their category URL.',
     effort: 'small',
   },
   {
-    item: 'Charts and Site folded',
-    rec: 'Done in this round: folded at the end of the sidebar and the index.',
+    item: 'Variant to tone',
+    rec: 'Alert and Badge still name their colour meaning `variant`; rename to `tone` (Badge mixes tone and outline style, so split it first).',
     effort: 'small',
   },
 ];

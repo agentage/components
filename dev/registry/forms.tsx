@@ -1,23 +1,22 @@
 import type { CategoryEntry } from '../registry';
-import { sections } from './sections';
+import { more, sections } from './sections';
 import * as Checkbox from '../demos/checkbox';
-import * as Combobox from '../demos/combobox';
 import * as DatePicker from '../demos/date-picker';
 import * as FormField from '../demos/form-field';
 import * as InlineEdit from '../demos/inline-edit';
 import * as Input from '../demos/input';
-import * as SecretInput from '../demos/secret-input';
+import * as Label from '../demos/label';
 import * as RadioGroup from '../demos/radio-group';
+import * as SecretInput from '../demos/secret-input';
 import * as Section from '../demos/section';
 import * as Select from '../demos/select';
-import * as Slider from '../demos/slider';
 import * as ToggleGroup from '../demos/toggle-group';
 import * as TreeSelect from '../demos/tree-select';
 
 export const FORMS: CategoryEntry = {
   slug: 'forms',
   label: 'Forms',
-  description: 'Inputs, pickers and the layouts that label them.',
+  description: 'Fields, pickers, toggles and form layout.',
   components: [
     {
       slug: 'input',
@@ -39,27 +38,11 @@ export const FORMS: CategoryEntry = {
     {
       slug: 'select',
       name: 'Select',
-      description: 'A native-feeling single choice from a short list.',
-      exports: [
-        'Select',
-        'SelectTrigger',
-        'SelectContent',
-        'SelectItem',
-        'SelectValue',
-        'SelectGroup',
-        'SelectLabel',
-        'SelectSeparator',
-      ],
+      core: true,
+      description: 'A single choice from a list, with an optional search box.',
+      exports: ['Select'],
       parts: ['fieldVariants'],
       demos: sections(Select),
-    },
-    {
-      slug: 'combobox',
-      name: 'Combobox',
-      description: 'A searchable single choice in an anchored list.',
-      exports: ['Combobox'],
-      parts: ['fieldVariants'],
-      demos: sections(Combobox),
     },
     {
       slug: 'tree-select',
@@ -94,14 +77,6 @@ export const FORMS: CategoryEntry = {
       demos: sections(RadioGroup),
     },
     {
-      slug: 'slider',
-      name: 'Slider',
-      description: 'A value or range on a track, keyboard adjustable.',
-      exports: ['Slider'],
-      parts: [],
-      demos: sections(Slider),
-    },
-    {
       slug: 'toggle-group',
       name: 'ToggleGroup',
       description: 'A radio group of buttons, as a grid or a joined segmented control.',
@@ -114,9 +89,9 @@ export const FORMS: CategoryEntry = {
       name: 'FormField',
       core: true,
       description: 'Label, hint, error and a live preview around one control, stacked or in a row.',
-      exports: ['FormField'],
+      exports: ['FormField', 'Label'],
       parts: [],
-      demos: sections(FormField),
+      demos: [...sections(FormField), ...more('Label', Label)],
     },
     {
       slug: 'section',

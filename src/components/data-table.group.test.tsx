@@ -28,8 +28,7 @@ const rowIds = (): string[] =>
 
 describe('DataTable dense default', () => {
   it('uses the dense density with 36 px rows and a 32 px quiet header', () => {
-    render(<DataTable columns={COLUMNS} data={REPORTS} rowKey={(r) => r.id} />);
-    expect(document.querySelector('table')?.dataset.density).toBe('dense');
+    render(<DataTable columns={COLUMNS} rows={REPORTS} rowKey={(r) => r.id} />);
     const head = screen.getByRole('columnheader', { name: 'Report' });
     expect(head.className).toContain('h-8');
     expect(head.className).toContain('normal-case');
@@ -40,21 +39,18 @@ describe('DataTable dense default', () => {
     expect(screen.getAllByRole('row')[1].className).toContain('hover:bg-accent');
   });
 
-  it('gives two-line rows 52 px and keeps the older densities', () => {
-    const { unmount } = render(<DataTable columns={COLUMNS} data={REPORTS} rowLines={2} />);
+  it('gives two-line rows 52 px', () => {
+    render(<DataTable columns={COLUMNS} rows={REPORTS} rowLines={2} />);
     expect(document.querySelector('[data-slot="disclosure"] > div > div')?.className).toContain(
       'min-h-[51px]'
     );
-    unmount();
-    render(<DataTable columns={COLUMNS} data={REPORTS} density="comfortable" />);
-    expect(screen.getByRole('columnheader', { name: 'Report' }).className).toContain('h-10');
   });
 
   it('writes one container query per hideBelow column', () => {
     expect(hideBelowCss('x', COLUMNS)).toBe(
       '@container (max-width: 599.98px){[data-dt="x"] [data-col="service"]{display:none}}'
     );
-    render(<DataTable columns={COLUMNS} data={REPORTS} />);
+    render(<DataTable columns={COLUMNS} rows={REPORTS} />);
     expect(
       document.querySelector('[data-slot="data-table-container"] style')?.textContent
     ).toContain('[data-col="service"]');
@@ -64,7 +60,7 @@ describe('DataTable dense default', () => {
     render(
       <DataTable
         columns={COLUMNS}
-        data={REPORTS}
+        rows={REPORTS}
         rowMenu={() => <DropdownMenuItem>Refresh now</DropdownMenuItem>}
         rowMenuLabel={(r) => `Actions for ${r.id}`}
       />
@@ -86,7 +82,7 @@ describe('DataTable grouping', () => {
       'Yesterday',
       'Today',
     ]);
-    render(<DataTable columns={COLUMNS} data={REPORTS} groupBy="day" rowKey={(r) => r.id} />);
+    render(<DataTable columns={COLUMNS} rows={REPORTS} groupBy="day" rowKey={(r) => r.id} />);
     const toggle = screen.getByRole('button', { name: /Today/ });
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     expect(within(toggle).getByText('2')).toBeTruthy();
@@ -97,17 +93,16 @@ describe('DataTable grouping', () => {
     render(
       <DataTable
         columns={COLUMNS}
-        data={REPORTS}
+        rows={REPORTS}
         groupBy="day"
         rowKey={(r) => r.id}
-        defaultCollapsedGroups={['Yesterday']}
         onCollapsedGroupsChange={onChange}
       />
     );
     const rows = document.querySelectorAll('[data-slot="data-table-row"]');
-    expect(rows[2].hasAttribute('inert')).toBe(true);
+    expect(rows[2].hasAttribute('inert')).toBe(false);
     fireEvent.click(screen.getByRole('button', { name: /Today/ }));
-    expect(onChange).toHaveBeenCalledWith(['Yesterday', 'Today']);
+    expect(onChange).toHaveBeenCalledWith(['Today']);
     expect(rows[0].hasAttribute('inert')).toBe(true);
     expect(screen.getByRole('button', { name: /Today/ }).getAttribute('aria-expanded')).toBe(
       'false'
@@ -116,13 +111,13 @@ describe('DataTable grouping', () => {
 
   it('accepts a group function and keeps row nodes across regrouping', () => {
     const { rerender } = render(
-      <DataTable columns={COLUMNS} data={REPORTS} rowKey={(r) => r.id} />
+      <DataTable columns={COLUMNS} rows={REPORTS} rowKey={(r) => r.id} />
     );
     const before = document.querySelector('[data-slot="data-table-row"]');
     rerender(
       <DataTable
         columns={COLUMNS}
-        data={REPORTS}
+        rows={REPORTS}
         rowKey={(r) => r.id}
         groupBy={(r) => ({ key: r.service, label: `Service ${r.service}` })}
       />
@@ -138,7 +133,7 @@ describe('DataTable roving focus', () => {
     render(
       <DataTable
         columns={COLUMNS}
-        data={REPORTS}
+        rows={REPORTS}
         groupBy="day"
         rowKey={(r) => r.id}
         onRowClick={() => {}}
@@ -161,7 +156,7 @@ describe('DataTable grow column', () => {
           { key: 'id', header: 'Report', grow: true },
           { key: 'service', header: 'Service', nowrap: true },
         ]}
-        data={REPORTS}
+        rows={REPORTS}
       />
     );
     const [grow, fixed] = Array.from(

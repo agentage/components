@@ -14,7 +14,7 @@ export const controlVariants = cva(
   }
 );
 
-/** Form fields (Input, Select, Combobox, DatePicker triggers): md 30 px, sm 26 px at 12 px. */
+/** Form fields (Input, Select, DatePicker triggers): md 30 px, sm 26 px at 12 px. */
 export const fieldVariants = cva(
   'w-full rounded-md border border-border bg-muted/30 transition-colors duration-fast focus-ring placeholder:text-muted-foreground/60 disabled:cursor-not-allowed disabled:opacity-50',
   {

@@ -34,7 +34,6 @@ describe('IconButton sizes and pressed', () => {
   it.each([
     ['sm', 'size-6'],
     ['md', 'size-7'],
-    ['lg', 'size-8'],
   ] as const)('renders size %s as %s', (size, cls) => {
     render(<IconButton icon={<Icon />} aria-label="Refresh" size={size} onClick={vi.fn()} />);
     expect(screen.getByRole('button').className).toContain(cls);

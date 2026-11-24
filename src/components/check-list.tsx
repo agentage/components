@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useControlled } from '../lib/use-controlled';
 import { cn } from '../lib/utils';
 import { Disclosure, DisclosureChevron } from './disclosure';
 import { StatusGlyph } from './status-glyph';
@@ -72,10 +71,6 @@ export interface CheckItemProps extends Omit<React.LiHTMLAttributes<HTMLLIElemen
   status?: CheckStatus;
   /** Right-aligned muted text: "fixed", "2 min 04 s", "41 of 41". */
   value?: React.ReactNode;
-  /** Detail open, controlled. */
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
   /** With `onCheckedChange` the row is a 28 px checkbox row instead of a status row. */
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
@@ -91,9 +86,6 @@ export const CheckItem = React.forwardRef<HTMLLIElement, CheckItemProps>(
       label,
       status = 'ok',
       value,
-      open: openProp,
-      defaultOpen = false,
-      onOpenChange,
       checked,
       onCheckedChange,
       disabled,
@@ -103,7 +95,7 @@ export const CheckItem = React.forwardRef<HTMLLIElement, CheckItemProps>(
     },
     ref
   ) => {
-    const [open, setOpen] = useControlled(openProp, defaultOpen, onOpenChange);
+    const [open, setOpen] = React.useState(false);
     const id = React.useId();
     const hasDetail = children !== undefined && children !== null && children !== false;
     if (onCheckedChange)

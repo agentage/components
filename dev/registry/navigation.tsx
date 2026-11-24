@@ -11,7 +11,7 @@ import * as Tabs from '../demos/tabs';
 export const NAVIGATION: CategoryEntry = {
   slug: 'navigation',
   label: 'Navigation',
-  description: 'Wayfinding: trees, sidebars, tabs, trails and page headers.',
+  description: 'Trees, tabs, paths and page headers.',
   components: [
     {
       slug: 'nav-row',

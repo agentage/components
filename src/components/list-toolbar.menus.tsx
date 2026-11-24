@@ -35,7 +35,6 @@ export interface DisplayMenuProps {
   toggles?: DisplayOption[];
   flags?: Record<string, boolean>;
   onFlagChange?: (flag: string, on: boolean) => void;
-  label?: string;
   className?: string;
 }
 
@@ -80,7 +79,7 @@ const SortSection = ({ sortOptions = [], sort, onSortChange }: DisplayMenuProps)
 /** Display options: Sort by and direction, Group by (None plus options), display toggles. */
 export const DisplayMenu = React.forwardRef<HTMLButtonElement, DisplayMenuProps>((props, ref) => {
   const { groupOptions, groupBy, onGroupByChange, toggles, flags, onFlagChange } = props;
-  const label = props.label ?? 'Display options';
+  const label = 'Display options';
   const sections = [
     props.sortOptions?.length ? <SortSection key="sort" {...props} /> : null,
     groupOptions?.length ? (

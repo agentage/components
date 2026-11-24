@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { Badge, Button, EntityCard, PageHeader, StatusGlyph, RelativeTime } from '../../../src';
+import { Badge, Button, PageHeader, StatusGlyph, RelativeTime } from '../../../src';
 import { Block } from '../../components/demo';
 import { RESULT_GLYPH } from '../../lib/result-status';
 import { SERVICES } from '../../lib/services-data';
 import { HistoryCell, serviceMenu, TriggerCell } from '../../lib/services-list-parts';
+import { ItemCard } from '../../lib/item-card';
 
 const LOADED = Date.now();
 
@@ -38,7 +39,7 @@ export const Example = () => {
           {rows.map((s) => {
             const last = s.history.at(-1);
             return (
-              <EntityCard
+              <ItemCard
                 key={s.id}
                 title={s.name}
                 indicator={
@@ -69,7 +70,6 @@ export const Example = () => {
                     <span>{s.history.length} results</span>
                   </>
                 }
-                selectable
                 selected={picked.includes(s.id)}
                 onSelectedChange={(on) => pick(s.id, on)}
                 enabled={s.enabled}

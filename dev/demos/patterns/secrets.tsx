@@ -3,18 +3,14 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Button,
-  ConfirmByTyping,
   CopyButton,
+  Dialog,
   DirtyBar,
   FormField,
   IconButton,
   Input,
   RelativeTime,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   SecretInput,
   useAnnounce,
 } from '../../../src';
@@ -27,6 +23,7 @@ export const Example = () => {
   const [rows, setRows] = useState<Row[]>(SEED);
   const [token, setToken] = useState<string | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<Row | null>(null);
   const counter = useRef(0);
   const nameRefs = useRef(new Map<string, HTMLInputElement>());
   const announce = useAnnounce();
@@ -140,46 +137,35 @@ export const Example = () => {
                 >
                   Environment
                 </span>
-                <Select value={r.env} onValueChange={(v) => patch(r.id, { env: v as Env })}>
-                  <SelectTrigger aria-labelledby={`env-${r.id}`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ENVS.map((e) => (
-                      <SelectItem key={e.value} value={e.value}>
-                        {e.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Select
+                  aria-labelledby={`env-${r.id}`}
+                  value={r.env}
+                  onValueChange={(v) => patch(r.id, { env: v as Env })}
+                  options={ENVS}
+                />
               </div>
               <div className="pt-[22px]">
-                {r.secret && r.isSet ? (
-                  <ConfirmByTyping
-                    phrase={r.name}
-                    title={`Delete ${r.name}`}
-                    description="The stored value is removed and cannot come back."
-                    actionLabel="Delete"
-                    onConfirm={() => remove(r)}
-                    trigger={
-                      <IconButton
-                        aria-label={`Delete ${r.name}`}
-                        icon={<TrashIcon />}
-                        onClick={() => undefined}
-                      />
-                    }
-                  />
-                ) : (
-                  <IconButton
-                    aria-label={`Delete ${r.name || 'new variable'}`}
-                    icon={<TrashIcon />}
-                    onClick={() => remove(r)}
-                  />
-                )}
+                <IconButton
+                  aria-label={`Delete ${r.name || 'new variable'}`}
+                  icon={<TrashIcon />}
+                  onClick={() => (r.secret && r.isSet ? setDeleting(r) : remove(r))}
+                />
               </div>
             </div>
           ))}
         </div>
+        <Dialog
+          open={deleting !== null}
+          onOpenChange={(o) => !o && setDeleting(null)}
+          title={`Delete ${deleting?.name ?? ''}`}
+          description="The stored value is removed and cannot come back."
+          tone="destructive"
+          confirmText={deleting?.name ?? ''}
+          confirmLabel="Delete"
+          onConfirm={() => {
+            if (deleting) remove(deleting);
+          }}
+        />
         <DirtyBar
           dirty={dirty}
           onSave={() => {

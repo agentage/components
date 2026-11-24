@@ -62,16 +62,14 @@ PropertyValue.displayName = 'PropertyValue';
 export interface PropertyTextProps {
   value: string;
   onValueChange: (value: string) => void;
-  placeholder?: string;
 }
 
 /** Free text that edits in place (InlineEdit); Enter commits, Esc reverts. */
-export const PropertyText = ({ value, onValueChange, placeholder }: PropertyTextProps) => (
+export const PropertyText = ({ value, onValueChange }: PropertyTextProps) => (
   <InlineEdit
     value={value}
     onCommit={onValueChange}
     label={usePropertyLabel()}
-    placeholder={placeholder}
     className="-ml-1.5 text-ui"
   />
 );

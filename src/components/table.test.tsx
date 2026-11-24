@@ -46,7 +46,7 @@ describe('Table', () => {
     const head = screen.getByRole('columnheader', { name: 'Name' });
     expect(head.className).not.toContain('sticky');
     expect(head.className).not.toContain('top-0');
-    expect(head.className).toContain('bg-card');
+    expect(head.className).toContain('bg-background');
   });
 });
 
@@ -65,13 +65,6 @@ describe('tableHeadVariants', () => {
     expect(loose).not.toContain('sticky');
   });
 
-  it('keeps the comfortable look behind the table look attribute', () => {
-    setup();
-    const cls = screen.getByRole('columnheader').className;
-    expect(cls).toContain('group-data-[look=comfortable]/table:h-10');
-    expect(cls).toContain('group-data-[look=comfortable]/table:uppercase');
-  });
-
   it('merges className last', () => {
     render(
       <table>
@@ -85,16 +78,5 @@ describe('tableHeadVariants', () => {
     const cls = screen.getByRole('columnheader').className;
     expect(cls).toContain('sticky');
     expect(cls.endsWith('w-10')).toBe(true);
-  });
-});
-
-describe('Table density', () => {
-  it('is compact by default and marks comfortable on the table', () => {
-    const { container, unmount } = render(<Table />);
-    expect(container.querySelector('table')?.getAttribute('data-density')).toBe('compact');
-    expect(container.querySelector('table')?.className).toContain('text-ui');
-    unmount();
-    const next = render(<Table density="comfortable" />);
-    expect(next.container.querySelector('table')?.getAttribute('data-density')).toBe('comfortable');
   });
 });

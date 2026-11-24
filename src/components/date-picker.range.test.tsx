@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { DatePicker, resolveDateRange, type DateRange } from './date-picker';
 
@@ -35,7 +36,7 @@ describe('DatePicker range mode', () => {
     render(
       <DatePicker
         mode="range"
-        defaultValue={{ from: new Date(2026, 10, 1), to: new Date(2026, 10, 3) }}
+        value={{ from: new Date(2026, 10, 1), to: new Date(2026, 10, 3) }}
         onValueChange={onValueChange}
       />
     );
@@ -54,17 +55,24 @@ describe('DatePicker range mode', () => {
 describe('DatePicker relative ranges', () => {
   it('keeps a preset relative and shows its own label', () => {
     const onValueChange = vi.fn();
-    const presets = [{ value: '24h', label: 'Past day' }];
-    render(<DatePicker mode="range" presets={presets} onValueChange={onValueChange} />);
+    const Picker = () => {
+      const [v, setV] = useState<DateRange>();
+      const change = (r: DateRange) => {
+        setV(r);
+        onValueChange(r);
+      };
+      return <DatePicker mode="range" value={v} onValueChange={change} />;
+    };
+    render(<Picker />);
     fireEvent.click(trigger());
-    fireEvent.click(screen.getByRole('button', { name: 'Past day' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Last 24 hours' }));
     const range = onValueChange.mock.calls[0][0] as DateRange;
     expect(range.expression).toBe('now-24h');
     const later = new Date(range.to.getTime() + 3_600_000);
     expect(resolveDateRange(range, later).to).toEqual(later);
-    expect(trigger().textContent).toContain('Past day');
+    expect(trigger().textContent).toContain('Last 24 hours');
     fireEvent.click(trigger());
-    expect(screen.getByRole('button', { name: 'Past day' }).getAttribute('aria-pressed')).toBe(
+    expect(screen.getByRole('button', { name: 'Last 24 hours' }).getAttribute('aria-pressed')).toBe(
       'true'
     );
   });
@@ -87,8 +95,8 @@ describe('DatePicker relative ranges', () => {
 });
 
 describe('DatePicker single mode', () => {
-  it('shows an uncontrolled defaultValue', () => {
-    render(<DatePicker defaultValue={new Date(2026, 0, 15, 12)} />);
+  it('shows the value', () => {
+    render(<DatePicker value={new Date(2026, 0, 15, 12)} />);
     expect(screen.getByRole('button').textContent).toMatch(/15/);
   });
 });

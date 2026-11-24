@@ -7,11 +7,18 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
+  CardMeta,
   CardTitle,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
   Skeleton,
+  StatusBar,
+  StatusGlyph,
   ToggleGroup,
   type CardState,
+  type StatusBarCell,
 } from '../../src';
+import { ItemCard } from '../lib/item-card';
 import { Block } from '../components/demo';
 import { useState } from 'react';
 
@@ -39,14 +46,16 @@ const CardStates = () => {
           <Card
             state={state}
             minHeight={188}
-            onRetry={() => setState('loading')}
-            error={{ message: 'Could not load requests', reference: 'req_8f2a91' }}
-            skeleton={
-              <div className="space-y-2">
-                <Skeleton className="h-7 w-28" />
-                <Skeleton variant="text" className="w-3/4" />
-              </div>
-            }
+            fallback={{
+              onRetry: () => setState('loading'),
+              error: { message: 'Could not load requests', reference: 'req_8f2a91' },
+              loading: (
+                <div className="space-y-2">
+                  <Skeleton className="h-7 w-28" />
+                  <Skeleton variant="text" className="w-3/4" />
+                </div>
+              ),
+            }}
           >
             <CardHeader>
               <CardTitle>Requests</CardTitle>
@@ -56,12 +65,14 @@ const CardStates = () => {
               <p className="m-0 text-xl font-semibold tabular-nums">12,408</p>
               <p className="m-0 text-xs text-muted-foreground">Up 4% on the day before</p>
             </CardContent>
-            <CardFooter
-              source="Edge logs"
-              updatedAt={UPDATED}
-              onRefresh={refresh}
-              refreshing={refreshing}
-            />
+            <CardFooter>
+              <CardMeta
+                source="Edge logs"
+                updatedAt={UPDATED}
+                onRefresh={refresh}
+                refreshing={refreshing}
+              />
+            </CardFooter>
           </Card>
           <Card state={state === 'ready' ? 'ready' : 'loading'} minHeight={188}>
             <CardHeader>
@@ -71,7 +82,9 @@ const CardStates = () => {
             <CardContent>
               <p className="m-0 text-xl font-semibold tabular-nums">0.12%</p>
             </CardContent>
-            <CardFooter updatedAt={UPDATED} />
+            <CardFooter>
+              <CardMeta updatedAt={UPDATED} />
+            </CardFooter>
           </Card>
         </div>
       </div>
@@ -131,7 +144,90 @@ export const States = () => (
   </div>
 );
 
+const TICKS: StatusBarCell[] = [
+  { tone: 'success', label: 'Backup 1, done' },
+  { tone: 'success', label: 'Backup 2, done' },
+  { tone: 'destructive', label: 'Backup 3, failed' },
+  { tone: 'success', label: 'Backup 4, done' },
+  { tone: 'success', label: 'Backup 5, done' },
+];
+
+const MENU = (
+  <>
+    <DropdownMenuItem>Open</DropdownMenuItem>
+    <DropdownMenuItem>Duplicate</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+  </>
+);
+
+const ItemCards = () => {
+  const [selected, setSelected] = useState(true);
+  const [enabled, setEnabled] = useState(true);
+  const [opened, setOpened] = useState(0);
+  return (
+    <Block
+      caption={`Item card: a Card with an indicator, a title button that opens the item (${String(opened)} opens), a checkbox, a switch, a menu, facts and a footer. Controls sit above the stretched title. The cards and board views of DataView use the same card by default.`}
+    >
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3">
+        <ItemCard
+          title="Nightly backup"
+          indicator={<StatusGlyph shape="dot" tone="success" label="Active" />}
+          description="Copies the main folder to the archive disk every morning."
+          facts={[
+            { label: 'Schedule', value: 'Every day 09:00' },
+            { label: 'Next', value: 'in 19 h' },
+            { label: 'Target', value: 'Main folder' },
+            { label: 'Success', value: '83%' },
+          ]}
+          footer={
+            <>
+              <StatusBar
+                size="sm"
+                label="Last 5 results of Nightly backup"
+                cells={TICKS}
+                slots={8}
+              />
+              <span>5 results</span>
+            </>
+          }
+          menu={MENU}
+          onOpen={() => setOpened((n) => n + 1)}
+        />
+        <ItemCard
+          title="Weekly digest"
+          indicator={
+            <StatusGlyph
+              shape="dot"
+              tone={enabled ? 'success' : 'muted'}
+              label={enabled ? 'Active' : 'Paused'}
+            />
+          }
+          description="Sends a summary of the week to the team."
+          facts={[
+            { label: 'Schedule', value: 'Mondays 08:00' },
+            { label: 'Next', value: 'in 3 d' },
+          ]}
+          selected={selected}
+          onSelectedChange={setSelected}
+          enabled={enabled}
+          onEnabledChange={setEnabled}
+          menu={MENU}
+          onOpen={() => setOpened((n) => n + 1)}
+        />
+      </div>
+    </Block>
+  );
+};
+
 export const Composition = () => (
+  <div className="space-y-5">
+    <ItemCards />
+    <ActionCard />
+  </div>
+);
+
+const ActionCard = () => (
   <Block caption="CardAction puts a control at the right of the header, next to the title.">
     <Card className="max-w-sm">
       <CardHeader>

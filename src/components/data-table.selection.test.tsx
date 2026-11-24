@@ -22,7 +22,7 @@ const Multi = ({ onChange }: { onChange?: (k: string[]) => void }) => {
   return (
     <DataTable
       columns={COLUMNS}
-      data={ROWS}
+      rows={ROWS}
       rowKey={(r) => r.id}
       rowLabel={(r) => r.name}
       selection="multi"
@@ -75,7 +75,7 @@ describe('DataTable selection', () => {
     render(
       <DataTable
         columns={COLUMNS}
-        data={ROWS}
+        rows={ROWS}
         rowKey={(r) => r.id}
         selection="single"
         onRowClick={open}
@@ -94,7 +94,7 @@ describe('DataTable selection', () => {
     const { container } = render(
       <DataTable
         columns={COLUMNS}
-        data={ROWS}
+        rows={ROWS}
         rowKey={(r) => r.id}
         selection="multi"
         groupBy="group"

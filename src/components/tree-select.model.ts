@@ -62,3 +62,18 @@ export const defaultPath = (path: TreeSelectNode[]): string => {
     .reduce((a, n) => (a === '' || a.endsWith('/') ? a : `${a}/`) + n.label, '');
   return `${path[0].label} / ${rest}`;
 };
+
+export interface TreeSelectLabels {
+  search: string;
+  /** Count slot of a row in `disabledIds`. */
+  added: string;
+  noMatch: string;
+  confirm: (count: number) => string;
+}
+
+export const TREE_SELECT_LABELS: TreeSelectLabels = {
+  search: 'Search',
+  added: 'Added',
+  noMatch: 'No match',
+  confirm: (n) => (n === 1 ? 'Add 1' : `Add ${String(n)}`),
+};

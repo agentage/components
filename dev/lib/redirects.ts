@@ -13,16 +13,22 @@ const PAGES: Record<string, string> = {
   'data-display/pagination': 'navigation/pagination',
   'data-display/status-dot': 'foundations/status-glyph',
   'data-display/table': 'lists/table',
-  'feedback/alert-dialog': 'overlays/alert-dialog',
+  'feedback/alert-dialog': 'overlays/dialog',
+  'feedback/confirm-by-typing': 'overlays/dialog',
+  'feedback/danger-zone': 'overlays/dialog',
   'feedback/command': 'overlays/command',
   'feedback/context-menu': 'overlays/context-menu',
   'feedback/dropdown-menu': 'overlays/dropdown-menu',
   'feedback/hover-card': 'overlays/hover-card',
-  'feedback/modal': 'overlays/modal',
-  'feedback/overlay-portals': 'overlays/overlay-portals',
+  'feedback/modal': 'overlays/dialog',
+  'feedback/overlay-portals': 'overlays/dialog',
   'feedback/popover': 'overlays/popover',
   'feedback/sheet': 'overlays/sheet',
   'feedback/tooltip': 'overlays/tooltip',
+  'overlays/alert-dialog': 'overlays/dialog',
+  'overlays/inspector-panel': 'overlays/sheet',
+  'overlays/modal': 'overlays/dialog',
+  'overlays/overlay-portals': 'overlays/dialog',
   'forms/checkbox': 'forms/checkbox-and-switch',
   'forms/label': 'foundations/label',
   'foundations/card': 'data-display/card',
@@ -43,6 +49,40 @@ const PAGES: Record<string, string> = {
   'site-docs/footer': 'site/footer',
   'site-docs/markdown': 'site/markdown',
   'site-docs/top-bar': 'site/top-bar',
+  'charts/sparkline': 'display/sparkline',
+  'charts/donut-card': 'display/stat-card',
+  'charts/funnel-card': 'display/stat-card',
+  'charts/gauge-card': 'display/stat-card',
+  'charts/heatmap-card': 'display/stat-card',
+  'charts/multi-stat-card': 'display/stat-card',
+  'charts/ranked-list-card': 'display/stat-card',
+  'charts/score-card': 'display/stat-card',
+  'data-display/entity-card': 'display/card',
+  'data-display/data-tree': 'lists/data-tree',
+  'data-display/log-view': 'lists/log-view',
+  'disclosure/check-list': 'display/step-list',
+  'deprecated/filter-bar': 'lists/list-toolbar',
+  'deprecated/nav-link': 'navigation/nav-row',
+  'deprecated/page-layout': 'navigation/page-header',
+  'deprecated/status-dot': 'foundations/status-glyph',
+  'deprecated/usage-meter': 'display/progress',
+  'feedback/quota-banner': 'feedback/alert',
+  'forms/combobox': 'forms/select',
+  'forms/slider': 'forms/toggle-group',
+  'foundations/heading': 'foundations/prose',
+  'foundations/label': 'forms/form-field',
+  'foundations/priority-glyph': 'foundations/status-glyph',
+  'foundations/separator': 'foundations/prose',
+  'lists/data-table': 'lists/data-view',
+  'lists/group-header': 'lists/list',
+  'overlays/context-menu': 'overlays/dropdown-menu',
+  'overlays/hover-card': 'overlays/popover',
+  'overlays/scroll-area': 'overlays/resizable',
+  'site/copy-button': 'foundations/copy-button',
+  'site/doc-sidebar': 'navigation/sidebar',
+  'site/footer': 'navigation',
+  'site/markdown': 'foundations/prose',
+  'site/top-bar': 'navigation',
   'patterns/grouped-list': 'patterns/list-page',
   'patterns/grouped-table': 'patterns/list-page',
   'patterns/dashboard-grid': 'patterns/card-grid',
@@ -55,17 +95,32 @@ const PAGES: Record<string, string> = {
 };
 
 const CATEGORIES: Record<string, string> = {
-  cards: 'charts',
+  cards: 'display',
+  charts: 'display',
+  'data-display': 'display',
+  disclosure: 'display',
+  deprecated: 'foundations',
   layout: 'navigation',
-  'site-docs': 'site',
+  'site-docs': 'foundations',
+  site: 'foundations',
 };
 
-/** The current path for a possibly old one, or the same path when nothing moved. */
-export const redirectedPath = (path: string): string => {
+const once = (path: string): string => {
   const [, root, category, page, ...rest] = path.replace(/\/+$/, '').split('/');
   if (root !== 'components' || !category || rest.length) return path;
   const moved = page ? PAGES[`${category}/${page}`] : undefined;
   if (moved) return `/components/${moved}`;
   const renamed = CATEGORIES[category];
   return renamed ? `/components/${[renamed, page].filter(Boolean).join('/')}` : path;
+};
+
+/** The current path for a possibly old one, or the same path when nothing moved; moves chain. */
+export const redirectedPath = (path: string): string => {
+  let current = path;
+  for (let i = 0; i < 4; i += 1) {
+    const next = once(current);
+    if (next === current) break;
+    current = next;
+  }
+  return current;
 };

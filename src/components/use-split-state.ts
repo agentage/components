@@ -30,8 +30,6 @@ interface SplitStateOptions {
   min: number;
   max: number;
   collapsible: boolean;
-  onWidthChange?: (px: number) => void;
-  onCollapsedChange?: (collapsed: boolean) => void;
   apiRef?: Ref<ResizableSplitApi>;
 }
 
@@ -42,8 +40,6 @@ export const useSplitState = ({
   min,
   max,
   collapsible,
-  onWidthChange,
-  onCollapsedChange,
   apiRef,
 }: SplitStateOptions): { api: ResizableSplitApi; set: (px: number) => void } => {
   const name = resizableSplitVar(storageKey);
@@ -73,9 +69,8 @@ export const useSplitState = ({
       setCollapsed(next);
       setRootVar(collapsedName, next ? '0px' : null);
       writeStored(flagKey, next ? '1' : '0');
-      onCollapsedChange?.(next);
     },
-    [collapsible, collapsedName, flagKey, onCollapsedChange]
+    [collapsible, collapsedName, flagKey]
   );
 
   // A split that stops being collapsible shows its pane again.
@@ -87,7 +82,6 @@ export const useSplitState = ({
     setWidth(next);
     setRootVar(name, `${String(next)}px`);
     writeStored(storageKey, String(next));
-    onWidthChange?.(next);
   };
 
   const api = useMemo<ResizableSplitApi>(

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useControlled } from '../lib/use-controlled';
 import { cn } from '../lib/utils';
 import { Disclosure } from './disclosure';
 import { StatusGlyph } from './status-glyph';
@@ -39,15 +38,6 @@ export const CONNECTOR = [
   'group-data-[glyphs]/steps:after:absolute group-data-[glyphs]/steps:after:left-[71.5px] group-data-[glyphs]/steps:after:top-[21px] group-data-[glyphs]/steps:after:bottom-0 group-data-[glyphs]/steps:after:w-px group-data-[glyphs]/steps:after:bg-border',
   'first:before:hidden [&:nth-last-child(1_of_[data-slot=step])]:after:hidden',
 ];
-
-export const useOpen = (
-  controlled: boolean | undefined,
-  initial: boolean,
-  onChange?: (open: boolean) => void
-): [boolean, () => void] => {
-  const [open, setOpen] = useControlled(controlled, initial, onChange);
-  return [open, () => setOpen(!open)];
-};
 
 interface StepHeadProps {
   offset?: React.ReactNode;

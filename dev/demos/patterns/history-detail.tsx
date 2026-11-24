@@ -54,7 +54,7 @@ const Detail = ({ build, onBack }: { build: Build; onBack: () => void }) => {
       <PageHeader
         icon={<StatusGlyph {...glyph} size="md" />}
         title={build.title}
-        subtitle={`${build.id} on ${build.branch} by ${build.author}`}
+        description={`${build.id} on ${build.branch} by ${build.author}`}
         className="px-4"
       />
       <Tabs defaultValue="logs" className="flex min-h-0 flex-1 flex-col px-4 pb-3">
@@ -128,11 +128,7 @@ export const Example = () => {
             rows={BUILDS}
             columns={COLUMNS}
             getRowId={(b) => b.id}
-            searchKeys={['title', 'id', 'branch']}
-            searchPlaceholder="Search history"
-            onRowOpen={setOpen}
-            rowMenu={menu}
-            rowMenuLabel={(b) => `Actions for ${b.id}`}
+            actions={{ open: setOpen, menu }}
           />
         )}
       </div>

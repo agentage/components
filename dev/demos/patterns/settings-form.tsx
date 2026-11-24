@@ -117,7 +117,7 @@ export const Example = () => {
                 <TreeSelect
                   nodes={FOLDER_TREE}
                   title="Add a folder"
-                  searchPlaceholder="Search folders"
+                  labels={{ search: 'Search folders' }}
                   disabledIds={v.folders.map((e) => e.id)}
                   formatPath={folderPath}
                   onValueChange={(ids) => {

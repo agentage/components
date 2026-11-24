@@ -26,7 +26,7 @@ describe('Progress', () => {
   });
 
   it('omits aria-valuenow and animates the bar when indeterminate', () => {
-    render(<Progress indeterminate label="Working" />);
+    render(<Progress label="Working" />);
     const bar = screen.getByRole('progressbar');
     expect(bar.getAttribute('aria-valuenow')).toBe(null);
     expect(bar.getAttribute('data-indeterminate')).toBe('true');
@@ -40,7 +40,7 @@ describe('Progress', () => {
 
 describe('progressVariants', () => {
   it('renders the exact indicator class string for every status', () => {
-    const base = 'h-full rounded-full transition-all';
+    const base = 'h-full rounded-full transition-all duration-300';
     const tokens = {
       default: 'bg-primary',
       success: 'bg-success',
@@ -60,31 +60,11 @@ describe('progressVariants', () => {
   });
 
   it('appends the indeterminate classes after the status token', () => {
-    render(<Progress indeterminate variant="success" label="p" />);
+    render(<Progress variant="success" label="p" />);
     const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
     expect(fill.className).toBe(
-      'h-full rounded-full transition-all bg-success w-full motion-safe:animate-pulse'
+      'h-full rounded-full transition-all duration-300 bg-success w-full motion-safe:animate-pulse'
     );
-  });
-});
-
-describe('Progress duration', () => {
-  it('defaults the fill transition to 300ms', () => {
-    render(<Progress value={30} label="p" />);
-    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
-    expect(fill.style.transitionDuration).toBe('300ms');
-  });
-
-  it('honours a custom duration', () => {
-    render(<Progress value={30} duration={800} label="p" />);
-    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
-    expect(fill.style.transitionDuration).toBe('800ms');
-  });
-
-  it('disables the transition when duration is false', () => {
-    render(<Progress value={30} duration={false} label="p" />);
-    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
-    expect(fill.style.transitionDuration).toBe('0s');
   });
 });
 
@@ -123,7 +103,7 @@ describe('Progress as a meter', () => {
   });
 
   it('renders a label row over the bar and names the bar by it', () => {
-    render(<Progress labelPosition="top" label="Seats" value={2} max={5} showValue role="meter" />);
+    render(<Progress meter label="Seats" value={2} max={5} showValue />);
     expect(screen.getByRole('meter', { name: 'Seats' })).toBeTruthy();
     expect(screen.getByText('40%')).toBeTruthy();
   });
@@ -131,12 +111,10 @@ describe('Progress as a meter', () => {
   it('shows the level by text and glyph, not only by colour', () => {
     const { container } = render(
       <Progress
-        role="meter"
-        labelPosition="top"
+        meter
         label="Storage"
         value={90}
         showValue
-        thresholds={{}}
         formatValue={(v, m) => `${String(v)} of ${String(m)}`}
       />
     );
@@ -145,8 +123,8 @@ describe('Progress as a meter', () => {
   });
 
   it('shows no level cue below the warning point', () => {
-    const { container } = render(<Progress value={10} thresholds={{}} label="Storage" showValue />);
-    expect(screen.getByRole('progressbar').getAttribute('aria-valuetext')).toBe(null);
+    const { container } = render(<Progress value={10} meter label="Storage" showValue />);
+    expect(screen.getByRole('meter').getAttribute('aria-valuetext')).toBe(null);
     expect(container.querySelector('[data-slot="progress-level-cue"]')).toBeNull();
   });
 });

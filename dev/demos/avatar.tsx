@@ -1,5 +1,5 @@
 'use client';
-import { Avatar, IconContainer, StatusGlyph } from '../../src';
+import { Avatar, StatusGlyph } from '../../src';
 import { Block, Row } from '../components/demo';
 import { BotIcon, EditIcon, HeartIcon, InfoIcon, ServerIcon } from '../lib/icons';
 
@@ -37,41 +37,25 @@ export const Variants = () => (
         <Avatar shape="square" icon={<HeartIcon />} name="Favorites" size="lg" tone="primary" />
       </Row>
     </Block>
-    <Block caption="IconContainer is a tinted square for a glyph: sm 24, md 28 (default), lg 32 and xl 40 px.">
-      <Row>
-        <IconContainer tone="blue" size="sm">
-          <InfoIcon />
-        </IconContainer>
-        <IconContainer tone="green">
-          <EditIcon />
-        </IconContainer>
-        <IconContainer tone="amber">
-          <HeartIcon />
-        </IconContainer>
-        <IconContainer tone="violet" size="lg">
-          <BotIcon />
-        </IconContainer>
-        <IconContainer tone="rose" size="lg">
-          <HeartIcon />
-        </IconContainer>
-        <IconContainer tone="cyan" size="xl">
-          <ServerIcon />
-        </IconContainer>
+    <Block caption="The meaning tones tint a square icon tile: success, warning, destructive and info.">
+      <Row className="gap-3">
+        <Avatar shape="square" icon={<EditIcon />} tone="success" name="Saved" />
+        <Avatar shape="square" icon={<HeartIcon />} tone="warning" name="Attention" />
+        <Avatar shape="square" icon={<ServerIcon />} tone="destructive" name="Offline" size="md" />
+        <Avatar shape="square" icon={<InfoIcon />} tone="info" name="Notice" size="md" />
       </Row>
     </Block>
   </div>
 );
 
 export const Sizes = () => (
-  <Block caption="From 2xs 18 px for inline meta up to 2xl 80 px for profiles; sm is the default.">
+  <Block caption="From 2xs 18 px for inline meta up to lg 48 px; sm is the default.">
     <div className="flex items-end gap-3">
       <Avatar name="Ada Lovelace" size="2xs" />
       <Avatar name="Ada Lovelace" size="xs" />
       <Avatar name="Ada Lovelace" />
       <Avatar name="Ada Lovelace" size="md" />
       <Avatar name="Ada Lovelace" size="lg" />
-      <Avatar name="Ada Lovelace" size="xl" />
-      <Avatar name="Ada Lovelace" size="2xl" />
     </div>
   </Block>
 );

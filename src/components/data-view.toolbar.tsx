@@ -88,7 +88,6 @@ export interface DataViewToolbarProps<T> {
   selected: T[];
   onClearSelection: () => void;
   bulkActions?: (rows: T[]) => React.ReactNode;
-  searchPlaceholder?: string;
   'aria-label'?: string;
   className?: string;
   ref?: React.Ref<HTMLDivElement>;
@@ -124,7 +123,7 @@ export const DataViewToolbar = <T,>({
       <ToolbarSearch
         value={state.query}
         onValueChange={c.setQuery}
-        placeholder={p.searchPlaceholder}
+        placeholder={p['aria-label'] ? `Search ${p['aria-label'].toLowerCase()}` : undefined}
       />
       {p.filters.length > 0 && (
         <FilterMenu
@@ -170,7 +169,9 @@ export const DataViewToolbar = <T,>({
           groupBy={state.groupBy}
           onGroupByChange={c.setGroupBy}
           toggles={[
-            ...columns.map((col) => ({ value: columnFlag(col.key), label: labelOf(col) })),
+            ...columns
+              .filter((col) => col.visibility !== 'none')
+              .map((col) => ({ value: columnFlag(col.key), label: labelOf(col) })),
             ...(columns.some((col) => col.groupable)
               ? [{ value: SHOW_EMPTY, label: 'Show empty groups' }]
               : []),

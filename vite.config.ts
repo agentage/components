@@ -24,8 +24,6 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
-        charts: resolve(__dirname, 'src/charts.ts'),
-        site: resolve(__dirname, 'src/site.ts'),
       },
       formats: ['es'],
     },

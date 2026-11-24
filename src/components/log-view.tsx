@@ -13,13 +13,11 @@ import {
 } from './log-view.model';
 import { LogRow } from './log-view.row';
 
-export type { LogLevel, LogLevelStyle, LogLine, LogTone } from './log-view.model';
+export type { LogLevel, LogLine } from './log-view.model';
 
 export interface LogViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onScroll'> {
   /** Oldest first. Keep ids stable so lines update in place; a capped buffer is fine. */
   lines: LogLine[];
-  /** Tone and glyph per level, merged over debug, info, warn and error. */
-  levels?: Record<string, LogLevelStyle>;
   /** Levels to show; all by default. */
   filter?: string[];
   /** Marks this text in every line. */
@@ -29,43 +27,34 @@ export interface LogViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
   showTime?: 'absolute' | 'relative' | false;
   /** Live tail: stays at the bottom while lines arrive. Pair with `onFollowChange`. */
   follow?: boolean;
-  defaultFollow?: boolean;
   onFollowChange?: (follow: boolean) => void;
   /** Called when a line is picked by click or Enter. */
   onLineOpen?: (line: LogLine) => void;
   /** Lines with `fields` open a DataTree below them. Default true. */
   expandable?: boolean;
-  /** Fixed line height in px for windowing. Default 24. */
-  rowHeight?: number;
   'aria-label'?: string;
 }
 
 const DETAIL_GUESS = 160;
+const rowHeight = 24;
 
 /** A windowed, keyboard-driven log with levels, live tail and expandable structured lines. */
 export const LogView = React.forwardRef<HTMLDivElement, LogViewProps>((props, ref) => {
   const {
     lines,
-    levels,
     filter,
     highlight,
     wrap = false,
     showTime = 'absolute',
     follow,
-    defaultFollow,
     onFollowChange,
     onLineOpen,
     expandable = true,
-    rowHeight = 24,
     className,
     'aria-label': label = 'Log',
     ...rest
   } = props;
   const base = React.useId();
-  const styles = React.useMemo(
-    () => ({ ...LOG_LEVELS, ...levels }) as Record<string, LogLevelStyle>,
-    [levels]
-  );
   const passes = React.useCallback(
     (l: LogLine) => !filter || filter.includes(l.level ?? 'info'),
     [filter]
@@ -83,7 +72,7 @@ export const LogView = React.forwardRef<HTMLDivElement, LogViewProps>((props, re
   const extra = shown.map((l) => (isOpen(l) ? (detailH[l.id] ?? DETAIL_GUESS) : 0));
   const offsets = offsetsOf(shown.length, rowHeight, extra);
   const tail = useFollow({
-    ...{ follow, defaultFollow, onFollowChange, lines, passes, shown, offsets },
+    ...{ follow, onFollowChange, lines, passes, shown, offsets },
     anchor: !wrap,
   });
   const { scroller } = tail;
@@ -163,7 +152,10 @@ export const LogView = React.forwardRef<HTMLDivElement, LogViewProps>((props, re
                 id={rowId(l)}
                 line={l}
                 index={i}
-                style={styles[l.level ?? 'info'] ?? LOG_LEVELS.info}
+                style={
+                  (LOG_LEVELS as Record<string, LogLevelStyle>)[l.level ?? 'info'] ??
+                  LOG_LEVELS.info
+                }
                 top={wrap ? undefined : offsets[i]}
                 height={rowHeight}
                 wrap={wrap}

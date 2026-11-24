@@ -2,15 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { Combobox } from '../components/combobox';
 import { Popover } from '../components/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/select';
+import { Select } from '../components/select';
 import { Sheet } from '../components/sheet';
 
 beforeAll(() => {
@@ -28,7 +21,7 @@ const btn = (name: string) => screen.getByRole('button', { name });
 const focused = () => document.activeElement;
 const setup = () => userEvent.setup({ pointerEventsCheck: 0 });
 
-/** Also checks the residue Radix leaves: pointer-events, its scroll lock and aria-hidden marks. */
+/** Also checks the residue overlays leave: pointer-events, scroll lock and aria-hidden marks. */
 const expectClean = () => {
   expect(document.querySelectorAll('[role="dialog"],[role="listbox"]').length).toBe(0);
   expect(document.body.style.overflow).toBe('');
@@ -41,16 +34,13 @@ const expectClean = () => {
   expect(fireEvent.keyDown(document.body, { key: 'Escape' })).toBe(true);
 };
 
-const Fruit = () => (
-  <Select>
-    <SelectTrigger aria-label="Fruit">
-      <SelectValue placeholder="Pick" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="apple">Apple</SelectItem>
-      <SelectItem value="pear">Pear</SelectItem>
-    </SelectContent>
-  </Select>
+const fruits = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'pear', label: 'Pear' },
+];
+
+const Fruit = ({ searchable }: { searchable?: boolean }) => (
+  <Select options={fruits} aria-label="Fruit" placeholder="Pick" searchable={searchable} />
 );
 
 const InSheet = ({ children }: { children: React.ReactNode }) => {
@@ -89,7 +79,6 @@ describe('overlay stack: Sheet > Select', () => {
     render(<InSheet children={<Fruit />} />);
     await user.click(btn('Open sheet'));
     await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
-    // Radix sets pointer-events: none on the body, so a real press lands on <html>.
     fireEvent.pointerDown(document.documentElement);
     fireEvent.mouseDown(document.documentElement);
     expect(screen.queryByRole('listbox')).toBeNull();
@@ -116,20 +105,20 @@ const InPopover = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-describe('overlay stack: unmount with a Radix layer open', () => {
+describe('overlay stack: unmount with the list open', () => {
   it('unmounting Sheet > Select with the listbox open leaves the body clean', async () => {
     const user = setup();
     const { unmount } = render(<InSheet children={<Fruit />} />);
     await user.click(btn('Open sheet'));
     await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
-    expect(document.body.style.pointerEvents).toBe('none');
+    expect(screen.getByRole('listbox')).toBeTruthy();
     unmount();
     expectClean();
   });
 });
 
 describe('overlay stack: Select inside a Popover', () => {
-  it('picking an option keeps the popover open; a page press under the Select closes only it', async () => {
+  it('picking an option keeps the popover open; Escape closes only the list first', async () => {
     const user = setup();
     render(<InPopover children={<Fruit />} />);
     await user.click(btn('Filters'));
@@ -139,8 +128,7 @@ describe('overlay stack: Select inside a Popover', () => {
     expect(screen.getByRole('dialog', { name: 'Filters' })).toBeTruthy();
     expect(screen.getByRole('combobox', { name: 'Fruit' }).textContent).toContain('Pear');
     await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
-    fireEvent.pointerDown(document.documentElement);
-    fireEvent.mouseDown(document.documentElement);
+    await user.keyboard('{Escape}');
     expect(screen.queryByRole('listbox')).toBeNull();
     expect(screen.getByRole('dialog', { name: 'Filters' })).toBeTruthy();
     await user.keyboard('{Escape}');
@@ -149,15 +137,10 @@ describe('overlay stack: Select inside a Popover', () => {
   });
 });
 
-const fruits = [
-  { value: 'apple', label: 'Apple' },
-  { value: 'pear', label: 'Pear' },
-];
-
-describe('overlay stack: Combobox in a Sheet', () => {
-  it('Escape and a press inside the sheet close only the combobox', async () => {
+describe('overlay stack: searchable Select in a Sheet', () => {
+  it('Escape and a press inside the sheet close only the list', async () => {
     const user = setup();
-    render(<InSheet children={<Combobox options={fruits} aria-label="Fruit" />} />);
+    render(<InSheet children={<Fruit searchable />} />);
     await user.click(btn('Open sheet'));
     await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
     expect(screen.getByRole('listbox')).toBeTruthy();

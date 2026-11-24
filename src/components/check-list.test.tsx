@@ -138,19 +138,15 @@ describe('Row status vocabulary', () => {
   });
 });
 
-describe('CheckItem detail open state', () => {
-  it('is controlled through open and onOpenChange', () => {
-    const changes: boolean[] = [];
+describe('CheckItem detail', () => {
+  it('opens the detail on click', () => {
     render(
       <CheckList title="Checks">
-        <CheckItem label="Lint" open={false} onOpenChange={(o) => changes.push(o)}>
-          detail
-        </CheckItem>
+        <CheckItem label="Lint">detail</CheckItem>
       </CheckList>
     );
     const row = screen.getByRole('button', { name: /Lint/ });
     fireEvent.click(row);
-    expect(changes).toEqual([true]);
-    expect(row.getAttribute('aria-expanded')).toBe('false');
+    expect(row.getAttribute('aria-expanded')).toBe('true');
   });
 });

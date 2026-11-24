@@ -58,33 +58,31 @@ export const Example = () => {
             rows={rows}
             columns={COLUMNS}
             getRowId={(t) => t.id}
-            searchKeys={['title', 'id']}
-            searchPlaceholder="Search items"
             views={['board', 'table']}
-            defaultGroupBy="status"
-            rowsBy={lanes === 'none' ? null : lanes}
-            onMove={(m) => {
-              setRows((l) => applyMove(l, m, lanes));
-              announce(`${m.id} moved to ${STATUS_LABEL[m.toGroup as ItemStatus] ?? m.toGroup}`);
+            defaultState={{ groupBy: 'status' }}
+            state={{ rowsBy: lanes === 'none' ? null : lanes }}
+            actions={{
+              open: (t) => setOpened(t.id),
+              menu: itemMenu,
+              move: (m) => {
+                setRows((l) => applyMove(l, m, lanes));
+                announce(`${m.id} moved to ${STATUS_LABEL[m.toGroup as ItemStatus] ?? m.toGroup}`);
+              },
+              add: (status) =>
+                setRows((l) => [
+                  ...l,
+                  {
+                    id: `ITM-${String(200 + l.length)}`,
+                    title: 'New item',
+                    status: status as ItemStatus,
+                    group: 'web',
+                    priority: 'none',
+                    assignee: null,
+                    labels: [],
+                    due: null,
+                  },
+                ]),
             }}
-            onAddToGroup={(status) =>
-              setRows((l) => [
-                ...l,
-                {
-                  id: `ITM-${String(200 + l.length)}`,
-                  title: 'New item',
-                  status: status as ItemStatus,
-                  group: 'web',
-                  priority: 'none',
-                  assignee: null,
-                  labels: [],
-                  due: null,
-                },
-              ])
-            }
-            rowMenu={itemMenu}
-            rowMenuLabel={(t) => `Actions for ${t.id}`}
-            onRowOpen={(t) => setOpened(t.id)}
           />
         </div>
       </div>

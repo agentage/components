@@ -14,12 +14,16 @@ export type DataViewValue = string | number | boolean | null | undefined;
 export interface DataViewColumn<T> extends DataTableColumn<T> {
   /** `multi`: a multi-select group in the Filter menu; `toggle`: a quick toggle (truthy rows). */
   filter?: 'multi' | 'toggle' | false;
+  /** Matched by the search box; when no column sets it, every column is searched. */
+  searchable?: boolean;
+  /** `optional`: hidden until switched on in Display; `none`: only filters, sorts, groups or searches. */
+  visibility?: 'shown' | 'optional' | 'none';
+  /** The cell renders two lines (a name over a muted description); rows grow to 52 px. */
+  twoLine?: boolean;
   /** Offered in Display, Group by. */
   groupable?: boolean;
   /** Group order by value when grouped by this column; unknown values follow. */
   groupOrder?: string[];
-  /** Hidden until switched on in Display, Columns. */
-  defaultHidden?: boolean;
   /** Value used to filter, group, sort and search; defaults to `row[key]`. */
   value?: (row: T) => DataViewValue;
   /** Label of one value in filter menus, chips and group headers. */
@@ -33,12 +37,6 @@ export interface DataViewColumn<T> extends DataTableColumn<T> {
    * `title` is line 2 (two lines at most); `chip` cells fill line 3. Unset: not on the card.
    */
   cardSlot?: 'id' | 'meta' | 'end' | 'title' | 'chip';
-}
-
-export interface DataViewQuickToggle<T> {
-  key: string;
-  label: string;
-  predicate: (row: T) => boolean;
 }
 
 export const SHOW_EMPTY = 'emptyGroups';
@@ -62,17 +60,12 @@ export const domainOf = <T>(column: DataViewColumn<T>, rows: T[]): string[] => [
 ];
 
 export const isShown = <T>(column: DataViewColumn<T>, flags: Record<string, boolean>): boolean =>
-  flags[columnFlag(column.key)] ?? !column.defaultHidden;
+  column.visibility !== 'none' &&
+  (flags[columnFlag(column.key)] ?? column.visibility !== 'optional');
 
-export const buildConfig = <T>(
-  columns: DataViewColumn<T>[],
-  searchKeys: string[] | undefined,
-  toggles: DataViewQuickToggle<T>[]
-): ListApplyConfig<T> => {
-  const byKey = new Map(columns.map((c) => [c.key, c]));
-  const searchCols = (searchKeys ?? columns.map((c) => c.key))
-    .map((k) => byKey.get(k))
-    .filter((c): c is DataViewColumn<T> => c !== undefined);
+export const buildConfig = <T>(columns: DataViewColumn<T>[]): ListApplyConfig<T> => {
+  const marked = columns.filter((c) => c.searchable);
+  const searchCols = marked.length > 0 ? marked : columns;
   const config: Required<ListApplyConfig<T>> = {
     search: (row) => searchCols.map((c) => keyOf(valueOf(c, row))).join(' '),
     filters: {},
@@ -95,7 +88,6 @@ export const buildConfig = <T>(
         return { key, label: formatOf(c, key) };
       };
   }
-  for (const t of toggles) config.flags[toggleFlag(t.key)] = t.predicate;
   return config;
 };
 

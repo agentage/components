@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import { Button, Count, Disclosure, DisclosureChevron, GroupHeader, StatusGlyph } from '../../src';
-import { Block, Row } from '../components/demo';
+import { Button, Disclosure, GroupHeader, StatusGlyph } from '../../src';
+import { Block } from '../components/demo';
 
 const FRAME = 'overflow-hidden rounded-lg border border-border';
 
@@ -88,19 +88,11 @@ export const Composition = () => {
         <div className={`${FRAME} h-[200px] overflow-auto`}>
           {['Active', 'Paused', 'Failed'].map((g) => (
             <section key={g}>
-              <GroupHeader sticky label={g} count={4} />
+              <GroupHeader className="sticky top-0 z-10" label={g} count={4} />
               <Body items={['Item one', 'Item two', 'Item three', 'Item four']} />
             </section>
           ))}
         </div>
-      </Block>
-      <Block caption="DisclosureChevron and Count on their own, for a custom header.">
-        <Row>
-          <DisclosureChevron open={false} />
-          <DisclosureChevron open />
-          <span className="text-ui font-semibold">Folders</span>
-          <Count>12</Count>
-        </Row>
       </Block>
       <Block caption="Disclosure animates any body open and shut; it stays mounted and inert while shut.">
         <Button size="sm" variant="outline" onClick={() => setShown((v) => !v)}>

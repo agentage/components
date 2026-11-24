@@ -58,7 +58,7 @@ describe('Tabs', () => {
 });
 
 describe('tabs variants', () => {
-  const renderVariant = (variant: 'default' | 'underline' | 'pill' | 'line') =>
+  const renderVariant = (variant?: 'pill' | 'line') =>
     render(
       <Tabs defaultValue="one" variant={variant}>
         <TabsList>
@@ -69,8 +69,8 @@ describe('tabs variants', () => {
       </Tabs>
     );
 
-  it('renders the pill look for the default variant', () => {
-    renderVariant('default');
+  it('renders the pill look by default', () => {
+    renderVariant();
     const list = screen.getByRole('tablist').className;
     for (const c of ['h-8.5', 'rounded-lg', 'border', 'bg-card']) expect(list).toContain(c);
     const on = screen.getByRole('tab', { name: 'One' }).className;
@@ -85,8 +85,8 @@ describe('tabs variants', () => {
     expect(screen.getByRole('tabpanel').className).toContain('focus-ring');
   });
 
-  it('renders the line look for the underline variant', () => {
-    renderVariant('underline');
+  it('renders the line look for the line variant', () => {
+    renderVariant('line');
     const list = screen.getByRole('tablist').className;
     for (const c of ['h-9.5', 'border-b', 'w-full']) expect(list).toContain(c);
     expect(list).not.toContain('rounded-lg');
@@ -96,11 +96,11 @@ describe('tabs variants', () => {
     expect(screen.getByRole('tab', { name: 'Two' }).className).not.toContain('after:bg-primary');
   });
 
-  it('renders the same looks for the named pill and line variants', () => {
+  it('renders the pill look for the default and for the pill variant', () => {
     const pill = renderVariant('pill');
     const pillList = screen.getByRole('tablist').className;
     pill.unmount();
-    renderVariant('default');
+    renderVariant();
     expect(screen.getByRole('tablist').className).toBe(pillList);
   });
 });

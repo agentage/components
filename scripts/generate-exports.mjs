@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Keeps the per-component subpath exports in sync with src/ (run via npm run exports:generate).
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -15,27 +15,23 @@ const STATIC_EXPORTS = {
   './package.json': './package.json',
 };
 
-// Grouped entries: one file at src/<name>.ts re-exporting a set of components.
-const GROUPS = ['charts', 'site'];
-for (const name of GROUPS) {
-  STATIC_EXPORTS[`./${name}`] = { types: `./dist/${name}.d.ts`, import: `./dist/${name}.js` };
-}
-
-const isModule = (file) =>
-  /\.tsx?$/.test(file) && !/\.test\.tsx?$/.test(file) && !/^index\.tsx?$/.test(file);
+// Public modules only: the ones the barrel re-exports from, plus `cn` at `./utils`. Parts files
+// and helpers stay internal, so an app can only reach what the docs list.
+const barrel = readFileSync(resolve(root, 'src/components/index.ts'), 'utf8');
+const reexported = [...barrel.matchAll(/from '(\.\.?\/[^']+)'/g)].map((m) => m[1]);
+const modules = new Set(['lib/utils']);
+for (const spec of reexported)
+  modules.add(spec.startsWith('../') ? spec.slice(3) : `components/${spec.slice(2)}`);
 
 const subpaths = {};
-for (const [dir, prefix] of [
-  ['src/components', 'components'],
-  ['src/lib', 'lib'],
-]) {
-  for (const file of readdirSync(resolve(root, dir)).filter(isModule)) {
-    const name = file.replace(/\.tsx?$/, '');
-    subpaths[`./${name}`] = {
-      types: `./dist/${prefix}/${name}.d.ts`,
-      import: `./dist/${prefix}/${name}.js`,
-    };
-  }
+for (const path of modules) {
+  const name = path.split('/').pop();
+  if (
+    !existsSync(resolve(root, 'src', `${path}.ts`)) &&
+    !existsSync(resolve(root, 'src', `${path}.tsx`))
+  )
+    throw new Error(`barrel re-exports a missing module: ${path}`);
+  subpaths[`./${name}`] = { types: `./dist/${path}.d.ts`, import: `./dist/${path}.js` };
 }
 
 const exportsMap = { ...STATIC_EXPORTS };

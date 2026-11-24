@@ -1,13 +1,5 @@
 'use client';
-import {
-  FormField,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../src';
+import { FormField, Input, Select } from '../../src';
 import { Block } from '../components/demo';
 import { SchedulePreview } from '../lib/schedule-preview';
 
@@ -35,15 +27,14 @@ export const Variants = () => (
           <Input mono defaultValue="release-notes" />
         </FormField>
         <FormField label="Status" layout="row">
-          <Select defaultValue="active">
-            <SelectTrigger aria-label="Status">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="paused">Paused</SelectItem>
-            </SelectContent>
-          </Select>
+          <Select
+            aria-label="Status"
+            defaultValue="active"
+            options={[
+              { value: 'active', label: 'Active' },
+              { value: 'paused', label: 'Paused' },
+            ]}
+          />
         </FormField>
       </div>
     </Block>

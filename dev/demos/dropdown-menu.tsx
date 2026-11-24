@@ -9,7 +9,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  toolbarIconButtonVariants,
+  IconButton,
 } from '../../src';
 import { Block, Row } from '../components/demo';
 import { UiIcon } from '../lib/ui-icons';
@@ -101,13 +101,7 @@ export const Composition = () => {
           <DropdownMenu
             aria-label="More"
             trigger={
-              <button
-                type="button"
-                aria-label="More actions"
-                className={toolbarIconButtonVariants()}
-              >
-                <MoreIcon />
-              </button>
+              <IconButton icon={<MoreIcon />} aria-label="More actions" onClick={() => {}} />
             }
           >
             <DropdownMenuItem icon={<UiIcon name="globe" />}>Copy link</DropdownMenuItem>

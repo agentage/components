@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { render, waitFor } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card';
+import { Card, CardContent, CardFooter, CardHeader, CardMeta, CardTitle } from './card';
 
 const source = (file: string): string => readFileSync(new URL(file, import.meta.url), 'utf8');
 
@@ -29,7 +29,9 @@ describe('Card on the server', () => {
             <CardTitle>Revenue</CardTitle>
           </CardHeader>
           <CardContent>Ready body</CardContent>
-          <CardFooter source="Billing" />
+          <CardFooter>
+            <CardMeta source="Billing" />
+          </CardFooter>
         </Card>
       );
       expect(html).toContain('Revenue');
@@ -46,12 +48,14 @@ describe('Card on the server', () => {
 describe('Card announcements', () => {
   it('names the card in the polite state announcement', async () => {
     const { rerender } = render(
-      <Card state="loading" announceLabel="Revenue">
+      <Card state="loading">
+        <CardTitle>Revenue</CardTitle>
         <CardContent>Body</CardContent>
       </Card>
     );
     rerender(
-      <Card state="ready" announceLabel="Revenue">
+      <Card state="ready">
+        <CardTitle>Revenue</CardTitle>
         <CardContent>Body</CardContent>
       </Card>
     );

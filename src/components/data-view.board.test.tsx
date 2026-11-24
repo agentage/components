@@ -28,10 +28,10 @@ const Board = (props: { rows?: Item[]; onMove?: (m: unknown) => void; rowsBy?: s
     columns={COLUMNS}
     getRowId={(r) => r.id}
     views={['board']}
-    defaultGroupBy="status"
+    defaultState={{ groupBy: 'status' }}
+    state={props.rowsBy ? { rowsBy: props.rowsBy } : undefined}
     renderCard={(r) => <div data-card={r.id}>{r.title}</div>}
-    onMove={props.onMove}
-    rowsBy={props.rowsBy}
+    actions={{ move: props.onMove }}
   />
 );
 

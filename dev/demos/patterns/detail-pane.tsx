@@ -9,7 +9,6 @@ import {
   DescriptionGroup,
   DescriptionList,
   DescriptionTerm,
-  Heading,
   Input,
   StatusGlyph,
   ToggleGroup,
@@ -136,9 +135,7 @@ export const Example = () => {
             </span>
           </div>
           <Waiting mode={mode} />
-          <Heading as="h4" className="mb-2 mt-5">
-            Outcome
-          </Heading>
+          <h4 className="mb-2 mt-5 text-sm font-semibold text-foreground">Outcome</h4>
           <Outcome mode={mode} />
           <DescriptionGroup title="Details" className="mt-5">
             <DescriptionList labelWidth="md">
@@ -158,9 +155,7 @@ export const Example = () => {
               </DescriptionDetail>
             </DescriptionList>
           </DescriptionGroup>
-          <Heading as="h4" className="mb-2 mt-5">
-            Steps
-          </Heading>
+          <h4 className="mb-2 mt-5 text-sm font-semibold text-foreground">Steps</h4>
           <TimelineSteps glyphs />
         </aside>
       </div>

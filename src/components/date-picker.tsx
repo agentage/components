@@ -33,8 +33,6 @@ export interface DatePickerProps extends Omit<
 > {
   mode?: 'single';
   value?: Date;
-  /** Uncontrolled start value. */
-  defaultValue?: Date;
   onValueChange?: (date: Date) => void;
   placeholder?: string;
   disabled?: boolean;
@@ -78,7 +76,6 @@ const SingleDatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     {
       mode: _mode,
       value,
-      defaultValue,
       onValueChange,
       placeholder = 'Pick a date',
       disabled = false,
@@ -91,10 +88,9 @@ const SingleDatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [open, setOpen] = React.useState(false);
-    const [internalValue, setInternalValue] = React.useState<string>(() => {
-      const start = value ?? defaultValue;
-      return start ? toInputValue(start) : '';
-    });
+    const [internalValue, setInternalValue] = React.useState<string>(() =>
+      value ? toInputValue(value) : ''
+    );
     // Derived, so a controlled `value` always wins over the last locally picked date.
     const inputValue = value === undefined ? internalValue : toInputValue(value);
 

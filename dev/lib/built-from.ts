@@ -22,7 +22,7 @@ const importedNames = (source: string): string[] =>
   );
 
 const homeRank = (r: ResolvedComponent): number =>
-  ['patterns', 'review'].includes(r.category.slug) ? 2 : r.category.slug === 'deprecated' ? 1 : 0;
+  ['patterns', 'review'].includes(r.category.slug) ? 1 : 0;
 
 const pageFor = (name: string): ResolvedComponent | undefined =>
   ALL_COMPONENTS.filter(({ component }) => component.exports.includes(name)).sort(

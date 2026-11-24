@@ -18,11 +18,9 @@ const TRIGGERS = '[data-slot="accordion-trigger"]:not(:disabled)';
 export interface AccordionProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue'> {
   /** `single` keeps at most one item open; `multiple` any number. Defaults to `single`. */
   type?: 'single' | 'multiple';
-  /** Open item values, controlled. */
-  value?: string[];
+  /** Item values open at first. */
   defaultValue?: string[];
-  onValueChange?: (value: string[]) => void;
-  /** Keep the open items in localStorage under this key (uncontrolled only). */
+  /** Keep the open items in localStorage under this key. */
   storageKey?: string;
   /** `default` rows divided by rules; `section` 32 px section headers (icon, title, summary). */
   variant?: 'default' | 'section';
@@ -52,9 +50,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
   (
     {
       type = 'single',
-      value,
       defaultValue = [],
-      onValueChange,
       storageKey,
       variant = 'default',
       level,
@@ -75,9 +71,9 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
     }, []);
     // A stored value of another shape (an older key) falls back to the default.
     const [openItems, setOpenItems, restoring] = useControlled(
-      value,
+      undefined,
       defaultValue,
-      onValueChange,
+      undefined,
       storageKey,
       isStrings
     );

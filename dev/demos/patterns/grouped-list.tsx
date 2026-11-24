@@ -1,22 +1,5 @@
 'use client';
-import { useState } from 'react';
-import {
-  Badge,
-  DataTable,
-  DisplayMenu,
-  FilterMenu,
-  ActiveFilters,
-  ListToolbar,
-  ListToolbarEnd,
-  StatusGlyph,
-  ToolbarSearch,
-  ToolbarToggle,
-  useListControls,
-  type DataTableColumn,
-  type ListApplyConfig,
-  type ListFilterGroup,
-  RelativeTime,
-} from '../../../src';
+import { Badge, DataView, RelativeTime, StatusGlyph, type DataViewColumn } from '../../../src';
 import { Block } from '../../components/demo';
 import { KindIcon } from '../../lib/kind-icons';
 import {
@@ -32,6 +15,7 @@ import { TRIGGER_ICON } from '../../lib/services-list-parts';
 import { RESULT_GLYPH, type ResultStatus } from '../../lib/result-status';
 
 const LOADED = Date.now();
+const DAY_LABEL = new Map(EVENTS.map((e) => [dayOf(e.ago).key, dayOf(e.ago).label]));
 const OUTCOME_TONE = {
   delivered: 'outline-success',
   'needs-review': 'outline-primary',
@@ -40,37 +24,14 @@ const OUTCOME_TONE = {
 const nameOf = (id: string) => serviceById(id)?.name ?? id;
 const ownerOf = (e: DemoEvent) => serviceById(e.serviceId)?.owner ?? 'Nobody';
 const MUTED = 'text-xs text-muted-foreground';
-const STATUSES = [...new Set(EVENTS.map((e) => e.status))];
 
-const CONFIG: ListApplyConfig<DemoEvent> = {
-  search: (e) => `${e.id} ${e.summary} ${e.question ?? ''} ${nameOf(e.serviceId)}`,
-  filters: { status: (e) => e.status },
-  flags: { needs: needsAttention },
-  sorts: { ago: (e) => e.ago },
-  groups: {
-    day: (e) => dayOf(e.ago),
-    owner: (e) => ({ key: ownerOf(e), label: ownerOf(e) }),
-    status: (e) => ({ key: e.status, label: RESULT_GLYPH[e.status].label }),
-  },
-};
-
-const FILTERS: ListFilterGroup[] = [
-  {
-    id: 'status',
-    label: 'Status',
-    options: STATUSES.map((s) => ({
-      value: s,
-      label: RESULT_GLYPH[s].label,
-      icon: <StatusGlyph {...RESULT_GLYPH[s]} label={undefined} />,
-      count: EVENTS.filter((e) => e.status === s).length,
-    })),
-  },
-];
-
-const COLUMNS: DataTableColumn<DemoEvent>[] = [
+// No column header: the list reads as rows under day headers. Hidden columns group and filter.
+const COLUMNS: DataViewColumn<DemoEvent>[] = [
   {
     key: 'id',
-    header: 'Event',
+    searchable: true,
+    header: '',
+    label: 'Event',
     className: 'min-w-24',
     nowrap: true,
     cell: (e) => (
@@ -82,7 +43,8 @@ const COLUMNS: DataTableColumn<DemoEvent>[] = [
   },
   {
     key: 'service',
-    header: 'Service',
+    header: '',
+    label: 'Service',
     className: 'min-w-34',
     hideBelow: 760,
     cell: (e) => (
@@ -91,7 +53,10 @@ const COLUMNS: DataTableColumn<DemoEvent>[] = [
   },
   {
     key: 'summary',
-    header: 'Summary',
+    searchable: true,
+    value: (e) => `${e.summary} ${e.question ?? ''} ${nameOf(e.serviceId)}`,
+    header: '',
+    label: 'Summary',
     grow: true,
     cell: (e) => (
       <span className={e.question ? 'truncate text-primary-emphasis' : 'truncate'}>
@@ -101,7 +66,8 @@ const COLUMNS: DataTableColumn<DemoEvent>[] = [
   },
   {
     key: 'trigger',
-    header: 'Trigger',
+    header: '',
+    label: 'Trigger',
     className: 'min-w-8',
     cell: (e) => (
       <span
@@ -115,7 +81,8 @@ const COLUMNS: DataTableColumn<DemoEvent>[] = [
   },
   {
     key: 'outcome',
-    header: 'Outcome',
+    header: '',
+    label: 'Outcome',
     className: 'min-w-34',
     hideBelow: 760,
     cell: (e) => (
@@ -126,7 +93,9 @@ const COLUMNS: DataTableColumn<DemoEvent>[] = [
   },
   {
     key: 'ago',
-    header: 'Started',
+    sortable: true,
+    header: '',
+    label: 'Started',
     className: 'min-w-16',
     align: 'right',
     nowrap: true,
@@ -134,71 +103,64 @@ const COLUMNS: DataTableColumn<DemoEvent>[] = [
   },
   {
     key: 'duration',
-    header: 'Duration',
+    header: '',
+    label: 'Duration',
     className: 'min-w-18',
     align: 'right',
     nowrap: true,
     hideBelow: 880,
     cell: (e) => <span className={MUTED}>{e.duration}</span>,
   },
+  {
+    key: 'day',
+    header: '',
+    label: 'Day',
+    visibility: 'none',
+    groupable: true,
+    value: (e) => dayOf(e.ago).key,
+    formatValue: (k) => DAY_LABEL.get(k) ?? k,
+  },
+  {
+    key: 'owner',
+    header: '',
+    label: 'Owner',
+    visibility: 'none',
+    groupable: true,
+    value: ownerOf,
+  },
+  {
+    key: 'status',
+    header: '',
+    label: 'Status',
+    visibility: 'none',
+    groupable: true,
+    filter: 'multi',
+    formatValue: (v) => RESULT_GLYPH[v as ResultStatus].label,
+    valueIcon: (v) => <StatusGlyph {...RESULT_GLYPH[v as ResultStatus]} label={undefined} />,
+  },
+  {
+    key: 'needs',
+    header: '',
+    label: 'Needs attention',
+    visibility: 'none',
+    filter: 'toggle',
+    value: needsAttention,
+  },
 ];
 
-export const Example = () => {
-  const [opened, setOpened] = useState<string | null>(null);
-  const c = useListControls({ groupBy: 'day', sort: { key: 'ago', dir: 'asc' } });
-  const { state } = c;
-  const result = c.apply(EVENTS, CONFIG);
-  const needs = state.flags.needs ?? false;
-  return (
-    <Block caption="Events grouped by day under sticky headers; click a header to collapse it.">
-      <div className="overflow-hidden rounded-lg border border-border bg-background">
-        <ListToolbar aria-label="Event controls">
-          <ToolbarSearch
-            value={state.query}
-            onValueChange={c.setQuery}
-            placeholder="Search events"
-          />
-          <FilterMenu
-            groups={FILTERS}
-            value={state.filters}
-            onToggle={c.toggleFilter}
-            onClear={c.clearFilters}
-          />
-          <ActiveFilters groups={FILTERS} value={state.filters} onRemove={c.toggleFilter} />
-          <ListToolbarEnd>
-            <ToolbarToggle pressed={needs} onPressedChange={(on) => c.setFlag('needs', on)}>
-              Needs attention
-            </ToolbarToggle>
-            <DisplayMenu
-              groupOptions={[
-                { value: 'day', label: 'Day' },
-                { value: 'owner', label: 'Owner' },
-                { value: 'status', label: 'Status' },
-              ]}
-              groupBy={state.groupBy}
-              onGroupByChange={c.setGroupBy}
-            />
-          </ListToolbarEnd>
-        </ListToolbar>
-        <div className="h-[480px] overflow-auto">
-          <DataTable
-            columns={COLUMNS}
-            rows={result.rows}
-            showHeader={false}
-            overflowX="visible"
-            rowKey={(e) => e.id}
-            groupBy={result.groupOf}
-            groupIcon={
-              state.groupBy === 'status'
-                ? (k) => <StatusGlyph {...RESULT_GLYPH[k as ResultStatus]} label={undefined} />
-                : undefined
-            }
-            onRowClick={(e) => setOpened(e.id)}
-            isRowSelected={(e) => e.id === opened}
-            empty={<p className="m-0 p-6 text-ui text-muted-foreground">No events match.</p>}
-          />
-        </div>
-      </div>
-    </Block>
-  );
-};
+export const Example = () => (
+  <Block caption="Events grouped by day under sticky headers; click a header to collapse it.">
+    <div className="overflow-hidden rounded-lg border border-border bg-background">
+      <DataView
+        aria-label="Events"
+        className="h-[525px]"
+        rows={EVENTS}
+        columns={COLUMNS}
+        getRowId={(e) => e.id}
+        defaultState={{ groupBy: 'day', sort: { key: 'ago', dir: 'asc' } }}
+        actions={{ open: () => undefined }}
+        empty={<p className="m-0 p-6 text-ui text-muted-foreground">No events match.</p>}
+      />
+    </div>
+  </Block>
+);

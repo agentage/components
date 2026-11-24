@@ -37,13 +37,9 @@ describe('Chip', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('activates from the keyboard when only interactive is set', async () => {
+  it('activates from the keyboard when it has onClick', async () => {
     const onClick = vi.fn();
-    render(
-      <Chip interactive onClick={onClick}>
-        Draft
-      </Chip>
-    );
+    render(<Chip onClick={onClick}>Draft</Chip>);
     screen.getByRole('button', { name: 'Draft' }).focus();
     await userEvent.keyboard('{Enter}');
     expect(onClick).toHaveBeenCalledTimes(1);

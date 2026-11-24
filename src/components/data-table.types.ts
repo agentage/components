@@ -1,11 +1,6 @@
 import type * as React from 'react';
 import type { SortableValue, SortState } from '../lib/table-sort';
-import type {
-  DataTableDensity,
-  DataTableGroup,
-  DataTableGroupBy,
-  DataTableGroupOrder,
-} from './data-table.group';
+import type { DataTableGroup, DataTableGroupBy, DataTableGroupOrder } from './data-table.group';
 import type { DataTableSelection } from './data-table.selection';
 
 export interface DataTableColumn<T> {
@@ -30,19 +25,7 @@ export interface DataTableColumn<T> {
 
 export interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
-  /** The rows to show; tables take `rows`, lists and menus take `items`. */
   rows?: T[];
-  /**
-   * Deprecated: use `rows`.
-   * @deprecated Use `rows`.
-   */
-  data?: T[];
-  /**
-   * Deprecated: the dense 36 px row is the only look; `compact`, `comfortable` and `default` keep
-   * the pre-0.21 sizes until the next major.
-   * @deprecated The dense 36 px row is the only look.
-   */
-  density?: DataTableDensity;
   /** 2 gives the 52 px two-line row (name over a muted description); dense only. */
   rowLines?: 1 | 2;
   /** Pin the header row while the container scrolls. */
@@ -60,10 +43,8 @@ export interface DataTableProps<T> {
   /** Show these groups even when empty (header with a 0 count), for "Show empty groups". */
   emptyGroups?: DataTableGroup[];
   collapsedGroups?: string[];
-  defaultCollapsedGroups?: string[];
   onCollapsedGroupsChange?: (keys: string[]) => void;
   rowKey?: (row: T, index: number) => string;
-  rowHref?: (row: T) => string | undefined;
   onRowClick?: (row: T) => void;
   isRowSelected?: (row: T) => boolean;
   rowActions?: (row: T) => React.ReactNode;
@@ -85,9 +66,7 @@ export interface DataTableProps<T> {
   groupIcon?: (key: string) => React.ReactNode;
   /** Shows a "+" in each group header. */
   onAddToGroup?: (key: string) => void;
-  addToGroupLabel?: (groupLabel: string) => string;
   empty?: React.ReactNode;
-  caption?: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLTableElement>;
 }

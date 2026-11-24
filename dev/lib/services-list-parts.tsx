@@ -2,7 +2,6 @@
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
-  EntityCard,
   StatusBar,
   StatusGlyph,
   Switch,
@@ -13,6 +12,7 @@ import {
 import { KindIcon, type KindIconName } from './kind-icons';
 import { TRIGGER_LABEL, type DemoService, type Trigger } from './services-data';
 import { RESULT_GLYPH, RESULT_TICK } from './result-status';
+import { ItemCard } from './item-card';
 
 /** Docs-only: the cells, columns, filters and sorts of the services list demos. */
 const LOADED = Date.now();
@@ -103,6 +103,8 @@ export const serviceColumns = (
     key: 'name',
     header: 'Name',
     sortable: true,
+    searchable: true,
+    twoLine,
     grow: true,
     cell: (a) => (
       <span className="flex min-w-0 flex-col gap-px">
@@ -196,7 +198,7 @@ export interface ServiceCardProps {
 }
 
 export const ServiceCard = ({ service: s, ...p }: ServiceCardProps) => (
-  <EntityCard
+  <ItemCard
     title={s.name}
     indicator={<StateDot service={s} />}
     description={s.description}
@@ -212,7 +214,6 @@ export const ServiceCard = ({ service: s, ...p }: ServiceCardProps) => (
         <span>{s.history.length} results</span>
       </>
     }
-    selectable
     selected={p.selected}
     onSelectedChange={p.onSelectedChange}
     enabled={s.enabled}

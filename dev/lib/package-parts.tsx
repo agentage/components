@@ -1,16 +1,9 @@
 'use client';
-import {
-  Button,
-  EntityCard,
-  Heading,
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '../../src';
+import { Button, Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../src';
 import { HOST_LABEL, StateBadge, Tile, type DemoPackage } from './packages-data';
+import { ItemCard } from './item-card';
 
-/** Docs-only: the detail of one package in the InspectorPanel. */
+/** Docs-only: the detail of one package in the docked Sheet. */
 export const PackageDetail = ({ e }: { e: DemoPackage }) => (
   <div className="flex flex-col gap-3">
     <div className="flex gap-3">
@@ -94,9 +87,9 @@ export const SimpleView = ({
   onOpen: (e: DemoPackage) => void;
 }) => (
   <div className="mx-auto flex max-w-[820px] flex-col gap-3 p-5">
-    <Heading as="h4">Your packages</Heading>
+    <h4 className="text-sm font-semibold text-foreground">Your packages</h4>
     {list.map((e) => (
-      <EntityCard
+      <ItemCard
         key={e.key}
         title={e.name}
         indicator={<Tile e={e} />}

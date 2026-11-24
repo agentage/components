@@ -7,13 +7,9 @@ import { isTopLayer, type OverlayLayer } from '../lib/overlay-layer';
 import { cn } from '../lib/utils';
 import { menuItemVariants, menuLabelVariants } from './menu.variants';
 
-/** `sm` is the menu; `md` is the deprecated pre-0.21 size. */
-export type MenuSize = 'sm' | 'md';
-
 /** Shared by every menu surface (dropdown, context) so items can close their own menu. */
 export const MenuCloseContext = React.createContext<{
   close: () => void;
-  size?: MenuSize;
   closeOnSelect?: boolean;
 }>({ close: () => {} });
 
@@ -75,7 +71,7 @@ export const MenuItem = ({
   children,
   ...props
 }: MenuItemProps): React.JSX.Element => {
-  const { close, size, closeOnSelect = true } = React.useContext(MenuCloseContext);
+  const { close, closeOnSelect = true } = React.useContext(MenuCloseContext);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     onClick?.(e);
@@ -88,7 +84,7 @@ export const MenuItem = ({
       role="menuitem"
       tabIndex={-1}
       onClick={handleClick}
-      className={cn(menuItemVariants({ variant, size }), className)}
+      className={cn(menuItemVariants({ variant }), className)}
       data-slot="menu-item"
       {...props}
     >
@@ -108,23 +104,17 @@ export const MenuItem = ({
 
 export type MenuSeparatorProps = React.HTMLAttributes<HTMLDivElement>;
 
-export const MenuSeparator = ({ className, ...props }: MenuSeparatorProps): React.JSX.Element => {
-  const { size } = React.useContext(MenuCloseContext);
-  return (
-    <div
-      className={cn('my-1 h-px bg-border', size === 'md' && '-mx-1', className)}
-      role="separator"
-      data-slot="menu-separator"
-      {...props}
-    />
-  );
-};
+export const MenuSeparator = ({ className, ...props }: MenuSeparatorProps): React.JSX.Element => (
+  <div
+    className={cn('my-1 h-px bg-border', className)}
+    role="separator"
+    data-slot="menu-separator"
+    {...props}
+  />
+);
 
 export type MenuLabelProps = React.HTMLAttributes<HTMLDivElement>;
 
-export const MenuLabel = ({ className, ...props }: MenuLabelProps): React.JSX.Element => {
-  const { size } = React.useContext(MenuCloseContext);
-  return (
-    <div className={cn(menuLabelVariants({ size }), className)} data-slot="menu-label" {...props} />
-  );
-};
+export const MenuLabel = ({ className, ...props }: MenuLabelProps): React.JSX.Element => (
+  <div className={cn(menuLabelVariants(), className)} data-slot="menu-label" {...props} />
+);

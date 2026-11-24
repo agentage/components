@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 export const alertVariants = cva(
-  'flex rounded-lg border [&>svg]:shrink-0 [&>svg]:size-4 [&>svg]:mt-0.5',
+  'flex gap-2.5 rounded-lg border p-3 text-ui [&>svg]:mt-0.5 [&>svg]:size-4 [&>svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -15,14 +15,9 @@ export const alertVariants = cva(
         warning: 'border-warning/30 bg-warning/10 text-warning',
         info: 'border-info/30 bg-info/10 text-info',
       },
-      density: {
-        compact: 'gap-2.5 p-3 text-ui',
-        comfortable: 'gap-3 p-4 text-sm',
-      },
     },
     defaultVariants: {
       variant: 'default',
-      density: 'compact',
     },
   }
 );
@@ -44,14 +39,7 @@ const CloseIcon = (): React.JSX.Element => (
 );
 
 export interface AlertProps
-  extends
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
-    Omit<VariantProps<typeof alertVariants>, 'density'> {
-  /**
-   * Deprecated: The 12 px compact alert is the only look; `comfortable` is the pre-0.21 p-4.
-   * @deprecated The 12 px compact alert is the only look; `comfortable` is the pre-0.21 p-4.
-   */
-  density?: 'compact' | 'comfortable' | null;
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   icon?: React.ReactNode;
   /** Bold first line; accent-coloured in the primary variant. */
   title?: React.ReactNode;
@@ -67,7 +55,6 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     {
       className,
       variant,
-      density,
       icon,
       title,
       actions,
@@ -82,7 +69,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       ref={ref}
       role="alert"
       data-slot="alert"
-      className={cn(alertVariants({ variant, density, className }))}
+      className={cn(alertVariants({ variant, className }))}
       {...props}
     >
       {icon}

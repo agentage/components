@@ -109,48 +109,23 @@ describe('Accordion headers and state', () => {
     expect(trigger('One').hasAttribute('tabindex')).toBe(false);
   });
 
-  it('is controlled through value and onValueChange', () => {
-    const seen: string[][] = [];
-    const Controlled = () => {
-      const [value, setValue] = React.useState<string[]>([]);
-      return (
-        <Accordion
-          type="multiple"
-          value={value}
-          onValueChange={(v) => {
-            seen.push(v);
-            setValue(v);
-          }}
-        >
-          <AccordionItem value="a">
-            <AccordionTrigger>One</AccordionTrigger>
-            <AccordionContent>Body A</AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="b">
-            <AccordionTrigger>Two</AccordionTrigger>
-            <AccordionContent>Body B</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      );
-    };
-    render(<Controlled />);
-    fireEvent.click(trigger('One'));
-    fireEvent.click(trigger('Two'));
-    expect(seen).toEqual([['a'], ['a', 'b']]);
-    expect(trigger('Two').getAttribute('aria-expanded')).toBe('true');
-  });
-
-  it('ignores clicks when controlled and the parent keeps the value', () => {
+  it('opens several items with type multiple', () => {
     render(
-      <Accordion value={[]}>
+      <Accordion type="multiple">
         <AccordionItem value="a">
           <AccordionTrigger>One</AccordionTrigger>
           <AccordionContent>Body A</AccordionContent>
         </AccordionItem>
+        <AccordionItem value="b">
+          <AccordionTrigger>Two</AccordionTrigger>
+          <AccordionContent>Body B</AccordionContent>
+        </AccordionItem>
       </Accordion>
     );
     fireEvent.click(trigger('One'));
-    expect(trigger('One').getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(trigger('Two'));
+    expect(trigger('One').getAttribute('aria-expanded')).toBe('true');
+    expect(trigger('Two').getAttribute('aria-expanded')).toBe('true');
   });
 });
 

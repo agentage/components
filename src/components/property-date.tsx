@@ -15,17 +15,12 @@ const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), 
 const iso = (d: Date) =>
   `${String(d.getFullYear())}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-export { formatPropertyDate };
-
 export interface PropertyDateProps {
-  /** Classes of the value button. */
-  className?: string;
   value: Date | null;
   onValueChange: (value: Date | null) => void;
-  placeholder?: string;
   /** "Today" for presets and the overdue check; the current date by default. */
   today?: Date;
-  disabled?: boolean;
+  className?: string;
 }
 
 const PRESETS = [
@@ -48,12 +43,12 @@ interface DateOptionsProps {
 
 const OPTION = '[data-slot="property-date-option"]';
 
-/** Popover body: mounts with the popover, so it binds arrow keys and takes focus on open. */
 const parseDraft = (draft: string, value: Date | null): Date | null => {
   const [y, m, d] = draft.split('-').map(Number);
   return y > 999 && m && d && draft !== (value ? iso(value) : '') ? new Date(y, m - 1, d) : null;
 };
 
+/** Popover body: mounts with the popover, so it binds arrow keys and takes focus on open. */
 const DateOptions = ({ label, today, value, onPick, onCommit }: DateOptionsProps) => {
   const picked = React.useRef(false);
   const pick = (d: Date | null): void => {
@@ -135,10 +130,7 @@ const DateOptions = ({ label, today, value, onPick, onCommit }: DateOptionsProps
 
 /** A due date: presets, a date field and No date; overdue values show in the destructive tone. */
 export const PropertyDate = React.forwardRef<HTMLButtonElement, PropertyDateProps>(
-  (
-    { value, onValueChange, placeholder = 'Set date', today: todayProp, disabled, className },
-    ref
-  ) => {
+  ({ value, onValueChange, today: todayProp, className }, ref) => {
     const label = usePropertyLabel();
     const [open, setOpen] = React.useState(false);
     const trigger = React.useRef<HTMLButtonElement>(null);
@@ -149,7 +141,7 @@ export const PropertyDate = React.forwardRef<HTMLButtonElement, PropertyDateProp
     const known = mounted || todayProp !== undefined;
     const overdue = known && value !== null && startOf(value) < today;
     const text = !value
-      ? placeholder
+      ? 'Set date'
       : known
         ? formatPropertyDate(value, today)
         : value.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -163,8 +155,8 @@ export const PropertyDate = React.forwardRef<HTMLButtonElement, PropertyDateProp
     };
     return (
       <Popover
-        isOpen={open}
-        onClose={() => setOpen(false)}
+        open={open}
+        onOpenChange={() => setOpen(false)}
         side="bottom"
         aria-label={label || 'Date'}
         className="w-55 min-w-0 p-1"
@@ -181,7 +173,6 @@ export const PropertyDate = React.forwardRef<HTMLButtonElement, PropertyDateProp
             valueText={`${text}${overdue ? ', overdue' : ''}`}
             aria-haspopup="dialog"
             aria-expanded={open}
-            disabled={disabled}
             onClick={() => setOpen(!open)}
             className={cn(
               !value && 'text-muted-foreground',

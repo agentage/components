@@ -3,15 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { Badge } from './badge';
 
 describe('Badge', () => {
-  it('is 20 px by default and keeps the old badge as size md', () => {
-    render(
-      <>
-        <Badge>new</Badge>
-        <Badge size="md">old</Badge>
-      </>
-    );
+  it('is 20 px', () => {
+    render(<Badge>new</Badge>);
     expect(screen.getByText('new').className).toContain('h-5');
-    expect(screen.getByText('old').className).toContain('px-2 py-0.5');
   });
 
   it('renders the solid pill', () => {

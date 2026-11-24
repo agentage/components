@@ -20,12 +20,21 @@ export interface CardError {
   reference?: string;
 }
 
+/** Bodies a card shows in place of its content while loading, empty or failed. */
+export interface CardFallback {
+  /** Loading placeholder; skeleton bones by default. */
+  loading?: React.ReactNode;
+  /** Empty body; "No data for this period" by default. */
+  empty?: React.ReactNode;
+  /** Error body: a message and an optional copyable reference. */
+  error?: CardError | React.ReactNode;
+  /** Shows Retry in the error body. */
+  onRetry?: () => void;
+}
+
 export interface CardStateBodyProps {
   state: 'loading' | 'empty' | 'error';
-  skeleton?: React.ReactNode;
-  empty?: React.ReactNode;
-  error?: CardError | React.ReactNode;
-  onRetry?: () => void;
+  fallback?: CardFallback;
 }
 
 const isCardError = (e: unknown): e is CardError =>
@@ -40,8 +49,9 @@ const DefaultSkeleton = () => (
 );
 
 /** The body a card shows while loading, empty or failed; the frame around it stays put. */
-export const CardStateBody = ({ state, skeleton, empty, error, onRetry }: CardStateBodyProps) => {
-  if (state === 'loading') return <>{skeleton ?? <DefaultSkeleton />}</>;
+export const CardStateBody = ({ state, fallback = {} }: CardStateBodyProps) => {
+  const { loading, empty, error, onRetry } = fallback;
+  if (state === 'loading') return <>{loading ?? <DefaultSkeleton />}</>;
   if (state === 'empty')
     return <>{empty ?? <EmptyState title="No data for this period" className="py-4" />}</>;
   const detail = isCardError(error) ? error : { message: error ?? 'Could not load this data.' };

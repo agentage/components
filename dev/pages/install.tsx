@@ -1,5 +1,6 @@
-import { Alert, Badge, Heading, InlineCode, Prose } from '../../src';
+import { Alert, Badge, InlineCode, Prose } from '../../src';
 import { Code } from '../components/code';
+import { Heading } from '../components/heading';
 
 const INSTALL = `npm install @agentage/components`;
 
@@ -20,7 +21,7 @@ import { Card, CardHeader, CardTitle } from '@agentage/components/card';
 
 // Interactive components already carry 'use client' as line 1,
 // so importing them from a server component works unchanged.
-import { Modal } from '@agentage/components/modal';`;
+import { Dialog } from '@agentage/components/dialog';`;
 
 export const InstallPage = () => (
   <div className="space-y-8">

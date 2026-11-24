@@ -2,10 +2,9 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AlertDialog } from '../components/alert-dialog';
-import { Combobox } from '../components/combobox';
+import { Select } from '../components/select';
 import { DropdownMenu, DropdownMenuItem } from '../components/dropdown-menu';
-import { Modal } from '../components/modal';
+import { Dialog } from '../components/dialog';
 import { Popover } from '../components/popover';
 
 const PopoverHarness = ({ content }: { content?: React.ReactNode }) => {
@@ -35,9 +34,9 @@ const PopoverHarness = ({ content }: { content?: React.ReactNode }) => {
 const ModalWith = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(true);
   return (
-    <Modal open={open} onOpenChange={setOpen} title="Settings">
+    <Dialog open={open} onOpenChange={setOpen} title="Settings">
       {children}
-    </Modal>
+    </Dialog>
   );
 };
 
@@ -92,7 +91,7 @@ describe('overlay layer stack', () => {
           <button type="button" onClick={() => setConfirm(true)}>
             Discard
           </button>
-          <AlertDialog
+          <Dialog
             open={confirm}
             onOpenChange={setConfirm}
             title="Discard changes?"
@@ -113,7 +112,7 @@ describe('overlay layer stack', () => {
     const user = userEvent.setup();
     render(
       <ModalWith>
-        <Combobox aria-label="Colour" options={[{ value: 'red', label: 'Red' }]} />
+        <Select aria-label="Colour" options={[{ value: 'red', label: 'Red' }]} />
       </ModalWith>
     );
     const trigger = screen.getByRole('combobox', { name: 'Colour' });
@@ -129,9 +128,9 @@ describe('overlay layer stack', () => {
   it('a backdrop press that dismisses a child layer does not close the modal', () => {
     const onOpenChange = vi.fn();
     const Harness = () => (
-      <Modal open onOpenChange={onOpenChange} title="Settings">
+      <Dialog open onOpenChange={onOpenChange} title="Settings">
         <PopoverHarness />
-      </Modal>
+      </Dialog>
     );
     render(<Harness />);
     fireEvent.click(screen.getByRole('button', { name: 'Filters' }));

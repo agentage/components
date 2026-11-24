@@ -15,6 +15,20 @@ import { asText, ICON, summaryOf, TITLE } from './content-blocks.meta';
 export type { DiffFile, DiffHunk } from './content-block.diff';
 export type { BlockStep, BlockStepState } from './content-block.parts';
 
+/** A log block starts at the tail and follows new lines until the reader scrolls up. */
+const TailLog = (props: { lines: LogLine[]; 'aria-label': string; style: React.CSSProperties }) => {
+  const [follow, setFollow] = React.useState(true);
+  return (
+    <LogView
+      {...props}
+      follow={follow}
+      onFollowChange={setFollow}
+      showTime={false}
+      className="py-1"
+    />
+  );
+};
+
 interface BlockBase {
   /** Stable key when blocks change. */
   id?: string;
@@ -106,13 +120,10 @@ const BlockBody = ({ block: b }: { block: ContentBlockData }) => {
     }
     case 'log':
       return (
-        <LogView
+        <TailLog
           lines={b.lines.map(toLogLine)}
-          defaultFollow
-          showTime={false}
           aria-label={b.title ?? 'Log lines'}
           style={{ height: Math.min(b.lines.length, b.tail ?? 8) * 24 + 8 }}
-          className="py-1"
         />
       );
     default:

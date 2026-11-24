@@ -1,45 +1,14 @@
 'use client';
-import { useRef, useState } from 'react';
-import {
-  Button,
-  useAnnounce,
-  useControlled,
-  usePersistedState,
-  useRovingFocus,
-  useScrollSpy,
-} from '../../src';
-import { Block, Row } from '../components/demo';
+import { useRef } from 'react';
+import { Button, useAnnounce, useScrollSpy } from '../../src';
+import { Block } from '../components/demo';
 
-const FILTERS = ['All', 'Enabled', 'Paused', 'Scheduled'];
 const SECTIONS = ['overview', 'usage', 'limits'];
 
 export const Example = () => {
-  const toolbar = useRef<HTMLDivElement>(null);
-  const [filter, setFilter] = useState('All');
   const announce = useAnnounce();
-  useRovingFocus(toolbar, { orientation: 'both' });
-
   return (
     <div className="space-y-5">
-      <Block caption="The roving-focus hook gives a group one Tab stop; arrows, Home and End move focus.">
-        <div ref={toolbar} role="toolbar" aria-label="Filter items" className="flex gap-1">
-          {FILTERS.map((f) => (
-            <Button
-              key={f}
-              data-roving-item=""
-              aria-pressed={filter === f}
-              variant={filter === f ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => {
-                setFilter(f);
-                announce(`Showing ${f.toLowerCase()} items`);
-              }}
-            >
-              {f}
-            </Button>
-          ))}
-        </div>
-      </Block>
       <Block caption="The announce hook writes to one hidden live region; try it with a screen reader on.">
         <Button
           variant="outline"
@@ -87,51 +56,8 @@ const SpyDemo = () => {
   );
 };
 
-export const Composition = () => {
-  const [open, setOpen] = useControlled<boolean>(undefined, false);
-  const [count, setCount] = usePersistedState<number>('demo-hooks-count', 0);
-  return (
-    <div className="space-y-5">
-      <Block caption="The scroll-spy hook returns the id in view; scroll the box to move the highlight.">
-        <SpyDemo />
-      </Block>
-      <Block caption="The controlled-state hook follows a value when given one; here it is uncontrolled.">
-        <Row>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setOpen(!open);
-            }}
-          >
-            {open ? 'Hide details' : 'Show details'}
-          </Button>
-          {open && <span className="text-ui text-muted-foreground">Details are visible.</span>}
-        </Row>
-      </Block>
-      <Block caption="The persisted-state hook mirrors a value to local storage, so the count survives a reload.">
-        <Row>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setCount(count + 1);
-            }}
-          >
-            Add one
-          </Button>
-          <span className="text-ui tabular-nums">Count: {count}</span>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              setCount(0);
-            }}
-          >
-            Reset
-          </Button>
-        </Row>
-      </Block>
-    </div>
-  );
-};
+export const Composition = () => (
+  <Block caption="The scroll-spy hook returns the id in view; scroll the box to move the highlight.">
+    <SpyDemo />
+  </Block>
+);

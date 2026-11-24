@@ -117,7 +117,7 @@ const Shell = () => {
             <Search />
             <ToggleGroup
               value={theme}
-              onChange={handleTheme}
+              onValueChange={handleTheme}
               options={[
                 { value: 'dark', label: 'Dark' },
                 { value: 'light', label: 'Light' },

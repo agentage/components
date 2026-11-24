@@ -1,18 +1,17 @@
 'use client';
 import { useState } from 'react';
-import { Button, DataView, useAnnounce } from '../../../src';
+import { Button, DataView, useAnnounce, type DataViewColumn } from '../../../src';
 import { Block } from '../../components/demo';
 import { itemColumns, itemMenu } from '../../lib/item-columns';
 import { ITEMS, PEOPLE, STATUS_LABEL, type DemoItem, type ItemStatus } from '../../lib/items-data';
 
-const COLUMNS = itemColumns();
-const QUICK = [
-  { key: 'mine', label: 'Mine', predicate: (t: DemoItem) => t.assignee === 'al' },
-  {
-    key: 'teams',
-    label: 'Teams',
-    predicate: (t: DemoItem) => PEOPLE.some((p) => p.team && p.k === t.assignee),
-  },
+// Quick toggles are toggle columns that never show as a table column.
+const toggle = (key: string, header: string, value: (t: DemoItem) => boolean) =>
+  ({ key, header, filter: 'toggle', visibility: 'none', value }) satisfies DataViewColumn<DemoItem>;
+const COLUMNS: DataViewColumn<DemoItem>[] = [
+  ...itemColumns(),
+  toggle('mine', 'Mine', (t) => t.assignee === 'al'),
+  toggle('teams', 'Teams', (t) => PEOPLE.some((p) => p.team && p.k === t.assignee)),
 ];
 
 export const Example = () => {
@@ -49,30 +48,25 @@ export const Example = () => {
           rows={rows}
           columns={COLUMNS}
           getRowId={(t) => t.id}
-          rowLabel={(t) => `${t.id} ${t.title}`}
-          searchKeys={['title', 'id']}
-          searchPlaceholder="Search items"
-          defaultGroupBy="status"
-          defaultSort={{ key: 'priority', dir: 'asc' }}
-          quickToggles={QUICK}
+          defaultState={{ groupBy: 'status', sort: { key: 'priority', dir: 'asc' } }}
           storageKey="ds-docs-grouped-table"
-          onAddToGroup={add}
-          selection="multi"
-          selectedIds={selected}
-          onSelectionChange={setSelected}
-          bulkActions={(picked) => (
-            <>
-              <Button size="sm" variant="outline" onClick={() => move(picked, 'done')}>
-                Mark done
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => move(picked, 'canceled')}>
-                Cancel
-              </Button>
-            </>
-          )}
-          rowMenu={itemMenu}
-          rowMenuLabel={(t) => `Actions for ${t.id}`}
-          emptyState={<p className="m-0 p-6 text-ui text-muted-foreground">No items match.</p>}
+          state={{ selection: selected }}
+          onStateChange={(st) => setSelected(st.selection)}
+          actions={{
+            add,
+            menu: itemMenu,
+            bulk: (picked) => (
+              <>
+                <Button size="sm" variant="outline" onClick={() => move(picked, 'done')}>
+                  Mark done
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => move(picked, 'canceled')}>
+                  Cancel
+                </Button>
+              </>
+            ),
+          }}
+          empty={<p className="m-0 p-6 text-ui text-muted-foreground">No items match.</p>}
         />
       </div>
     </Block>

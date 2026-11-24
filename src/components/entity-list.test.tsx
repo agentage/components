@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { EntityList, List, ListRow, type ListItem } from './entity-list';
+import { List, ListRow, type ListItem } from './entity-list';
 
 const row = (c: HTMLElement, i = 0): HTMLElement =>
   c.querySelectorAll<HTMLElement>('[data-slot="list-row"]')[i];
@@ -9,45 +9,21 @@ const row = (c: HTMLElement, i = 0): HTMLElement =>
 describe('ListRow', () => {
   it('is 52 px two-line or 36 px one-line by default', () => {
     const { container } = render(
-      <EntityList>
+      <List>
         <ListRow title="Nightly backup" description="Copies the archive" href="/a" />
         <ListRow title="Weekly report" />
-      </EntityList>
+      </List>
     );
     expect(row(container, 0).className).toContain('min-h-[52px]');
     expect(row(container, 1).className).toContain('min-h-9');
     expect(row(container, 0).className).toContain('hover:bg-accent');
     expect(row(container, 1).className).not.toContain('cursor-pointer');
-    expect(row(container, 0).dataset.density).toBe('compact');
-  });
-
-  it('keeps the pre-0.21 row as density comfortable', () => {
-    const { container } = render(<ListRow title="A" density="comfortable" />);
-    expect(row(container).className).toContain('py-3');
-    expect(row(container).className).not.toContain('min-h-9');
   });
 
   it('stretches the link across the row and keeps actions above it', () => {
     render(<ListRow title="Open me" href="/x" actions={<button type="button">More</button>} />);
     expect(screen.getByRole('link', { name: 'Open me' }).className).toContain('after:inset-0');
     expect(screen.getByRole('button', { name: 'More' }).parentElement?.className).toContain('z-10');
-  });
-
-  it('renders the 54 px stacked layout with an emphasized title and alert meta', () => {
-    const { container } = render(
-      <ListRow
-        variant="stacked"
-        title="Review request"
-        kind="Request"
-        emphasized
-        alert="4 min"
-        selected
-      />
-    );
-    expect(row(container).className).toContain('h-[54px]');
-    expect(row(container).className).toContain('bg-accent');
-    expect(row(container).textContent).toContain('New, Request: Review request');
-    expect(screen.getByText('4 min').className).toContain('text-primary-emphasis');
   });
 });
 
@@ -79,20 +55,20 @@ const Grouped = ({ open = vi.fn() }: { open?: (id: string) => void }) => {
       value={sel}
       onValueChange={setSel}
       onOpen={open}
-      label="Requests"
+      aria-label="Requests"
     />
   );
 };
 
 const btn = (name: RegExp) => screen.getByRole('button', { name });
 
-describe('EntityList data mode', () => {
+describe('List data mode', () => {
   it('groups rows under counted headers and marks the selected row', () => {
     render(<Grouped />);
     expect(screen.getByRole('region', { name: 'Requests' })).toBeTruthy();
     expect(btn(/To review/).textContent).toContain('2');
     expect(btn(/Draft ready/).getAttribute('aria-current')).toBe('true');
-    expect(btn(/New.*Request.*Approve access/)).toBeTruthy();
+    expect(btn(/New.*Request.*Approve access/).className).toContain('h-[54px]');
     expect(screen.getByText('waiting 4 min')).toBeTruthy();
   });
 
@@ -132,13 +108,10 @@ describe('EntityList data mode', () => {
     expect(localStorage.getItem('list-test')).toBe('["now"]');
   });
 
-  it('renders a flat list with the default label and a custom body', () => {
-    const { container } = render(
-      <EntityList items={ITEMS} renderItem={(i) => <span>custom {i.id}</span>} />
-    );
+  it('renders a flat list with the default label', () => {
+    const { container } = render(<List items={ITEMS} />);
     expect(screen.getByRole('region', { name: 'List' })).toBeTruthy();
     expect(container.querySelectorAll('[data-slot="list-item"]')).toHaveLength(3);
     expect(container.querySelector('[data-slot="group-header"]')).toBeNull();
-    expect(screen.getByText('custom a')).toBeTruthy();
   });
 });

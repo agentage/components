@@ -19,8 +19,8 @@ const Card = ({ side }: { side: 'top' | 'bottom' }) => {
           <p className="m-0 text-xs text-muted-foreground">Every day at 02:00, 3 copies kept.</p>
         </div>
       }
-      isOpen={open}
-      onClose={() => setOpen(false)}
+      open={open}
+      onOpenChange={() => setOpen(false)}
     />
   );
 };
@@ -41,8 +41,8 @@ export const Example = () => {
             <p className="m-0 text-xs text-muted-foreground">Linux, 4 cores, Active</p>
           </div>
         }
-        isOpen={open}
-        onClose={() => setOpen(false)}
+        open={open}
+        onOpenChange={() => setOpen(false)}
       />
     </Block>
   );

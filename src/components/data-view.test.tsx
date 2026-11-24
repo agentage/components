@@ -1,8 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ListControlsState } from '../lib/use-list-controls';
-import { DataView, type DataViewColumn } from './data-view';
+import { DataView, type DataViewColumn, type DataViewState } from './data-view';
 
 interface Entry {
   id: string;
@@ -20,9 +19,22 @@ const ROWS: Entry[] = [
 ];
 
 const COLUMNS: DataViewColumn<Entry>[] = [
-  { key: 'title', header: 'Title', sortable: true },
+  { key: 'title', header: 'Title', sortable: true, searchable: true },
   { key: 'status', header: 'Status', filter: 'multi', groupable: true, sortable: true },
-  { key: 'owner', header: 'Owner', filter: 'multi', groupable: true, defaultHidden: true },
+  {
+    key: 'owner',
+    header: 'Owner',
+    filter: 'multi',
+    groupable: true,
+    visibility: 'optional',
+  },
+  {
+    key: 'urgent',
+    header: 'Urgent',
+    filter: 'toggle',
+    visibility: 'none',
+    value: (t) => t.urgent,
+  },
 ];
 
 const titles = () =>
@@ -36,9 +48,7 @@ const view = (props: Partial<React.ComponentProps<typeof DataView<Entry>>> = {})
       rows={ROWS}
       columns={COLUMNS}
       getRowId={(t) => t.id}
-      searchKeys={['title']}
       views={['table', 'cards']}
-      quickToggles={[{ key: 'urgent', label: 'Urgent', predicate: (t) => t.urgent }]}
       {...props}
     />
   );
@@ -116,13 +126,16 @@ describe('DataView', () => {
   it('works controlled', () => {
     const onStateChange = vi.fn();
     const Controlled = () => {
-      const [state, setState] = useState<ListControlsState>({
+      const [state, setState] = useState<DataViewState>({
         query: 'fix',
         filters: {},
         view: 'table',
         sort: null,
         groupBy: null,
         flags: {},
+        selection: [],
+        collapsed: [],
+        rowsBy: null,
       });
       return (
         <DataView
@@ -145,7 +158,7 @@ describe('DataView', () => {
   });
 
   it('keeps empty group headers when no row matches and empty groups are on', () => {
-    view({ defaultGroupBy: 'status' });
+    view({ defaultState: { groupBy: 'status' } });
     openDisplay();
     fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Show empty groups' }));
     fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
@@ -173,7 +186,9 @@ describe('DataView group order', () => {
     );
 
   it('orders groups by the column groupOrder', () => {
-    render(<DataView rows={rows} columns={cols} getRowId={(r) => r.id} defaultGroupBy="s" />);
+    render(
+      <DataView rows={rows} columns={cols} getRowId={(r) => r.id} defaultState={{ groupBy: 's' }} />
+    );
     expect(groups()).toEqual(['todo', 'done']);
   });
 

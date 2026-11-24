@@ -1,13 +1,5 @@
 import type { ReactNode } from 'react';
-import {
-  FormField,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  type TreeSelectNode,
-} from '../../src';
+import { FormField, Select, type TreeSelectNode } from '../../src';
 import { UiIcon } from './ui-icons';
 import type { PathEntry } from './path-list';
 
@@ -109,18 +101,13 @@ export const Choice = (p: {
   onChange: (v: string) => void;
   items: string[][];
 }) => (
-  <Select value={p.value} onValueChange={p.onChange}>
-    <SelectTrigger id={p.id} className="w-56">
-      <SelectValue />
-    </SelectTrigger>
-    <SelectContent>
-      {p.items.map(([v, l]) => (
-        <SelectItem key={v} value={v}>
-          {l}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
+  <Select
+    id={p.id}
+    className="w-56"
+    value={p.value}
+    onValueChange={p.onChange}
+    options={p.items.map(([value, label]) => ({ value, label }))}
+  />
 );
 
 /** One row-layout FormField. */

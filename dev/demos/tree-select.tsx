@@ -23,7 +23,7 @@ export const Example = () => {
           title="Add a folder"
           onValueChange={setOne}
           formatPath={folderPath}
-          searchPlaceholder="Search folders"
+          labels={{ search: 'Search folders' }}
           trigger={<Plus>Single pick</Plus>}
         />
         <span className="font-mono text-xs text-muted-foreground">
@@ -48,8 +48,10 @@ export const Variants = () => {
           }}
           disabledIds={many}
           formatPath={folderPath}
-          confirmLabel={(n) => `Add ${String(n)} ${n === 1 ? 'folder' : 'folders'}`}
-          searchPlaceholder="Search folders"
+          labels={{
+            search: 'Search folders',
+            confirm: (n) => `Add ${String(n)} ${n === 1 ? 'folder' : 'folders'}`,
+          }}
           trigger={<Plus>Multi pick</Plus>}
         />
         <span className="font-mono text-xs text-muted-foreground">
@@ -70,7 +72,7 @@ export const States = () => (
       defaultExpanded={['work', 'personal']}
       onValueChange={() => {}}
       formatPath={folderPath}
-      searchPlaceholder="Search folders"
+      labels={{ search: 'Search folders' }}
       trigger={<Plus>Some already added</Plus>}
     />
   </Block>

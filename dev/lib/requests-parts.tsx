@@ -8,7 +8,6 @@ import {
   DescriptionList,
   DescriptionTerm,
   DropdownMenuItem,
-  Heading,
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -135,9 +134,12 @@ export const ReadingPane = ({ it }: { it: RequestItem }) => (
         {it.sender}, {it.place}, {it.ref}, <RelativeTime value={at(it.min)} />
       </span>
     </div>
-    <Heading as="h3" id="request-title" className="mb-1.5 mt-2 leading-tight wrap-anywhere">
+    <h3
+      id="request-title"
+      className="mb-1.5 mt-2 text-base font-semibold leading-tight text-foreground wrap-anywhere"
+    >
       {it.title}
-    </Heading>
+    </h3>
     <p className="m-0 text-ui text-muted-foreground">{it.summary}</p>
     <ContentBlocks blocks={it.body} className="mt-4" key={it.id} />
   </article>

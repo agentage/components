@@ -97,3 +97,20 @@ describe('DescriptionList enhancements', () => {
     expect(dl?.parentElement?.className).toContain('@container');
   });
 });
+
+describe('DescriptionList inline', () => {
+  it('lays pairs side by side, label over value', () => {
+    const { container } = render(
+      <DescriptionList variant="inline">
+        <div>
+          <DescriptionTerm>p50</DescriptionTerm>
+          <DescriptionDetail>96 ms</DescriptionDetail>
+        </div>
+      </DescriptionList>
+    );
+    const dl = container.querySelector('dl');
+    expect(dl?.className).toContain('@min-[15rem]:grid-flow-col');
+    expect(dl?.className).not.toContain('grid-cols-[90px');
+    expect(screen.getByText('96 ms').tagName).toBe('DD');
+  });
+});

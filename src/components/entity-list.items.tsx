@@ -15,7 +15,6 @@ export interface ItemRowsProps<T extends ListItem> {
   selected: string | null;
   onSelect: (id: string) => void;
   onOpen?: (id: string) => void;
-  renderItem?: (item: T) => React.ReactNode;
 }
 
 /** j and k move between rows, skipping group headers and shut groups. */
@@ -33,7 +32,6 @@ export const ItemRows = <T extends ListItem>({
   selected,
   onSelect,
   onOpen,
-  renderItem,
 }: ItemRowsProps<T>) => {
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, id: string): void => {
     if (e.key === 'Enter') {
@@ -63,9 +61,7 @@ export const ItemRows = <T extends ListItem>({
             onDoubleClick={() => onOpen?.(item.id)}
             onKeyDown={(e) => onKeyDown(e, item.id)}
           >
-            {renderItem ? (
-              renderItem(item)
-            ) : variant === 'stacked' ? (
+            {variant === 'stacked' ? (
               <StackedRowBody item={item} />
             ) : (
               <DefaultRowBody item={item} />
@@ -99,13 +95,13 @@ export const ItemGroup = <T extends ListItem>({
   >
     <GroupHeader
       level={3}
-      sticky
       label={group.label}
       icon={group.icon}
       count={group.rows.length}
       open={open}
       onOpenChange={onOpenChange}
       controls={bodyId}
+      className="sticky top-0 z-10"
     />
     <Disclosure id={bodyId} open={open} className="border-b border-border">
       <ItemRows rows={group.rows} {...rows} />

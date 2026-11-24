@@ -34,7 +34,7 @@ const LEVEL_WORD = { default: '', warning: 'warning', critical: 'critical' } as 
 
 export interface ProgressLevel {
   level?: UsageLevel;
-  /** Bar colour: the level colour when thresholds are set, otherwise `variant`. */
+  /** Bar colour: the level colour of a meter, otherwise `variant`. */
   variant: NonNullable<ProgressProps['variant']>;
   /** Visible value: `formatValue` or the rounded percentage. */
   text: string;
@@ -47,9 +47,9 @@ export const progressLevel = (
   value: number,
   max: number,
   pct: number,
-  { thresholds, formatValue, variant = 'default' }: ProgressProps
+  { meter, formatValue, variant = 'default' }: ProgressProps
 ): ProgressLevel => {
-  const level = thresholds ? resolveUsageLevel(usageFraction(value, max), thresholds) : undefined;
+  const level = meter ? resolveUsageLevel(usageFraction(value, max)) : undefined;
   const text = formatValue ? formatValue(value, max) : `${String(pct)}%`;
   const word = level ? LEVEL_WORD[level] : '';
   const withWord = word ? `${text}, ${word}` : text;

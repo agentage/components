@@ -1,7 +1,7 @@
 import { createRef } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { Button, buttonVariants } from './button';
+import { Button } from './button';
 
 describe('Button', () => {
   it('forwards a ref to the button element', () => {
@@ -50,10 +50,6 @@ describe('Button size scale', () => {
     render(<Button size="sm">Save</Button>);
     const cls = screen.getByRole('button').className.split(' ');
     for (const c of ['h-6', 'px-2', 'gap-1', 'text-xs']) expect(cls).toContain(c);
-  });
-
-  it('renders icon-md as an exact alias of icon', () => {
-    expect(buttonVariants({ size: 'icon-md' })).toBe(buttonVariants({ size: 'icon' }));
   });
 
   it('merges className last', () => {

@@ -46,20 +46,12 @@ describe('Card', () => {
 });
 
 describe('Card surface', () => {
-  it('renders the same surface for the deprecated flat variant', () => {
-    const { container } = render(<Card variant="flat">Body</Card>);
-    const card = container.querySelector('[data-slot="card"]') as HTMLElement;
-    expect(card.dataset.variant).toBe('flat');
-    expect(card.className).toContain('rounded-lg');
-    expect(card.className).toContain('px-3.5 py-3');
-    expect(card.className).not.toContain('shadow');
-  });
-
-  it('renders the default surface with no shadow', () => {
+  it('renders the one flat surface with no shadow', () => {
     const { container } = render(<Card>Body</Card>);
     const card = container.querySelector('[data-slot="card"]') as HTMLElement;
-    expect(card.dataset.variant).toBe('default');
     expect(card.className).toContain('bg-card');
+    expect(card.className).toContain('rounded-lg');
+    expect(card.className).toContain('px-3.5 py-3');
     expect(card.className).not.toContain('shadow');
   });
 

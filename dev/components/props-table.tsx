@@ -13,8 +13,7 @@ import { COMPONENT_PROPS, EXPORT_SUBPATH } from '../generated/props';
 const REPO = 'https://github.com/agentage/components/tree/master/src/components';
 
 // One line box for every cell, so names, types and descriptions share a baseline.
-const CELL =
-  'py-2 align-top text-xs leading-5 group-data-[density=compact]/table:h-auto group-data-[density=compact]/table:py-2';
+const CELL = 'h-auto py-2 align-top text-xs leading-5';
 
 /**
  * Generated prop table for one export. Components whose whole surface is

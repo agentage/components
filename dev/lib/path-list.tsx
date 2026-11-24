@@ -3,16 +3,7 @@
 
 import * as React from 'react';
 import { cn } from '../../src/lib/utils';
-import {
-  Badge,
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Truncate,
-} from '../../src';
+import { Badge, Button, Select, Truncate } from '../../src';
 
 export interface PathEntry {
   id: string;
@@ -94,22 +85,14 @@ export const PathList = React.forwardRef<HTMLDivElement, PathListProps>(
                 className="flex-1 font-mono text-xs text-muted-foreground"
               />
               {accessOptions && (
-                <Select value={e.access} onValueChange={(v) => onAccessChange?.(e.id, v)}>
-                  <SelectTrigger
-                    size="sm"
-                    className="w-auto min-w-[112px] flex-none"
-                    aria-label={`Access for ${e.source} ${e.path}`}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accessOptions.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
-                        {o.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Select
+                  size="sm"
+                  className="min-w-[112px] flex-none"
+                  aria-label={`Access for ${e.source} ${e.path}`}
+                  value={e.access}
+                  onValueChange={(v) => onAccessChange?.(e.id, v)}
+                  options={accessOptions}
+                />
               )}
               {onRemove && (
                 <Button

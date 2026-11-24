@@ -20,7 +20,7 @@ export const Tabs = ({
   defaultValue = '',
   value: controlledValue,
   onValueChange,
-  variant = 'default',
+  variant = 'pill',
   className,
   children,
   ...props

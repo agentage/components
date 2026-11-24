@@ -7,7 +7,6 @@ import {
   parseRelativeRange,
   RANGE_PRESETS,
   type DateRange,
-  type RangePreset,
 } from '../lib/relative-range';
 import { useMounted } from '../lib/use-mounted';
 import { cn, MUTED_ON_HOVER } from '../lib/utils';
@@ -20,10 +19,7 @@ import { rowVariants } from './row.variants';
 
 export interface DateRangePickerProps {
   value?: DateRange;
-  defaultValue?: DateRange;
   onValueChange?: (range: DateRange) => void;
-  /** Quick picks; each `value` is a relative expression such as `24h` or `today`. */
-  presets?: RangePreset[];
   placeholder?: string;
   disabled?: boolean;
   /** Toolbar control height: md 28 px (default), sm 24 px. */
@@ -43,9 +39,7 @@ export const DateRangePicker = React.forwardRef<HTMLButtonElement, DateRangePick
   (
     {
       value,
-      defaultValue,
       onValueChange,
-      presets = RANGE_PRESETS,
       placeholder = 'Pick a range',
       disabled,
       size = 'md',
@@ -56,7 +50,7 @@ export const DateRangePicker = React.forwardRef<HTMLButtonElement, DateRangePick
   ) => {
     const [range, setRange] = useControlled<DateRange | undefined>(
       value,
-      defaultValue,
+      undefined,
       (r) => r && onValueChange?.(r)
     );
     const [open, setOpen] = React.useState(false);
@@ -100,7 +94,7 @@ export const DateRangePicker = React.forwardRef<HTMLButtonElement, DateRangePick
           <p className="m-0 text-xs text-destructive">Try 15m, 6h, 2d, now-6h or a date.</p>
         )}
         <ul className="m-0 flex list-none flex-col gap-px p-0" aria-label="Presets">
-          {presets.map((p) => (
+          {RANGE_PRESETS.map((p) => (
             <li key={p.value}>
               <button
                 type="button"

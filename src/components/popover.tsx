@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { isValidElement, useCallback, useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { OverlayLayerProvider, useOverlayLayer } from '../lib/overlay-layer';
-import { useAnchorPosition, type AnchorAlign } from '../lib/use-anchor-position';
+import { useAnchorPosition } from '../lib/use-anchor-position';
 import { FOCUSABLE_SELECTOR } from '../lib/use-focus-trap';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
@@ -12,14 +12,9 @@ import { cn } from '../lib/utils';
 export interface PopoverProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   trigger: ReactNode;
   content: ReactNode;
-  /** @deprecated Use `open`. */
-  isOpen?: boolean;
-  /** @deprecated Use `onOpenChange`. */
-  onClose?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** `start`/`end` are the canonical names; `left`/`right` are kept as aliases. */
-  align?: 'left' | 'right' | 'center' | 'start' | 'end';
+  align?: 'start' | 'center' | 'end';
   /** Preferred side; flips when there is no room. Default `top`. */
   side?: 'top' | 'bottom';
   /** Accessible name of the surface; `aria-label` or `aria-labelledby` also work. */
@@ -29,14 +24,6 @@ export interface PopoverProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
 const focusables = (root: HTMLElement | null): HTMLElement[] =>
   Array.from(root?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
 
-const alignMap: Record<NonNullable<PopoverProps['align']>, AnchorAlign> = {
-  left: 'start',
-  right: 'end',
-  center: 'center',
-  start: 'start',
-  end: 'end',
-};
-
 /**
  * Non-modal surface anchored to `trigger`. Focus moves in on open and back to the trigger on
  * close; Tab past either end leaves the surface next to the trigger and closes it.
@@ -44,22 +31,16 @@ const alignMap: Record<NonNullable<PopoverProps['align']>, AnchorAlign> = {
 export const Popover = ({
   trigger,
   content,
-  isOpen: isOpenProp,
-  onClose: onCloseProp,
-  open: openProp,
+  open: isOpen = false,
   onOpenChange,
-  align = 'left',
+  align = 'start',
   side = 'top',
   label,
   className,
   onKeyDown,
   ...props
 }: PopoverProps): React.JSX.Element => {
-  const isOpen = openProp ?? isOpenProp ?? false;
-  const onClose = useCallback((): void => {
-    onCloseProp?.();
-    onOpenChange?.(false);
-  }, [onCloseProp, onOpenChange]);
+  const onClose = useCallback((): void => onOpenChange?.(false), [onOpenChange]);
   const anchorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const mounted = useMounted();
@@ -73,7 +54,7 @@ export const Popover = ({
 
   const { top, left } = useAnchorPosition(anchorRef, contentRef, showing, {
     side,
-    align: alignMap[align],
+    align,
   });
 
   const triggerNode = (): HTMLElement | null =>

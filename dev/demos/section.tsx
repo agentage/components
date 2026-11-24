@@ -1,19 +1,6 @@
 'use client';
 import { useState } from 'react';
-import {
-  Avatar,
-  Button,
-  FormField,
-  Input,
-  Section,
-  SectionLabel,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Switch,
-} from '../../src';
+import { Avatar, Button, FormField, Input, Section, SectionLabel, Select, Switch } from '../../src';
 import { Block } from '../components/demo';
 import { UserIcon } from '../lib/icons';
 import { UiIcon } from '../lib/ui-icons';
@@ -39,51 +26,22 @@ export const Example = () => (
 );
 
 export const Variants = () => (
-  <div className="space-y-5">
-    <Block caption="The open variant is the default: no box, and a 1 px rule between sections.">
-      <div className="max-w-xl">
-        <Section title="Profile" description="Your account information.">
-          <p className="text-ui text-muted-foreground">Ada Lovelace, ada@example.com</p>
-        </Section>
-        <Section title="Billing" description="Plan and invoices.">
-          <p className="text-ui text-muted-foreground">Team plan, billed monthly.</p>
-        </Section>
-      </div>
-    </Block>
-    <Block caption="The boxed variant is a bordered block, for cards in a grid.">
-      <div className="grid grid-cols-2 gap-4">
-        <Section
-          variant="boxed"
-          icon={<UserIcon />}
-          iconColor="bg-info/10 text-info"
-          title="Profile"
-          description="Your account information"
-          action={
-            <Button variant="ghost" size="sm">
-              Edit
-            </Button>
-          }
-        >
-          <div className="flex items-center gap-3">
-            <Avatar name="Ada Lovelace" size="lg" />
-            <div>
-              <p className="text-ui font-medium">Ada Lovelace</p>
-              <p className="text-xs text-muted-foreground">ada@example.com</p>
-            </div>
+  <Block caption="Sections stack with a 1 px rule between them and no box.">
+    <div className="max-w-xl">
+      <Section icon={<UserIcon />} title="Profile" description="Your account information.">
+        <div className="flex items-center gap-3">
+          <Avatar name="Ada Lovelace" size="lg" />
+          <div>
+            <p className="text-ui font-medium">Ada Lovelace</p>
+            <p className="text-xs text-muted-foreground">ada@example.com</p>
           </div>
-        </Section>
-        <Section
-          variant="boxed"
-          icon={<UiIcon name="folder" />}
-          iconColor="bg-success/10 text-success"
-          title="Defaults"
-          description="Shared settings"
-        >
-          <p className="text-ui text-muted-foreground">Three services use these defaults.</p>
-        </Section>
-      </div>
-    </Block>
-  </div>
+        </div>
+      </Section>
+      <Section icon={<UiIcon name="folder" />} title="Defaults" description="Shared settings.">
+        <p className="text-ui text-muted-foreground">Three services use these defaults.</p>
+      </Section>
+    </div>
+  </Block>
 );
 
 export const Composition = () => {
@@ -94,15 +52,14 @@ export const Composition = () => {
       <div className="max-w-xl">
         <Section title="Delivery" description="Where reports go and what happens on failure.">
           <FormField label="Channel" layout="row">
-            <Select defaultValue="email">
-              <SelectTrigger aria-label="Channel">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="webhook">Webhook</SelectItem>
-              </SelectContent>
-            </Select>
+            <Select
+              aria-label="Channel"
+              defaultValue="email"
+              options={[
+                { value: 'email', label: 'Email' },
+                { value: 'webhook', label: 'Webhook' },
+              ]}
+            />
           </FormField>
           <SectionLabel>On failure</SectionLabel>
           <div className="space-y-2">

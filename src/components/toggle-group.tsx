@@ -31,8 +31,6 @@ export interface ToggleGroupProps<T extends string> extends Omit<
 > {
   value: T;
   onValueChange?: (value: T) => void;
-  /** @deprecated Use `onValueChange`. */
-  onChange?: (value: T) => void;
   options: ToggleOption<T>[];
   columns?: ToggleGroupColumns;
   vertical?: boolean;
@@ -47,7 +45,6 @@ export interface ToggleGroupProps<T extends string> extends Omit<
 export const ToggleGroup = <T extends string>({
   value,
   onValueChange,
-  onChange,
   options,
   columns,
   vertical = false,
@@ -59,10 +56,7 @@ export const ToggleGroup = <T extends string>({
   ...props
 }: ToggleGroupProps<T>): React.JSX.Element => {
   const buttonsRef = React.useRef<(HTMLButtonElement | null)[]>([]);
-  const commit = (next: T): void => {
-    onValueChange?.(next);
-    onChange?.(next);
-  };
+  const commit = (next: T): void => onValueChange?.(next);
   const segmented = variant === 'segmented';
   const gridCols = columns ?? Math.max(1, options.length);
   const mapped = segmented || isGridColumns(gridCols);

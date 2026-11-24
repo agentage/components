@@ -14,8 +14,8 @@ const Harness = (): React.JSX.Element => {
           </button>
         }
         content={<button type="button">Edit</button>}
-        isOpen={open}
-        onClose={() => setOpen(false)}
+        open={open}
+        onOpenChange={() => setOpen(false)}
       />
     </div>
   );
@@ -28,8 +28,8 @@ describe('Popover', () => {
         <Popover
           trigger={<button type="button">Details</button>}
           content="Machine info"
-          isOpen
-          onClose={vi.fn()}
+          open
+          onOpenChange={vi.fn()}
         />
       </div>
     );
@@ -45,8 +45,8 @@ describe('Popover', () => {
       <Popover
         trigger={<button type="button">Details</button>}
         content="Machine info"
-        isOpen
-        onClose={onClose}
+        open
+        onOpenChange={onClose}
       />
     );
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -73,8 +73,8 @@ describe('Popover', () => {
         <Popover
           trigger={<button type="button">Details</button>}
           content="Machine info"
-          isOpen
-          onClose={onClose}
+          open
+          onOpenChange={onClose}
         />
         <button type="button">Elsewhere</button>
       </>
@@ -93,8 +93,8 @@ describe('Popover surface props', () => {
       <Popover
         trigger={<span>t</span>}
         content="c"
-        isOpen
-        onClose={vi.fn()}
+        open
+        onOpenChange={vi.fn()}
         className="mt-4"
         id="pop"
         data-testid="pop"
@@ -106,7 +106,9 @@ describe('Popover surface props', () => {
   });
 
   it('accepts the canonical start/end align aliases', () => {
-    render(<Popover trigger={<span>t</span>} content="c" isOpen onClose={vi.fn()} align="end" />);
+    render(
+      <Popover trigger={<span>t</span>} content="c" open onOpenChange={vi.fn()} align="end" />
+    );
     expect(document.body.querySelector('[data-slot="popover-content"]')).not.toBeNull();
   });
 });
@@ -116,9 +118,9 @@ describe('Popover side', () => {
     const close = vi.fn();
     render(
       <Popover
-        isOpen
+        open
         side="bottom"
-        onClose={close}
+        onOpenChange={close}
         aria-label="Pick"
         trigger={<button>t</button>}
         content="c"

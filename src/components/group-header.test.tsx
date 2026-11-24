@@ -69,10 +69,18 @@ describe('GroupHeader', () => {
     expect(screen.getByRole('heading', { level: 3 }).querySelector('button')).not.toBeNull();
   });
 
-  it('sticks to the top on request, names the toggle by id and forwards the ref', () => {
+  it('takes a sticky className, names the toggle by id and forwards the ref', () => {
     const ref = createRef<HTMLDivElement>();
-    render(<GroupHeader ref={ref} label="G" sticky triggerId="t1" onOpenChange={() => {}} />);
+    render(
+      <GroupHeader
+        ref={ref}
+        label="G"
+        className="sticky top-0"
+        controls="b1"
+        onOpenChange={() => {}}
+      />
+    );
     expect(ref.current?.className).toContain('sticky');
-    expect(screen.getByRole('button').id).toBe('t1');
+    expect(screen.getByRole('button').id).toBe('b1-toggle');
   });
 });

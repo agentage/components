@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority';
 
-/** `line` and `pill` are the two looks; `default` and `underline` are deprecated aliases of them. */
-export type TabsVariant = 'default' | 'underline' | 'line' | 'pill';
+export type TabsVariant = 'line' | 'pill';
 
 const LINE_LIST = 'flex h-9.5 w-full items-center gap-1 self-stretch border-b border-border';
 const PILL_LIST =
@@ -11,17 +10,13 @@ const PILL_LIST =
 export const tabsListVariants = cva('w-fit self-start', {
   variants: {
     variant: {
-      /** @deprecated Renders `pill`. */
-      default: PILL_LIST,
-      /** @deprecated Renders `line`. */
-      underline: LINE_LIST,
       /** 38 px list over a 1 px rule; the active tab has a 2 px amber bar. */
       line: LINE_LIST,
       /** 34 px bordered tray of 28 px pills. */
       pill: PILL_LIST,
     },
   },
-  defaultVariants: { variant: 'default' },
+  defaultVariants: { variant: 'pill' },
 });
 
 const TRIGGER =
@@ -34,14 +29,14 @@ const OFF = 'text-muted-foreground hover:bg-accent hover:text-foreground';
 
 export const tabsTriggerVariants = cva(TRIGGER, {
   variants: {
-    variant: { default: '', underline: '', line: '', pill: '' },
+    variant: { line: '', pill: '' },
     active: { true: '', false: OFF },
   },
   compoundVariants: [
-    { variant: ['line', 'underline'], active: true, class: LINE_ON },
-    { variant: ['pill', 'default'], active: true, class: PILL_ON },
+    { variant: 'line', active: true, class: LINE_ON },
+    { variant: 'pill', active: true, class: PILL_ON },
   ],
-  defaultVariants: { variant: 'default', active: false },
+  defaultVariants: { variant: 'pill', active: false },
 });
 
 export const tabsContentVariants = cva('mt-3 focus-ring');

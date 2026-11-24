@@ -15,20 +15,12 @@ export const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary-emphasis underline-offset-4 hover:underline',
       },
-      // One control metric: md 28 px, px 10, gap 6, 13 px; sm 24 px, px 8, gap 4, 12 px; lg 32 px.
+      // One control metric: md 28 px, px 10, gap 6, 13 px; sm 24 px, px 8, gap 4, 12 px.
       size: {
-        /** @deprecated Same as `md`. */
-        default: 'h-7 px-2.5 text-ui',
         sm: 'h-6 gap-1 px-2 text-xs [&_svg:not([class*="size-"])]:size-3.5',
         md: 'h-7 px-2.5 text-ui',
-        /** @deprecated 32 px; the scale is md 28 and sm 24. */
-        lg: 'h-8 px-3 text-ui',
         icon: 'size-7',
         'icon-sm': 'size-6',
-        /** @deprecated Same as `icon`. */
-        'icon-md': 'size-7',
-        /** @deprecated 32 px; use `icon` (28) or `icon-sm` (24). */
-        'icon-lg': 'size-8',
       },
     },
     defaultVariants: {

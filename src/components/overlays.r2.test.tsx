@@ -1,18 +1,16 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ContextMenu, ContextMenuItem } from './context-menu';
 import { DropdownMenu, DropdownMenuItem } from './dropdown-menu';
-import { Modal } from './modal';
+import { Dialog } from './dialog';
 import { Sheet } from './sheet';
 
 describe('dialog names and close', () => {
-  it('names a Modal from aria-label when it has no title', () => {
+  it('names a Dialog from aria-label when it has no title', () => {
     render(
-      <Modal open onOpenChange={() => {}} aria-label="Settings">
+      <Dialog open onOpenChange={() => {}} aria-label="Settings">
         Body
-      </Modal>
+      </Dialog>
     );
     expect(screen.getByRole('dialog', { name: 'Settings' })).toBeTruthy();
   });
@@ -58,30 +56,6 @@ describe('controlled menus', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'More' }));
     expect(onOpenChange).toHaveBeenCalledWith(true);
-    expect(screen.queryByRole('menu')).toBeNull();
-  });
-
-  it('closes a ContextMenu when open turns false and keeps focus while the parent rerenders', () => {
-    const Harness = ({ open }: { open?: boolean }) => {
-      const [, setTick] = useState(0);
-      return (
-        <ContextMenu
-          open={open}
-          onOpenChange={() => setTick((t) => t + 1)}
-          trigger={<div>Target</div>}
-        >
-          <ContextMenuItem>One</ContextMenuItem>
-          <ContextMenuItem>Two</ContextMenuItem>
-        </ContextMenu>
-      );
-    };
-    const { rerender } = render(<Harness />);
-    fireEvent.contextMenu(screen.getByText('Target'));
-    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' });
-    expect(document.activeElement?.textContent).toBe('Two');
-    rerender(<Harness />);
-    expect(document.activeElement?.textContent).toBe('Two');
-    rerender(<Harness open={false} />);
     expect(screen.queryByRole('menu')).toBeNull();
   });
 });

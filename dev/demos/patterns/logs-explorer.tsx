@@ -4,10 +4,10 @@ import {
   DataTree,
   DatePicker,
   FilterMenu,
-  InspectorPanel,
   ListToolbar,
   ListToolbarEnd,
   LogView,
+  Sheet,
   StatusBar,
   StatusGlyph,
   ToolbarSearch,
@@ -118,7 +118,8 @@ export const Example = () => {
             aria-label="Log lines"
           />
         </div>
-        <InspectorPanel
+        <Sheet
+          mode="docked"
           open={picked !== null}
           onOpenChange={(o) => !o && setPicked(null)}
           title={picked ? picked.message : 'Line'}
@@ -135,7 +136,7 @@ export const Example = () => {
               aria-label="Line fields"
             />
           )}
-        </InspectorPanel>
+        </Sheet>
       </div>
     </Block>
   );

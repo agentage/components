@@ -7,7 +7,11 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
+  CardMeta,
   CardTitle,
+  DescriptionDetail,
+  DescriptionList,
+  DescriptionTerm,
   DropdownMenu,
   DropdownMenuItem,
   IconButton,
@@ -60,9 +64,11 @@ const Latency = () => {
     <Card
       state={state}
       minHeight={210}
-      error={{ message: 'The response times could not be loaded.', reference: 'req-4f2a91' }}
-      onRetry={() => setState('loading')}
-      empty="No response times in this period."
+      fallback={{
+        error: { message: 'The response times could not be loaded.', reference: 'req-4f2a91' },
+        onRetry: () => setState('loading'),
+        empty: 'No response times in this period.',
+      }}
     >
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle>Response time</CardTitle>
@@ -84,12 +90,14 @@ const Latency = () => {
           }))}
         />
       </CardContent>
-      <CardFooter
-        source="Region: EU West"
-        updatedAt={checked}
-        onRefresh={() => setState('loading')}
-        refreshing={state === 'loading'}
-      />
+      <CardFooter>
+        <CardMeta
+          source="Region: EU West"
+          updatedAt={checked}
+          onRefresh={() => setState('loading')}
+          refreshing={state === 'loading'}
+        />
+      </CardFooter>
     </Card>
   );
 };
@@ -145,43 +153,43 @@ export const Example = () => {
             <StatCard
               title="Uptime"
               value="99.98%"
-              period="30 days"
-              comparison={{ previous: '99.96%', label: 'before', delta: '+0.02 pt', up: true }}
+              trend={{ value: '+0.02 pt', direction: 'up' }}
+              hint="99.96% before, 30 days"
             />
             <StatCard
               title="Response time"
               value="182 ms"
-              period="p95"
-              comparison={{
-                previous: '194 ms',
-                label: 'yesterday',
-                delta: '-12 ms',
-                up: false,
-                sentiment: 'down-is-good',
-              }}
-              chart={<Sparkline data={[230, 214, 220, 201, 196, 188, 182]} />}
-              chartLabel="Response time falling over 7 days."
-            />
-            <StatCard
-              title="Incidents"
-              value={3}
-              period="30 days"
-              facts={[
-                { label: 'Open', value: 0 },
-                { label: 'Longest', value: '18 min' },
-              ]}
-            />
+              trend={{ value: '-12 ms', direction: 'down', sentiment: 'down-is-good' }}
+              hint="194 ms yesterday, p95"
+            >
+              <Sparkline
+                data={[230, 214, 220, 201, 196, 188, 182]}
+                chartLabel="Response time falling over 7 days."
+              />
+            </StatCard>
+            <StatCard title="Incidents" value={3} hint="30 days">
+              <DescriptionList variant="inline">
+                <div>
+                  <DescriptionTerm>Open</DescriptionTerm>
+                  <DescriptionDetail>0</DescriptionDetail>
+                </div>
+                <div>
+                  <DescriptionTerm>Longest</DescriptionTerm>
+                  <DescriptionDetail>18 min</DescriptionDetail>
+                </div>
+              </DescriptionList>
+            </StatCard>
             <StatCard
               title="Last check"
               value={paused ? 'Paused' : 'OK'}
-              indicator={
+              icon={
                 <StatusGlyph
                   shape={paused ? 'slash' : 'check'}
                   tone={paused ? 'muted' : 'success'}
                   label={paused ? 'Paused' : 'Passing'}
                 />
               }
-              description={<RelativeTime value={ago(1)} />}
+              hint={<RelativeTime value={ago(1)} />}
             />
           </div>
           <Latency />

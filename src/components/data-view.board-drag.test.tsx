@@ -36,9 +36,8 @@ const Board = (p: { rows?: Item[]; onMove?: (m: unknown) => void; onOpen?: (r: I
     columns={COLUMNS}
     getRowId={(r) => r.id}
     views={['board']}
-    defaultGroupBy="status"
-    onMove={p.onMove}
-    onRowOpen={p.onOpen}
+    defaultState={{ groupBy: 'status' }}
+    actions={{ move: p.onMove, open: p.onOpen }}
   />
 );
 
