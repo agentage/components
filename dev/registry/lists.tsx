@@ -6,6 +6,7 @@ import * as GroupHeader from '../demos/group-header';
 import * as ListDemo from '../demos/list';
 import * as ListToolbar from '../demos/list-toolbar';
 import * as LogView from '../demos/log-view';
+import * as Pagination from '../demos/pagination';
 import * as Table from '../demos/table';
 
 export const LISTS: CategoryEntry = {
@@ -27,7 +28,8 @@ export const LISTS: CategoryEntry = {
       slug: 'table',
       name: 'Table',
       core: true,
-      description: 'Table parts with the dense look: 32 px header, 36 px rows.',
+      description:
+        'Table parts with the dense look: 32 px header, 36 px rows, and Pagination for page buttons.',
       exports: [
         'Table',
         'TableHeader',
@@ -36,9 +38,10 @@ export const LISTS: CategoryEntry = {
         'TableHead',
         'TableCell',
         'TableCaption',
+        'Pagination',
       ],
       parts: [],
-      demos: sections(Table),
+      demos: [...sections(Table), ...more('Pagination', Pagination)],
     },
     {
       slug: 'data-view',

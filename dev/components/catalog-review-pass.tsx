@@ -5,9 +5,13 @@ import { CATEGORIES } from '../registry';
 
 /** Component pages per category before this pass (0.21 draft), by today's category. */
 const BEFORE: [string, number, string][] = [
-  ['Foundations', 14, 'Heading, Separator, Label and PriorityGlyph pages folded or removed'],
+  [
+    'Foundations',
+    14,
+    'Heading, Separator, Label and PriorityGlyph pages folded or removed; the Hooks page is gone (useAnnounce is on Card)',
+  ],
   ['Forms', 13, 'Combobox merged into Select, Slider removed'],
-  ['Navigation', 7, ''],
+  ['Navigation', 7, 'Pagination is a section of the Table page; useScrollSpy is on SectionIndex'],
   [
     'Lists and data',
     6,
@@ -16,7 +20,7 @@ const BEFORE: [string, number, string][] = [
   [
     'Display',
     16,
-    'Data display and Disclosure merged; EntityCard folded into Card, CheckList on the StepList page',
+    'Data display and Disclosure merged; EntityCard folded into Card, CheckList on the StepList page, Collapsible a section of Accordion',
   ],
   [
     'Overlays',

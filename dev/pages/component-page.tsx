@@ -6,6 +6,7 @@ import { AppThemeSwitch } from '../components/app-theme-switch';
 import { PropsTable } from '../components/props-table';
 import { EXPORT_SUBPATH } from '../generated/props';
 import { builtFrom } from '../lib/built-from';
+import { sectionId } from '../lib/section-id';
 import { Link } from '../lib/router';
 import { componentPath, type ResolvedComponent } from '../registry';
 
@@ -62,7 +63,8 @@ export const ComponentPage = ({ category, component }: ResolvedComponent) => (
     {component.demos.map((demo, index) => (
       <section
         key={demo.title ?? index}
-        className="space-y-4"
+        id={sectionId(demo.title ?? component.name)}
+        className="space-y-4 scroll-mt-4"
         data-section={demo.title ?? component.name}
       >
         <h2 className={H2}>{demo.title ?? 'Example'}</h2>

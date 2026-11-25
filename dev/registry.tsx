@@ -13,6 +13,8 @@ import { REVIEW } from './registry/review';
 export interface DemoEntry {
   /** Section heading: Example, Variants, Sizes, States or Composition. */
   title?: string;
+  /** Set on a folded-in component's sections: its name, for the search palette and old links. */
+  group?: string;
   Component: ComponentType;
 }
 

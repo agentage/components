@@ -113,6 +113,7 @@ export { DataView } from './data-view';
 export type {
   DataViewActions,
   DataViewColumn,
+  DataViewDefault,
   DataViewKind,
   DataViewProps,
   DataViewState,

@@ -48,8 +48,11 @@ export const Example = () => {
           rows={rows}
           columns={COLUMNS}
           getRowId={(t) => t.id}
-          defaultState={{ groupBy: 'status', sort: { key: 'priority', dir: 'asc' } }}
-          storageKey="ds-docs-grouped-table"
+          defaultState={{
+            groupBy: 'status',
+            sort: { key: 'priority', dir: 'asc' },
+            storageKey: 'ds-docs-grouped-table',
+          }}
           state={{ selection: selected }}
           onStateChange={(st) => setSelected(st.selection)}
           actions={{

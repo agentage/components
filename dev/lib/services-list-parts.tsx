@@ -118,6 +118,8 @@ export const serviceColumns = (
       </span>
     ),
   },
+  { key: 'description', header: 'Description', visibility: 'none', searchable: true },
+  { key: 'triggerText', header: 'Trigger text', visibility: 'none', searchable: true },
   {
     key: 'trigger',
     header: 'Trigger',
@@ -164,6 +166,7 @@ export const serviceColumns = (
   {
     key: 'owner',
     header: 'Owner',
+    searchable: true,
     hideBelow: 1100,
     className: 'min-w-28',
     filter: 'multi',

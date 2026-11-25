@@ -1,6 +1,7 @@
 import type { CategoryEntry } from '../registry';
 import { more, sections } from './sections';
 import * as Accordion from '../demos/accordion';
+import * as Announce from '../demos/announce';
 import * as Card from '../demos/card';
 import * as CheckList from '../demos/check-list';
 import * as CodeBlock from '../demos/code-block';
@@ -35,9 +36,10 @@ export const DISPLAY: CategoryEntry = {
         'CardContent',
         'CardFooter',
         'CardMeta',
+        'useAnnounce',
       ],
-      parts: ['Skeleton', 'EmptyState', 'RelativeTime', 'useAnnounce'],
-      demos: sections(Card),
+      parts: ['Skeleton', 'EmptyState', 'RelativeTime'],
+      demos: [...sections(Card), ...more('useAnnounce', Announce)],
     },
     {
       slug: 'stat-card',
@@ -131,21 +133,21 @@ export const DISPLAY: CategoryEntry = {
       demos: sections(EmptyState),
     },
     {
-      slug: 'collapsible',
-      name: 'Collapsible',
-      description: 'One trigger over one animated body; `asChild` for a custom trigger.',
-      exports: ['Collapsible', 'CollapsibleTrigger', 'CollapsibleContent'],
-      parts: ['Disclosure', 'DisclosureChevron', 'Count'],
-      demos: sections(Collapsible),
-    },
-    {
       slug: 'accordion',
       name: 'Accordion',
       description:
-        'Collapsible items, one or many open, as plain rows or 32 px section headers that can remember what is open.',
-      exports: ['Accordion', 'AccordionItem', 'AccordionTrigger', 'AccordionContent'],
+        'Collapsible items, one or many open, as plain rows or 32 px section headers that can remember what is open; Collapsible is the single open and shut body.',
+      exports: [
+        'Accordion',
+        'AccordionItem',
+        'AccordionTrigger',
+        'AccordionContent',
+        'Collapsible',
+        'CollapsibleTrigger',
+        'CollapsibleContent',
+      ],
       parts: ['Disclosure', 'DisclosureChevron', 'Count', 'useControlled'],
-      demos: sections(Accordion),
+      demos: [...sections(Accordion), ...more('Collapsible', Collapsible)],
     },
     {
       slug: 'step-list',

@@ -1,6 +1,5 @@
 import type { CategoryEntry } from '../registry';
 import { more, sections } from './sections';
-import * as A11yHooks from '../demos/a11y-hooks';
 import * as Avatar from '../demos/avatar';
 import * as Badge from '../demos/badge';
 import * as Button from '../demos/button';
@@ -109,14 +108,6 @@ export const FOUNDATIONS: CategoryEntry = {
       exports: ['CopyButton'],
       parts: [],
       demos: sections(CopyButton),
-    },
-    {
-      slug: 'hooks',
-      name: 'Hooks',
-      description: 'Accessibility hooks for screens: announce to screen readers and scroll spy.',
-      exports: ['useAnnounce', 'useScrollSpy'],
-      parts: [],
-      demos: sections(A11yHooks),
     },
   ],
 };

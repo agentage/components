@@ -23,8 +23,7 @@ const ui = () => (
     rows={ROWS}
     columns={COLUMNS}
     getRowId={(t) => t.id}
-    defaultState={{ groupBy: 'status' }}
-    storageKey="dvr"
+    defaultState={{ groupBy: 'status', storageKey: 'dvr' }}
   />
 );
 

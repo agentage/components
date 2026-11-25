@@ -1,7 +1,7 @@
 // Docs-only figures of the simplification pass (2026-11-24), from the generated prop tables.
 export const PASS_PROPS: [name: string, before: number, after: string][] = [
   ['DataTable', 34, 'internal (DataView)'],
-  ['DataView', 30, '11'],
+  ['DataView', 30, '10'],
   ['StatCard', 29, '8'],
   ['EntityCard', 16, 'internal (DataView cards; Item card in docs)'],
   ['ListRow', 16, '7'],

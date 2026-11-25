@@ -848,10 +848,11 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     },
     {
       name: 'defaultState',
-      type: 'Partial<DataViewState> | undefined',
+      type: 'DataViewDefault | undefined',
       required: false,
       defaultValue: null,
-      description: "Start state of the uncontrolled keys, for example `{ groupBy: 'status' }`.",
+      description:
+        "Start state of the uncontrolled keys, for example `{ groupBy: 'status' }`; see `DataViewDefault`.",
     },
     {
       name: 'empty',
@@ -881,13 +882,6 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
       required: false,
       defaultValue: null,
       description: 'Controlled keys of the state; keys left out stay internal.',
-    },
-    {
-      name: 'storageKey',
-      type: 'string | undefined',
-      required: false,
-      defaultValue: null,
-      description: 'Persist the controls and the collapsed groups in localStorage under this key.',
     },
     {
       name: 'views',
@@ -3397,6 +3391,7 @@ export const EXPORT_SUBPATH: Record<string, string> = {
   DataView: './data-view',
   DataViewActions: '.',
   DataViewColumn: '.',
+  DataViewDefault: '.',
   DataViewKind: '.',
   DataViewProps: '.',
   DataViewState: '.',

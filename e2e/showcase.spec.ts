@@ -188,6 +188,37 @@ test.describe('routing', () => {
     }
   });
 
+  test('folded pages redirect to their section on the host page', async ({ page }) => {
+    const moved: [string, string, string][] = [
+      ['/components/navigation/pagination', '/components/lists/table', 'pagination-example'],
+      ['/components/display/collapsible', '/components/display/accordion', 'collapsible-example'],
+      ['/components/foundations/hooks', '/components/display/card', 'useannounce-example'],
+    ];
+    for (const [from, to, id] of moved) {
+      await page.goto(from);
+      await expect(page).toHaveURL(`${to}#${id}`);
+      await expect(page.locator(`#${id}`)).toBeVisible();
+    }
+  });
+
+  test('the command palette lands on a folded section', async ({ page }) => {
+    const found: [string, string, string][] = [
+      ['collapsible', 'Collapsible', '/components/display/accordion#collapsible-example'],
+      ['pagination', 'Pagination', '/components/lists/table#pagination-example'],
+      ['useAnnounce', 'useAnnounce', '/components/display/card#useannounce-example'],
+    ];
+    for (const [query, name, to] of found) {
+      await open(page, '/');
+      await page.getByRole('button', { name: 'Search' }).click();
+      await page.getByRole('combobox').fill(query);
+      await page
+        .getByRole('option', { name: new RegExp(`^${name}`) })
+        .first()
+        .click();
+      await expect(page).toHaveURL(to);
+    }
+  });
+
   test('a pattern page links to the components it is built from', async ({ page }) => {
     await open(page, '/components/patterns/card-grid');
     const built = section(page, 'Built from');

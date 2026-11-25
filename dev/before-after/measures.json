@@ -66,6 +66,10 @@
       "two-line row": {
         "h": 49,
         "fs": "14px"
+      },
+      "page button": {
+        "h": 32,
+        "fs": "14px"
       }
     },
     "lists/list": {
@@ -85,12 +89,6 @@
       "badge": {
         "h": 22,
         "fs": "12px"
-      }
-    },
-    "navigation/pagination": {
-      "page button": {
-        "h": 32,
-        "fs": "14px"
       }
     },
     "display/empty-state": {
@@ -235,15 +233,13 @@
         "fs": "10px"
       }
     },
-    "display/collapsible": {
-      "trigger": {
-        "h": 36,
-        "fs": "14px"
-      }
-    },
     "display/accordion": {
       "trigger": {
         "h": 52,
+        "fs": "14px"
+      },
+      "collapsible trigger": {
+        "h": 36,
         "fs": "14px"
       }
     },
@@ -327,6 +323,10 @@
       "two-line row": {
         "h": 48.5,
         "fs": "13px"
+      },
+      "page button": {
+        "h": 28,
+        "fs": "13px"
       }
     },
     "lists/list": {
@@ -349,12 +349,6 @@
       "badge": {
         "h": 20,
         "fs": "12px"
-      }
-    },
-    "navigation/pagination": {
-      "page button": {
-        "h": 28,
-        "fs": "13px"
       }
     },
     "display/empty-state": {
@@ -499,15 +493,13 @@
         "fs": "10px"
       }
     },
-    "display/collapsible": {
-      "trigger": {
-        "h": 28,
-        "fs": "13px"
-      }
-    },
     "display/accordion": {
       "trigger": {
         "h": 40,
+        "fs": "13px"
+      },
+      "collapsible trigger": {
+        "h": 28,
         "fs": "13px"
       }
     },

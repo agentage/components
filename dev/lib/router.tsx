@@ -17,11 +17,19 @@ const currentPath = (): string => {
   const path = window.location.pathname || '/';
   const moved = redirectedPath(path);
   if (moved !== path) window.history.replaceState(null, '', moved);
-  return moved;
+  return moved.split('#')[0] ?? moved;
+};
+
+/** Scroll to the `#section` of the address once the page has rendered. */
+const scrollToHash = (): void => {
+  const id = window.location.hash.slice(1);
+  if (id) requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
 };
 
 export const RouterProvider = ({ children }: { children: ReactNode }) => {
   const [path, setPath] = useState(currentPath);
+
+  useEffect(scrollToHash, []);
 
   useEffect(() => {
     const onPop = (): void => {
@@ -35,10 +43,12 @@ export const RouterProvider = ({ children }: { children: ReactNode }) => {
 
   const navigate = useCallback((target: string) => {
     const to = redirectedPath(target);
-    if (to === currentPath()) return;
+    const [pathname = to] = to.split('#');
+    if (to === currentPath() + window.location.hash) return;
     window.history.pushState(null, '', to);
-    setPath(to);
+    setPath(pathname);
     window.scrollTo(0, 0);
+    scrollToHash();
   }, []);
 
   // Library link components take a plain href, so intercept them here

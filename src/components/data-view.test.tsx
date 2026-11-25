@@ -211,3 +211,47 @@ describe('DataView group order', () => {
     expect(groups()).toEqual(['todo', 'doing', 'done']);
   });
 });
+
+describe('DataView search over a secondary line', () => {
+  interface Doc {
+    id: string;
+    name: string;
+    note: string;
+  }
+  const docs: Doc[] = [
+    { id: 'a', name: 'Alpha', note: 'weekly export of invoices' },
+    { id: 'b', name: 'Beta', note: 'checks for broken links' },
+  ];
+  const find = (columns: DataViewColumn<Doc>[], query: string): (string | null | undefined)[] => {
+    render(<DataView rows={docs} columns={columns} getRowId={(d) => d.id} />);
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: query } });
+    return titles();
+  };
+
+  it('finds a row by the text of a two-line cell kept in a hidden searchable column', () => {
+    const columns: DataViewColumn<Doc>[] = [
+      {
+        key: 'name',
+        header: 'Name',
+        searchable: true,
+        twoLine: true,
+        cell: (d) => (
+          <span>
+            {d.name}
+            <small>{d.note}</small>
+          </span>
+        ),
+      },
+      { key: 'note', header: 'Note', visibility: 'none', searchable: true },
+    ];
+    expect(find(columns, 'invoices')).toEqual(['Alphaweekly export of invoices']);
+  });
+
+  it('does not find the secondary text when only the first line is searchable', () => {
+    const columns: DataViewColumn<Doc>[] = [
+      { key: 'name', header: 'Name', searchable: true, cell: (d) => d.name },
+      { key: 'note', header: 'Note', visibility: 'none' },
+    ];
+    expect(find(columns, 'invoices')).toEqual([]);
+  });
+});

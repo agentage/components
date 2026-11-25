@@ -48,7 +48,7 @@ export const ROWS: BeforeAfterRow[] = [
     route: 'lists/table',
     status: 'changed',
     change:
-      'the dense look is the default of the bare parts: row 43 to 36 px, text 14 to 13 px, header 40 to 32 px plain 12 px, hover solid',
+      'the dense look is the default of the bare parts: row 43 to 36 px, text 14 to 13 px, header 40 to 32 px plain 12 px, hover solid; Pagination buttons 32 to 28 px, text 14 to 13 px',
   },
   {
     route: 'lists/list',
@@ -57,11 +57,6 @@ export const ROWS: BeforeAfterRow[] = [
     change:
       'row 63 to 52 px (two-line) and 36 px (one-line), 13/600 title; EntityList gains a data mode (groups, selection, keys) and the 54 px stacked layout; preferred name List',
     props: 'List items, variant, groupBy, value, storageKey; ListRow',
-  },
-  {
-    route: 'navigation/pagination',
-    status: 'changed',
-    change: 'page buttons 32 to 28 px, text 14 to 13 px',
   },
   {
     route: 'display/empty-state',
@@ -189,17 +184,11 @@ export const ROWS: BeforeAfterRow[] = [
   },
   { route: 'foundations/kbd', status: 'changed', change: 'text 10 to 11 px, radius 4 to 6 px' },
   {
-    route: 'display/collapsible',
-    status: 'changed',
-    change: 'trigger 36 to 28 px, 13 px, chevron and count; height animates, inert when shut',
-    props: 'CollapsibleTrigger chevron, count',
-  },
-  {
     route: 'display/accordion',
     status: 'changed',
     change:
-      'trigger 52 to 36 px, 13 px, leading chevron, solid hover; height animates, inert when shut',
-    props: 'AccordionTrigger count',
+      'trigger 52 to 36 px, 13 px, leading chevron, solid hover; height animates, inert when shut; Collapsible trigger 36 to 28 px with chevron and count',
+    props: 'AccordionTrigger count, CollapsibleTrigger chevron, count',
   },
   {
     route: 'foundations/copy-button',

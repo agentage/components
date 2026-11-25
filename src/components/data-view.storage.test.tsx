@@ -33,7 +33,7 @@ const ui = (props: Partial<React.ComponentProps<typeof DataView<Entry>>> = {}) =
     columns={COLUMNS}
     getRowId={(t) => t.id}
     views={['table', 'cards']}
-    storageKey="dv"
+    defaultState={{ storageKey: 'dv' }}
     {...props}
   />
 );
@@ -107,7 +107,6 @@ describe('DataView storage', () => {
     render(
       ui({
         columns: cols,
-        storageKey: undefined,
         defaultState: { sort: { key: 'rank', dir: 'asc' } },
       })
     );
@@ -117,7 +116,7 @@ describe('DataView storage', () => {
 
   it('bulk actions get only the selected rows a search leaves visible', () => {
     const bulk = vi.fn(() => null);
-    render(ui({ storageKey: undefined, actions: { bulk } }));
+    render(ui({ defaultState: {}, actions: { bulk } }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select Write docs' }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select Fix login' }));
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'docs' } });
