@@ -2,8 +2,19 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
+// 32 px header (12 px regular muted), 36 px rows at 13 px.
 const TABLE_HEAD_BASE =
-  'h-10 bg-card px-4 text-left align-middle text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground [&:has([role=checkbox])]:pr-0';
+  'h-8 bg-background px-3 text-left align-middle text-xs font-normal text-muted-foreground whitespace-nowrap [&:has([role=checkbox])]:pr-0';
+
+const TABLE_CELL_BASE = 'h-9 px-3 py-0 align-middle [&:has([role=checkbox])]:pr-0';
+
+const TABLE_ROW_BASE = cn(
+  'border-b border-border transition-colors duration-fast hover:bg-accent data-[state=selected]:bg-accent',
+  'hover:[--color-muted-foreground:color-mix(in_oklab,var(--color-foreground)_72%,var(--color-accent))]',
+  'data-[state=selected]:[--color-muted-foreground:color-mix(in_oklab,var(--color-foreground)_72%,var(--color-accent))]'
+);
+
+export type TableProps = React.HTMLAttributes<HTMLTableElement>;
 
 // Empty cva base keeps the pin classes ahead of TABLE_HEAD_BASE, so the merged string is unchanged.
 export const tableHeadVariants = cva('', {
@@ -18,12 +29,12 @@ export const tableHeadVariants = cva('', {
   },
 });
 
-export const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
+export const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, ...props }, ref) => (
     <div className="relative w-full overflow-auto" data-slot="table-container">
       <table
         ref={ref}
-        className={cn('w-full caption-bottom text-sm', className)}
+        className={cn('w-full caption-bottom text-ui', className)}
         data-slot="table"
         {...props}
       />
@@ -75,15 +86,7 @@ export const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
 >(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn(
-      'border-b border-border transition-colors duration-[140ms] hover:bg-accent/40 data-[state=selected]:bg-accent',
-      className
-    )}
-    data-slot="table-row"
-    {...props}
-  />
+  <tr ref={ref} className={cn(TABLE_ROW_BASE, className)} data-slot="table-row" {...props} />
 ));
 TableRow.displayName = 'TableRow';
 
@@ -110,12 +113,7 @@ export const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
-  <td
-    ref={ref}
-    className={cn('px-4 py-2.5 align-middle [&:has([role=checkbox])]:pr-0', className)}
-    data-slot="table-cell"
-    {...props}
-  />
+  <td ref={ref} className={cn(TABLE_CELL_BASE, className)} data-slot="table-cell" {...props} />
 ));
 TableCell.displayName = 'TableCell';
 
@@ -125,7 +123,7 @@ export const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn('mt-4 text-sm text-muted-foreground', className)}
+    className={cn('mt-3 text-xs text-muted-foreground', className)}
     data-slot="table-caption"
     {...props}
   />

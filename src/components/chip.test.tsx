@@ -18,7 +18,7 @@ describe('Chip', () => {
     expect(chip.getAttribute('tabindex')).toBe('0');
     expect(chip.dataset.slot).toBe('chip-body');
     const wrapper = chip.parentElement as HTMLElement;
-    expect(wrapper.className).toContain('has-[[data-slot=chip-body]:focus-visible]:ring-2');
+    expect(wrapper.className).toContain('has-[[data-slot=chip-body]:focus-visible]:outline-ring');
   });
 
   it('activates on Enter', async () => {
@@ -37,13 +37,9 @@ describe('Chip', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('activates from the keyboard when only interactive is set', async () => {
+  it('activates from the keyboard when it has onClick', async () => {
     const onClick = vi.fn();
-    render(
-      <Chip interactive onClick={onClick}>
-        Draft
-      </Chip>
-    );
+    render(<Chip onClick={onClick}>Draft</Chip>);
     screen.getByRole('button', { name: 'Draft' }).focus();
     await userEvent.keyboard('{Enter}');
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -76,7 +72,7 @@ describe('Chip', () => {
       </Chip>
     );
     const remove = screen.getByRole('button', { name: 'Remove tag' });
-    expect(remove.className).toContain('focus-visible:ring-2');
+    expect(remove.className).toContain('focus-ring');
   });
 
   it('removes without also activating the chip', async () => {

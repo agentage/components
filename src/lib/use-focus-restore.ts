@@ -14,7 +14,7 @@ export const useFocusRestore = (
 
   useEffect(() => {
     if (!active) return;
-    // Captured now: refs are already detached by the time this cleanup runs.
+    // Captured now: refs are already detached by the time this cleanup executes.
     const container = containerRef?.current ?? null;
     opener.current = document.activeElement as HTMLElement | null;
 

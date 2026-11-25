@@ -21,8 +21,8 @@
   </g>
 
   <!-- headline -->
-  <text x="80" y="176" font-size="62" font-weight="700" fill="#ffffff" letter-spacing="-1.2">Design System</text>
-  <text x="80" y="228" font-size="26" fill="#8b949e">OKLCH tokens + 60+ React components, ready to install.</text>
+  <text x="80" y="176" font-size="62" font-weight="700" fill="#ffffff" letter-spacing="-1.2">Components</text>
+  <text x="80" y="228" font-size="26" fill="#8b949e">OKLCH tokens + React components, ready to install.</text>
 
   <!-- feature chips -->
   <g font-size="17" fill="#c9d1d9">
@@ -48,7 +48,7 @@
   <g transform="translate(80, 336)">
     <rect x="0" y="0" width="480" height="46" rx="8" fill="#0a0e17" stroke="#2b3245"/>
     <text x="18" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" fill="#8b949e">$</text>
-    <text x="40" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" fill="#e6edf3">npm install @agentage/design-system</text>
+    <text x="40" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" fill="#e6edf3">npm install @agentage/components</text>
   </g>
 
   <!-- right: OKLCH gold ramp -->

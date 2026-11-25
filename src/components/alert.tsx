@@ -3,11 +3,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 export const alertVariants = cva(
-  'flex gap-3 rounded-lg border p-4 text-sm [&>svg]:shrink-0 [&>svg]:size-4 [&>svg]:mt-0.5',
+  'flex gap-2.5 rounded-lg border p-3 text-ui [&>svg]:mt-0.5 [&>svg]:size-4 [&>svg]:shrink-0',
   {
     variants: {
       variant: {
         default: 'border-border bg-card text-card-foreground',
+        /** "Waiting for you": amber rule and tint, foreground text, accent title. */
+        primary: 'border-primary/55 bg-primary/8 text-foreground',
         destructive: 'border-destructive/30 bg-destructive/10 text-destructive',
         success: 'border-success/30 bg-success/10 text-success',
         warning: 'border-warning/30 bg-warning/10 text-warning',
@@ -37,14 +39,32 @@ const CloseIcon = (): React.JSX.Element => (
 );
 
 export interface AlertProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   icon?: React.ReactNode;
+  /** Bold first line; accent-coloured in the primary variant. */
+  title?: React.ReactNode;
+  /** A row of buttons under the message, 8 px apart. */
+  actions?: React.ReactNode;
   onClose?: () => void;
   closeLabel?: string;
 }
 
+/** Announces at once (`role="alert"`); pass `role="status"` or `role="note"` for a callout that is there on load. */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant, icon, onClose, closeLabel = 'Dismiss', children, ...props }, ref) => (
+  (
+    {
+      className,
+      variant,
+      icon,
+      title,
+      actions,
+      onClose,
+      closeLabel = 'Dismiss',
+      children,
+      ...props
+    },
+    ref
+  ) => (
     <div
       ref={ref}
       role="alert"
@@ -53,14 +73,29 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       {...props}
     >
       {icon}
-      <div className="flex-1">{children}</div>
+      <div className="min-w-0 flex-1">
+        {title && (
+          <div
+            className={cn('mb-1 font-semibold', variant === 'primary' && 'text-primary-emphasis')}
+            data-slot="alert-title"
+          >
+            {title}
+          </div>
+        )}
+        {children}
+        {actions && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-2" data-slot="alert-actions">
+            {actions}
+          </div>
+        )}
+      </div>
       {onClose && (
         <button
           type="button"
           onClick={onClose}
           className={cn(
             'shrink-0 rounded-sm p-0.5 opacity-60 hover:opacity-100 transition-opacity cursor-pointer',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
+            'focus-ring'
           )}
           aria-label={closeLabel}
         >

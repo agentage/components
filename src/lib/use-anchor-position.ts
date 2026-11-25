@@ -10,6 +10,8 @@ export interface AnchorPositionOptions {
   align?: AnchorAlign;
   /** Gap between anchor and surface, in px. */
   offset?: number;
+  /** Minimum distance from the viewport edges, in px. */
+  margin?: number;
 }
 
 export interface AnchorPosition {
@@ -19,8 +21,8 @@ export interface AnchorPosition {
 
 const MARGIN = 8;
 
-const clamp = (value: number, size: number, viewport: number): number =>
-  Math.max(MARGIN, Math.min(value, viewport - size - MARGIN));
+const clamp = (value: number, size: number, viewport: number, margin = MARGIN): number =>
+  Math.max(margin, Math.min(value, viewport - size - margin));
 
 // useLayoutEffect warns on the server; anchored surfaces only ever render on the client.
 const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : useLayoutEffect;
@@ -34,7 +36,12 @@ export const useAnchorPosition = (
   anchorRef: RefObject<HTMLElement | null>,
   surfaceRef: RefObject<HTMLElement | null>,
   open: boolean,
-  { side = 'bottom', align = 'center', offset = MARGIN }: AnchorPositionOptions = {}
+  {
+    side = 'bottom',
+    align = 'center',
+    offset = MARGIN,
+    margin = MARGIN,
+  }: AnchorPositionOptions = {}
 ): AnchorPosition => {
   const [position, setPosition] = useState<AnchorPosition>({ top: 0, left: 0 });
 
@@ -50,8 +57,8 @@ export const useAnchorPosition = (
 
     if (side === 'top' || side === 'bottom') {
       top = side === 'top' ? anchor.top - surface.height - offset : anchor.bottom + offset;
-      if (side === 'top' && top < MARGIN) top = anchor.bottom + offset;
-      if (side === 'bottom' && top + surface.height > vh - MARGIN) {
+      if (side === 'top' && top < margin) top = anchor.bottom + offset;
+      if (side === 'bottom' && top + surface.height > vh - margin) {
         top = anchor.top - surface.height - offset;
       }
       left =
@@ -62,8 +69,8 @@ export const useAnchorPosition = (
             : anchor.left + anchor.width / 2 - surface.width / 2;
     } else {
       left = side === 'left' ? anchor.left - surface.width - offset : anchor.right + offset;
-      if (side === 'left' && left < MARGIN) left = anchor.right + offset;
-      if (side === 'right' && left + surface.width > vw - MARGIN) {
+      if (side === 'left' && left < margin) left = anchor.right + offset;
+      if (side === 'right' && left + surface.width > vw - margin) {
         left = anchor.left - surface.width - offset;
       }
       top =
@@ -75,11 +82,11 @@ export const useAnchorPosition = (
     }
 
     const next = {
-      top: clamp(top, surface.height, vh),
-      left: clamp(left, surface.width, vw),
+      top: clamp(top, surface.height, vh, margin),
+      left: clamp(left, surface.width, vw, margin),
     };
     setPosition((prev) => (prev.top === next.top && prev.left === next.left ? prev : next));
-  }, [anchorRef, surfaceRef, side, align, offset]);
+  }, [anchorRef, surfaceRef, side, align, offset, margin]);
 
   useIsomorphicLayoutEffect(() => {
     if (!open) return;
@@ -88,11 +95,15 @@ export const useAnchorPosition = (
     const handle = (): void => update();
     window.addEventListener('scroll', handle, true);
     window.addEventListener('resize', handle);
+    // A surface that grows after open (an expanded section) must flip or clamp again.
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(handle);
+    if (surfaceRef.current) ro?.observe(surfaceRef.current);
     return (): void => {
       window.removeEventListener('scroll', handle, true);
       window.removeEventListener('resize', handle);
+      ro?.disconnect();
     };
-  }, [open, update]);
+  }, [open, update, surfaceRef]);
 
   return position;
 };

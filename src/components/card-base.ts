@@ -1,34 +1,17 @@
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 
-/**
- * Three card surfaces exist today and all ship as-is:
- *
- * - `panel` (CARD_BASE) — bg-sidebar, rounded-lg, p-4. The dense metric/chart
- *   cards (gauge, donut, score, heatmap, funnel, ranked-list, multi-stat).
- * - `card` — bg-card, rounded-xl, py-6 + shadow. The `Card` composition in
- *   card.tsx, with padding supplied per slot.
- * - `flat` — bg-card, rounded-xl, p-5, no shadow, block layout. `Card
- *   variant="flat"`, for content that supplies its own internal spacing.
- *
- * Converging them is a deliberate visual change, still deferred. Until then
- * this CVA is the single place all three are declared.
- */
-export const cardSurface = cva('border border-border', {
-  variants: {
-    surface: {
-      panel: 'rounded-lg bg-sidebar p-4',
-      card: 'flex flex-col gap-6 rounded-xl bg-card py-6 text-card-foreground shadow-sm',
-      flat: 'block rounded-xl bg-card p-5 text-card-foreground',
-    },
-  },
-  defaultVariants: {
-    surface: 'panel',
-  },
+/** The one card surface: bg-card, 1 px border, radius 8, no shadow, 12/14 padding. */
+export const CARD_SURFACE =
+  'flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card px-3.5 py-3 text-card-foreground';
+
+/** `md` is the larger 16/20 padding for a card that leads a page. */
+export const cardSurface = cva(CARD_SURFACE, {
+  variants: { padding: { sm: '', md: 'gap-3 px-5 py-4' } },
+  defaultVariants: { padding: 'sm' },
 });
 
-export type CardSurfaceVariants = VariantProps<typeof cardSurface>;
+/** Hover border and focus ring for a clickable card; the ring follows a `[data-card-activator]`. */
+export const CARD_INTERACTIVE =
+  'cursor-pointer transition-colors duration-fast hover:border-muted-foreground focus-ring has-[[data-card-activator]:focus-visible]:outline-2 has-[[data-card-activator]:focus-visible]:outline-ring has-[[data-card-activator]:focus-visible]:-outline-offset-2';
 
-// Shared classes for the advanced full-card patterns (gauge/donut/score/etc.).
-export const CARD_BASE = 'rounded-lg border border-border bg-sidebar p-4';
-export const TITLE = 'text-xs text-muted-foreground';
-export const DESC = 'text-xs text-muted-foreground mt-3';
+export const CARD_SELECTED = 'border-primary hover:border-primary';

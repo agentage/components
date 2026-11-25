@@ -1,0 +1,527 @@
+{
+  "before": {
+    "forms/section": {
+      "section": {
+        "h": 138,
+        "fs": "16px"
+      },
+      "title": {
+        "h": 20,
+        "fs": "14px"
+      }
+    },
+    "navigation/sidebar": {
+      "nav row": {
+        "h": 36,
+        "fs": "14px"
+      },
+      "group label": {
+        "h": 20,
+        "fs": "12px"
+      }
+    },
+    "navigation/page-header": {
+      "header": {
+        "h": 52,
+        "fs": "16px"
+      },
+      "title": {
+        "h": 20,
+        "fs": "14px"
+      },
+      "action": {
+        "h": 28,
+        "fs": "12px"
+      }
+    },
+    "foundations/avatar": {
+      "avatar": {
+        "h": 24,
+        "fs": "10px"
+      },
+      "icon button": {
+        "h": 28,
+        "fs": "16px"
+      },
+      "icon container": {
+        "h": 32,
+        "fs": "16px"
+      }
+    },
+    "display/stat-card": {
+      "stat card": {
+        "h": 178,
+        "fs": "16px"
+      }
+    },
+    "lists/table": {
+      "row": {
+        "h": 43,
+        "fs": "14px"
+      },
+      "header": {
+        "h": 40,
+        "fs": "11px"
+      },
+      "two-line row": {
+        "h": 49,
+        "fs": "14px"
+      }
+    },
+    "lists/list": {
+      "two-line row": {
+        "h": 63,
+        "fs": "16px"
+      },
+      "one-line row": "missing"
+    },
+    "foundations/button": {
+      "button md": {
+        "h": 28,
+        "fs": "12px"
+      }
+    },
+    "foundations/badge": {
+      "badge": {
+        "h": 22,
+        "fs": "12px"
+      }
+    },
+    "navigation/pagination": {
+      "page button": {
+        "h": 32,
+        "fs": "14px"
+      }
+    },
+    "display/empty-state": {
+      "empty state": {
+        "h": 246,
+        "fs": "16px"
+      }
+    },
+    "foundations/status-glyph": {
+      "dot": {
+        "h": 14,
+        "fs": "14px"
+      }
+    },
+    "display/code-block": {
+      "code block": {
+        "h": 89.8,
+        "fs": "16px"
+      }
+    },
+    "display/progress": {
+      "bar": {
+        "h": 8,
+        "fs": "16px"
+      }
+    },
+    "forms/input": {
+      "input": {
+        "h": 36,
+        "fs": "14px"
+      },
+      "textarea": {
+        "h": 78,
+        "fs": "14px"
+      },
+      "select": {
+        "h": 36,
+        "fs": "14px"
+      }
+    },
+    "forms/form-field": {
+      "label": {
+        "h": 14,
+        "fs": "14px"
+      }
+    },
+    "forms/checkbox-and-switch": {
+      "checkbox": {
+        "h": 16,
+        "fs": "14px"
+      }
+    },
+    "forms/radio-group": {
+      "item": {
+        "h": 16,
+        "fs": "14px"
+      }
+    },
+    "forms/date-picker": {
+      "trigger": {
+        "h": 36,
+        "fs": "14px"
+      }
+    },
+    "forms/toggle-group": {
+      "option": {
+        "h": 34,
+        "fs": "12px"
+      }
+    },
+    "feedback/alert": {
+      "alert": {
+        "h": 54,
+        "fs": "14px"
+      }
+    },
+    "feedback/toast": {
+      "toast": {
+        "h": 72,
+        "fs": "16px"
+      }
+    },
+    "overlays/tooltip": {
+      "tooltip": {
+        "h": 28,
+        "fs": "12px"
+      }
+    },
+    "overlays/dialog": {
+      "modal": {
+        "h": 348,
+        "fs": "16px"
+      }
+    },
+    "overlays/sheet": {
+      "sheet header": {
+        "h": 32,
+        "fs": "16px"
+      }
+    },
+    "overlays/popover": {
+      "popover": {
+        "h": 78,
+        "fs": "16px"
+      }
+    },
+    "overlays/command": {
+      "input": {
+        "h": 44,
+        "fs": "14px"
+      },
+      "item": {
+        "h": 36,
+        "fs": "14px"
+      }
+    },
+    "overlays/resizable": {
+      "group": {
+        "h": 256,
+        "fs": "16px"
+      }
+    },
+    "navigation/breadcrumb": {
+      "link": {
+        "h": 20,
+        "fs": "14px"
+      },
+      "page": {
+        "h": 20,
+        "fs": "14px"
+      }
+    },
+    "foundations/prose": {
+      "prose": {
+        "h": 181.8,
+        "fs": "14px"
+      }
+    },
+    "foundations/kbd": {
+      "kbd": {
+        "h": 20,
+        "fs": "10px"
+      }
+    },
+    "display/collapsible": {
+      "trigger": {
+        "h": 36,
+        "fs": "14px"
+      }
+    },
+    "display/accordion": {
+      "trigger": {
+        "h": 52,
+        "fs": "14px"
+      }
+    },
+    "foundations/copy-button": {
+      "button": {
+        "h": 28,
+        "fs": "12px"
+      }
+    },
+    "foundations/skeleton-and-spinner": {
+      "spinner": {
+        "h": 21.9,
+        "fs": "16px"
+      }
+    }
+  },
+  "after": {
+    "forms/section": {
+      "section": {
+        "h": 179,
+        "fs": "16px"
+      },
+      "title": {
+        "h": 28,
+        "fs": "16px"
+      }
+    },
+    "navigation/sidebar": {
+      "nav row": {
+        "h": 28,
+        "fs": "14px"
+      },
+      "group label": {
+        "h": 28,
+        "fs": "12px"
+      }
+    },
+    "navigation/page-header": {
+      "header": {
+        "h": 48,
+        "fs": "16px"
+      },
+      "title": {
+        "h": 20,
+        "fs": "14px"
+      },
+      "action": {
+        "h": 28,
+        "fs": "13px"
+      }
+    },
+    "foundations/avatar": {
+      "avatar": {
+        "h": 22,
+        "fs": "11px"
+      },
+      "icon button": {
+        "h": 24,
+        "fs": "16px"
+      },
+      "icon container": {
+        "h": 24,
+        "fs": "16px"
+      }
+    },
+    "display/stat-card": {
+      "stat card": {
+        "h": 139,
+        "fs": "16px"
+      }
+    },
+    "lists/table": {
+      "row": {
+        "h": 36,
+        "fs": "13px"
+      },
+      "header": {
+        "h": 32,
+        "fs": "12px"
+      },
+      "two-line row": {
+        "h": 48.5,
+        "fs": "13px"
+      }
+    },
+    "lists/list": {
+      "two-line row": {
+        "h": 52,
+        "fs": "16px"
+      },
+      "one-line row": {
+        "h": 36,
+        "fs": "16px"
+      }
+    },
+    "foundations/button": {
+      "button md": {
+        "h": 28,
+        "fs": "13px"
+      }
+    },
+    "foundations/badge": {
+      "badge": {
+        "h": 20,
+        "fs": "12px"
+      }
+    },
+    "navigation/pagination": {
+      "page button": {
+        "h": 28,
+        "fs": "13px"
+      }
+    },
+    "display/empty-state": {
+      "empty state": {
+        "h": 217.5,
+        "fs": "16px"
+      }
+    },
+    "foundations/status-glyph": {
+      "dot": {
+        "h": 13,
+        "fs": "13px"
+      }
+    },
+    "display/code-block": {
+      "code block": {
+        "h": 74.3,
+        "fs": "16px"
+      }
+    },
+    "display/progress": {
+      "bar": {
+        "h": 8,
+        "fs": "16px"
+      }
+    },
+    "forms/input": {
+      "input": {
+        "h": 30,
+        "fs": "13px"
+      },
+      "textarea": {
+        "h": 72.5,
+        "fs": "13px"
+      },
+      "select": {
+        "h": 30,
+        "fs": "13px"
+      }
+    },
+    "forms/form-field": {
+      "label": {
+        "h": 13,
+        "fs": "13px"
+      }
+    },
+    "forms/checkbox-and-switch": {
+      "checkbox": {
+        "h": 16,
+        "fs": "14px"
+      }
+    },
+    "forms/radio-group": {
+      "item": {
+        "h": 16,
+        "fs": "13px"
+      }
+    },
+    "forms/date-picker": {
+      "trigger": {
+        "h": 30,
+        "fs": "13px"
+      }
+    },
+    "forms/toggle-group": {
+      "option": {
+        "h": 28,
+        "fs": "13px"
+      }
+    },
+    "feedback/alert": {
+      "alert": {
+        "h": 45.5,
+        "fs": "13px"
+      }
+    },
+    "feedback/toast": {
+      "toast": {
+        "h": 63.5,
+        "fs": "16px"
+      }
+    },
+    "overlays/tooltip": {
+      "tooltip": {
+        "h": 24,
+        "fs": "12px"
+      }
+    },
+    "overlays/dialog": {
+      "modal": {
+        "h": 316,
+        "fs": "16px"
+      }
+    },
+    "overlays/sheet": {
+      "sheet header": {
+        "h": 28,
+        "fs": "16px"
+      }
+    },
+    "overlays/popover": {
+      "popover": {
+        "h": 70,
+        "fs": "13px"
+      }
+    },
+    "overlays/command": {
+      "input": {
+        "h": 44,
+        "fs": "14px"
+      },
+      "item": {
+        "h": 32,
+        "fs": "13px"
+      }
+    },
+    "overlays/resizable": {
+      "group": {
+        "h": 256,
+        "fs": "16px"
+      }
+    },
+    "navigation/breadcrumb": {
+      "link": {
+        "h": 19.5,
+        "fs": "13px"
+      },
+      "page": {
+        "h": 19.5,
+        "fs": "13px"
+      }
+    },
+    "foundations/prose": {
+      "prose": {
+        "h": 181.9,
+        "fs": "14px"
+      }
+    },
+    "foundations/kbd": {
+      "kbd": {
+        "h": 20,
+        "fs": "10px"
+      }
+    },
+    "display/collapsible": {
+      "trigger": {
+        "h": 28,
+        "fs": "13px"
+      }
+    },
+    "display/accordion": {
+      "trigger": {
+        "h": 40,
+        "fs": "13px"
+      }
+    },
+    "foundations/copy-button": {
+      "button": {
+        "h": 28,
+        "fs": "13px"
+      }
+    },
+    "foundations/skeleton-and-spinner": {
+      "spinner": {
+        "h": 21.1,
+        "fs": "16px"
+      }
+    }
+  }
+}

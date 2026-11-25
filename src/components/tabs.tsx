@@ -3,7 +3,8 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
 import type { TabsVariant } from './tabs.variants';
-import { tabsContentVariants, tabsListVariants, tabsTriggerVariants } from './tabs.variants';
+import { TabsContext, tabsId } from './tabs.context';
+import { tabsContentVariants, tabsListVariants } from './tabs.variants';
 
 export type { TabsVariant };
 
@@ -15,38 +16,22 @@ export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-interface TabsContextValue {
-  value: string;
-  onValueChange: (value: string) => void;
-  instanceId: string;
-  variant: TabsVariant;
-  /** True when the current value matches one of the registered triggers. */
-  hasActive: boolean;
-  firstValue: string | null;
-  registerTrigger: (value: string) => () => void;
-}
-
-const TabsContext = React.createContext<TabsContextValue>({
-  value: '',
-  onValueChange: () => {},
-  instanceId: '',
-  variant: 'default',
-  hasActive: true,
-  firstValue: null,
-  registerTrigger: () => () => {},
-});
-
 export const Tabs = ({
   defaultValue = '',
   value: controlledValue,
   onValueChange,
-  variant = 'default',
+  variant = 'pill',
   className,
   children,
   ...props
 }: TabsProps): React.JSX.Element => {
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [triggers, setTriggers] = React.useState<string[]>([]);
+  const [panels, setPanels] = React.useState<string[]>([]);
+  const registerPanel = React.useCallback((v: string) => {
+    setPanels((prev) => (prev.includes(v) ? prev : [...prev, v]));
+    return () => setPanels((prev) => prev.filter((x) => x !== v));
+  }, []);
   const instanceId = React.useId();
   const value = controlledValue ?? internalValue;
 
@@ -73,6 +58,8 @@ export const Tabs = ({
         hasActive: triggers.includes(value),
         firstValue: triggers[0] ?? null,
         registerTrigger,
+        panels,
+        registerPanel,
       }}
     >
       <div className={cn('flex flex-col', className)} data-slot="tabs" {...props}>
@@ -105,77 +92,8 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 );
 TabsList.displayName = 'TabsList';
 
-export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  value: string;
-  children: React.ReactNode;
-}
-
-const NAV_KEYS: Record<string, (index: number, count: number) => number> = {
-  ArrowRight: (i, n) => (i + 1) % n,
-  ArrowLeft: (i, n) => (i - 1 + n) % n,
-  Home: () => 0,
-  End: (_i, n) => n - 1,
-};
-
-export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
-  (
-    { value: triggerValue, className, children, disabled = false, onKeyDown, onClick, ...props },
-    ref
-  ) => {
-    const { value, onValueChange, instanceId, variant, hasActive, firstValue, registerTrigger } =
-      React.useContext(TabsContext);
-    const isActive = value === triggerValue;
-
-    React.useEffect(() => {
-      if (disabled) return;
-      return registerTrigger(triggerValue);
-    }, [disabled, registerTrigger, triggerValue]);
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
-      onKeyDown?.(e);
-      const move = NAV_KEYS[e.key];
-      const tablist = e.currentTarget.closest('[role="tablist"]');
-      if (e.defaultPrevented || !move || !tablist) return;
-
-      const tabs = Array.from(
-        tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)')
-      );
-      const next = tabs[move(tabs.indexOf(e.currentTarget), tabs.length)];
-      if (!next) return;
-
-      e.preventDefault();
-      next.focus();
-      const nextValue = next.getAttribute('data-value');
-      if (nextValue) {
-        onValueChange(nextValue);
-      }
-    };
-
-    return (
-      <button
-        ref={ref}
-        role="tab"
-        aria-selected={isActive}
-        aria-controls={`${instanceId}-panel-${triggerValue}`}
-        id={`${instanceId}-trigger-${triggerValue}`}
-        data-value={triggerValue}
-        tabIndex={isActive || (!hasActive && firstValue === triggerValue) ? 0 : -1}
-        disabled={disabled}
-        onClick={(e) => {
-          onClick?.(e);
-          onValueChange(triggerValue);
-        }}
-        onKeyDown={handleKeyDown}
-        data-slot="tabs-trigger"
-        className={cn(tabsTriggerVariants({ variant, active: isActive }), className)}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
-);
-TabsTrigger.displayName = 'TabsTrigger';
+export { TabsTrigger } from './tabs.trigger';
+export type { TabsTriggerProps } from './tabs.trigger';
 
 export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string;
@@ -184,7 +102,8 @@ export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
   ({ value: contentValue, className, children, ...props }, ref) => {
-    const { value, instanceId } = React.useContext(TabsContext);
+    const { value, instanceId, registerPanel } = React.useContext(TabsContext);
+    React.useEffect(() => registerPanel(contentValue), [registerPanel, contentValue]);
 
     if (value !== contentValue) {
       return null;
@@ -194,8 +113,8 @@ export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
       <div
         ref={ref}
         role="tabpanel"
-        id={`${instanceId}-panel-${contentValue}`}
-        aria-labelledby={`${instanceId}-trigger-${contentValue}`}
+        id={tabsId(instanceId, 'panel', contentValue)}
+        aria-labelledby={tabsId(instanceId, 'trigger', contentValue)}
         tabIndex={0}
         data-slot="tabs-content"
         className={cn(tabsContentVariants(), className)}

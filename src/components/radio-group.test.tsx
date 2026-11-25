@@ -130,17 +130,18 @@ describe('RadioGroup class strings', () => {
     expect(screen.getByRole('radiogroup').className).toBe('grid gap-2 mt-4');
   });
 
-  it('keeps the selected indicator class string byte-identical', () => {
+  it('renders the selected indicator with a focus ring and the primary fill', () => {
     tree();
-    expect(screen.getAllByRole('radio')[0].className).toBe(
-      'flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 border-primary bg-primary'
-    );
+    const cls = screen.getAllByRole('radio')[0].className;
+    for (const c of ['size-4', 'rounded-full', 'focus-ring', 'border-primary', 'bg-primary']) {
+      expect(cls).toContain(c);
+    }
   });
 
   it('keeps the disabled item label class string byte-identical', () => {
     tree();
     expect((screen.getAllByRole('radio')[1].parentElement as HTMLElement).className).toBe(
-      'flex items-center gap-2 text-sm opacity-50 cursor-not-allowed pl-2'
+      'flex items-center gap-2 text-ui opacity-50 cursor-not-allowed pl-2'
     );
   });
 

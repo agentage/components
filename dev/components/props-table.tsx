@@ -10,7 +10,10 @@ import {
 } from '../../src';
 import { COMPONENT_PROPS, EXPORT_SUBPATH } from '../generated/props';
 
-const REPO = 'https://github.com/agentage/design-system/tree/master/src/components';
+const REPO = 'https://github.com/agentage/components/tree/master/src/components';
+
+// One line box for every cell, so names, types and descriptions share a baseline.
+const CELL = 'h-auto py-2 align-top text-xs leading-5';
 
 /**
  * Generated prop table for one export. Components whose whole surface is
@@ -52,21 +55,19 @@ export const PropsTable = ({ name }: { name: string }) => {
         <TableBody>
           {props.map((prop) => (
             <TableRow key={prop.name}>
-              <TableCell className="whitespace-nowrap align-top font-mono text-xs">
-                {prop.name}
-                {prop.required && (
-                  <Badge variant="warning" className="ml-2 align-middle">
-                    required
-                  </Badge>
-                )}
+              <TableCell className={`${CELL} whitespace-nowrap font-mono text-foreground`}>
+                <span className="flex h-5 items-center gap-2">
+                  {prop.name}
+                  {prop.required && <Badge variant="warning">required</Badge>}
+                </span>
               </TableCell>
-              <TableCell className="align-top font-mono text-xs text-muted-foreground">
+              <TableCell className={`${CELL} font-mono text-muted-foreground`}>
                 {prop.type}
               </TableCell>
-              <TableCell className="align-top font-mono text-xs text-muted-foreground">
+              <TableCell className={`${CELL} font-mono text-muted-foreground`}>
                 {prop.defaultValue ?? '-'}
               </TableCell>
-              <TableCell className="align-top text-xs text-muted-foreground">
+              <TableCell className={`${CELL} text-muted-foreground`}>
                 {prop.description || '-'}
               </TableCell>
             </TableRow>

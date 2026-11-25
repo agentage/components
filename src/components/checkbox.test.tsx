@@ -47,19 +47,23 @@ describe('Checkbox', () => {
   });
 });
 
-describe('Checkbox class strings', () => {
-  it('keeps the unchecked class string byte-identical', () => {
+describe('Checkbox classes', () => {
+  it('renders the unchecked box with a focus ring and a muted border', () => {
     render(<Checkbox aria-label="Toggle" />);
-    expect(screen.getByRole('checkbox').className).toBe(
-      'flex size-4 shrink-0 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background border-muted-foreground/50 bg-background hover:border-muted-foreground'
-    );
+    const cls = screen.getByRole('checkbox').className;
+    expect(cls).toContain('size-4');
+    expect(cls).toContain('focus-ring');
+    expect(cls).toContain('border-muted-foreground/50');
+    expect(cls).not.toContain('bg-primary');
   });
 
-  it('keeps the checked + disabled + className string byte-identical', () => {
+  it('renders the checked, disabled box and merges className last', () => {
     render(<Checkbox aria-label="Toggle" checked disabled className="mt-4" />);
-    expect(screen.getByRole('checkbox').className).toBe(
-      'flex size-4 shrink-0 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background border-primary bg-primary text-primary-foreground cursor-not-allowed opacity-50 mt-4'
-    );
+    const cls = screen.getByRole('checkbox').className;
+    expect(cls).toContain('bg-primary');
+    expect(cls).toContain('opacity-50');
+    expect(cls).toContain('cursor-not-allowed');
+    expect(cls.endsWith('mt-4')).toBe(true);
   });
 
   it('marks the control invalid and swaps the resting border on error', () => {
@@ -74,13 +78,22 @@ describe('Checkbox class strings', () => {
     render(<Checkbox aria-label="Toggle" error={false} />);
     const box = screen.getByRole('checkbox');
     expect(box.getAttribute('aria-invalid')).toBeNull();
-    expect(box.className).toBe(
-      'flex size-4 shrink-0 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background border-muted-foreground/50 bg-background hover:border-muted-foreground'
-    );
+    expect(box.className).toContain('border-muted-foreground/50');
+    expect(box.className).not.toContain('border-destructive');
   });
 
   it('spreads unknown props onto the button', () => {
     render(<Checkbox aria-label="Toggle" data-testid="cb" />);
     expect(screen.getByTestId('cb')).toBe(screen.getByRole('checkbox'));
+  });
+});
+
+describe('Checkbox size', () => {
+  it('sm is a 13 px box with a 3 px radius', () => {
+    render(<Checkbox aria-label="Toggle" size="sm" checked />);
+    const cls = screen.getByRole('checkbox').className;
+    expect(cls).toContain('size-[13px]');
+    expect(cls).toContain('rounded-[3px]');
+    expect(cls).not.toMatch(/(^| )size-4( |$)/);
   });
 });

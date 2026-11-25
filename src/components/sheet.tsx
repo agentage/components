@@ -1,137 +1,116 @@
 'use client';
 
-import { useEffect, useId, useRef, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { useFocusTrap } from '../lib/use-focus-trap';
-import { useMounted } from '../lib/use-mounted';
-import { useScrollLock } from '../lib/use-scroll-lock';
+import * as React from 'react';
 import { cn } from '../lib/utils';
+import { OverlayLayerProvider } from '../lib/overlay-layer';
+import {
+  DialogBackdrop,
+  DialogClose,
+  DialogPortal,
+  DialogTitleBar,
+  useDialogShell,
+} from './dialog-shell';
+import { DockedSheet } from './sheet.docked';
 
-export const sheetVariants = cva(
-  'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-lg outline-none',
-  {
-    variants: {
-      side: {
-        left: 'left-0 border-r',
-        right: 'right-0 border-l',
-      },
-    },
-    defaultVariants: {
-      side: 'right',
-    },
-  }
-);
-
-export interface SheetProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof sheetVariants> {
+export interface SheetProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title?: string;
-  description?: string;
-  /** Extra content for the title bar, rendered between the title block and the close button. */
-  header?: ReactNode;
-  children: ReactNode;
+  title?: React.ReactNode;
+  /** Overlay only: the line under the title. */
+  description?: React.ReactNode;
+  /** Extra header buttons, before Close. */
+  actions?: React.ReactNode;
+  /** Overlay only: the edge it docks to. Default `right`. */
+  side?: 'left' | 'right';
+  /**
+   * `overlay` (default) is a modal panel over a backdrop. `docked` is an in-page right panel,
+   * resizable between 360 and 420 px, and a full-screen dialog below 760 px.
+   */
+  mode?: 'overlay' | 'docked';
+  /** Docked only: the start width in px. Default 380. */
+  defaultWidth?: number;
+  /**
+   * Docked only: persist the width in localStorage under this key. Under SSR, also list the key
+   * in `ResizableSplitPrepaint` so the server HTML already has the stored width.
+   */
+  storageKey?: string;
 }
 
-const CloseIcon = (): React.JSX.Element => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="18" y1="6" x2="6" y2="18" />
-    <line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
+/** A side panel: a modal overlay, or with `mode="docked"` an in-page inspector panel. */
+export const Sheet = React.forwardRef<HTMLElement, SheetProps>(({ mode, ...props }, ref) =>
+  mode === 'docked' ? <DockedSheet ref={ref} {...props} /> : <OverlaySheet ref={ref} {...props} />
 );
+Sheet.displayName = 'Sheet';
 
-export const Sheet = ({
-  open,
-  onOpenChange,
-  side,
-  title,
-  description,
-  header,
-  children,
-  className,
-  ...props
-}: SheetProps): React.JSX.Element | null => {
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const mounted = useMounted();
-  const instanceId = useId();
-  const titleId = `${instanceId}-title`;
-  const descId = `${instanceId}-desc`;
+const SIDES = { left: 'left-0 border-r', right: 'right-0 border-l' } as const;
 
-  useScrollLock(open);
-  useFocusTrap(sheetRef, open && mounted);
+const OverlaySheet = React.forwardRef<HTMLElement, SheetProps>(
+  (
+    {
+      open,
+      onOpenChange,
+      side = 'right',
+      title,
+      description,
+      actions,
+      defaultWidth: _defaultWidth,
+      storageKey: _storageKey,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const sheetRef = React.useRef<HTMLDivElement>(null);
+    React.useImperativeHandle(ref, () => sheetRef.current as HTMLElement);
+    const instanceId = React.useId();
+    const titleId = `${instanceId}-title`;
+    const descId = `${instanceId}-desc`;
+    const close = React.useCallback(() => onOpenChange(false), [onOpenChange]);
+    const { mounted, layer } = useDialogShell(sheetRef, open, close);
 
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onOpenChange(false);
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [open, onOpenChange]);
+    if (!open || !mounted) return null;
 
-  if (!open || !mounted) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[var(--z-overlay,50)]" data-slot="sheet">
-      <div
-        aria-hidden="true"
-        className="fixed inset-0 bg-overlay backdrop-blur-sm"
-        onClick={() => onOpenChange(false)}
-      />
-      <div
-        ref={sheetRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title != null ? titleId : undefined}
-        aria-describedby={description != null ? descId : undefined}
-        tabIndex={-1}
-        className={cn(sheetVariants({ side }), className)}
-        data-slot="sheet-content"
-        {...props}
-      >
-        {(title != null || header != null) && (
-          <div className="flex items-start justify-between gap-3 border-b border-border p-4">
-            <div className="min-w-0 flex-1">
-              {title != null && (
-                <h2 id={titleId} className="text-lg font-semibold text-foreground">
-                  {title}
-                </h2>
+    return (
+      <DialogPortal>
+        <OverlayLayerProvider layer={layer}>
+          <div className="fixed inset-0 z-[var(--z-overlay,50)]" data-slot="sheet">
+            <DialogBackdrop layer={layer} onClick={close} />
+            <div
+              ref={sheetRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={title != null ? titleId : undefined}
+              aria-describedby={description != null ? descId : undefined}
+              tabIndex={-1}
+              className={cn(
+                'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-[var(--shadow-popover)] outline-none',
+                SIDES[side],
+                className
               )}
-              {description && (
-                <p id={descId} className="mt-1 text-sm text-muted-foreground">
-                  {description}
-                </p>
-              )}
-            </div>
-            {header != null && (
-              <div className="flex min-w-0 items-center gap-2" data-slot="sheet-header">
-                {header}
-              </div>
-            )}
-            <button
-              onClick={() => onOpenChange(false)}
-              className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-              aria-label="Close"
+              data-slot="sheet-content"
+              {...props}
             >
-              <CloseIcon />
-            </button>
+              {title != null || actions != null ? (
+                <DialogTitleBar
+                  titleId={titleId}
+                  title={title}
+                  descriptionId={descId}
+                  description={description}
+                  extra={actions != null && <div data-slot="sheet-actions">{actions}</div>}
+                  close={<DialogClose onClick={close} />}
+                />
+              ) : (
+                <div className="flex justify-end px-3 pt-3">
+                  <DialogClose onClick={close} />
+                </div>
+              )}
+              <div className="flex-1 overflow-y-auto p-4">{children}</div>
+            </div>
           </div>
-        )}
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
-      </div>
-    </div>,
-    document.body
-  );
-};
+        </OverlayLayerProvider>
+      </DialogPortal>
+    );
+  }
+);
+OverlaySheet.displayName = 'OverlaySheet';

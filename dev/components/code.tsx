@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { CodeBlock } from '../../src';
 import { highlight } from '../lib/highlight';
 
-export interface CodeProps {
+interface CodeProps {
   code: string;
   language?: string;
   className?: string;

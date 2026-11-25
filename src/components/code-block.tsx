@@ -7,10 +7,10 @@ import { cn } from '../lib/utils';
 
 export const codeBlockCopyVariants = cva(
   [
-    'absolute right-2 top-2 rounded-md p-1.5 transition-colors',
+    'absolute right-2 top-2 grid size-6 place-items-center rounded-lg transition-colors duration-fast [&_svg]:size-3.5',
     'text-muted-foreground hover:bg-accent hover:text-foreground',
     'opacity-0 group-hover:opacity-100 focus:opacity-100',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'focus-ring',
   ],
   {
     variants: {
@@ -83,11 +83,11 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
         {...props}
       >
         {language && (
-          <div className="flex items-center justify-between border-b border-border px-4 py-2">
+          <div className="flex h-8 items-center justify-between border-b border-border px-3">
             <span className="text-xs text-muted-foreground font-mono">{language}</span>
           </div>
         )}
-        <pre className="overflow-x-auto p-4 text-sm leading-relaxed">
+        <pre className="overflow-x-auto px-3 py-2.5 text-xs leading-relaxed">
           {children ?? <code className="font-mono text-foreground">{code}</code>}
         </pre>
         {showCopy && (
@@ -112,10 +112,7 @@ export const InlineCode = React.forwardRef<HTMLElement, InlineCodeProps>(
   ({ className, ...props }, ref) => (
     <code
       ref={ref}
-      className={cn(
-        'rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground',
-        className
-      )}
+      className={cn('rounded-sm bg-muted px-1 py-px font-mono text-xs text-foreground', className)}
       data-slot="inline-code"
       {...props}
     />

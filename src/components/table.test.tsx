@@ -46,21 +46,23 @@ describe('Table', () => {
     const head = screen.getByRole('columnheader', { name: 'Name' });
     expect(head.className).not.toContain('sticky');
     expect(head.className).not.toContain('top-0');
-    expect(head.className).toContain('bg-card');
+    expect(head.className).toContain('bg-background');
   });
 });
 
 describe('tableHeadVariants', () => {
-  const BASE =
-    'h-10 bg-card px-4 text-left align-middle text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground [&:has([role=checkbox])]:pr-0';
+  const DENSE = ['h-8', 'px-3', 'text-xs', 'font-normal', 'text-muted-foreground'];
 
-  it('renders the exact class string with and without the pin', () => {
+  it('renders the dense head, pinned unless sticky is off', () => {
     const { unmount } = setup();
-    expect(screen.getByRole('columnheader').className).toBe(`sticky top-0 z-10 ${BASE}`);
+    const pinned = screen.getByRole('columnheader').className;
+    for (const c of ['sticky', 'top-0', 'z-10', ...DENSE]) expect(pinned).toContain(c);
     unmount();
 
     setup({ sticky: false });
-    expect(screen.getByRole('columnheader').className).toBe(BASE);
+    const loose = screen.getByRole('columnheader').className;
+    for (const c of DENSE) expect(loose).toContain(c);
+    expect(loose).not.toContain('sticky');
   });
 
   it('merges className last', () => {
@@ -73,6 +75,8 @@ describe('tableHeadVariants', () => {
         </tbody>
       </table>
     );
-    expect(screen.getByRole('columnheader').className).toBe(`sticky top-0 z-10 ${BASE} w-10`);
+    const cls = screen.getByRole('columnheader').className;
+    expect(cls).toContain('sticky');
+    expect(cls.endsWith('w-10')).toBe(true);
   });
 });

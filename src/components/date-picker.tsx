@@ -2,29 +2,48 @@
 
 import * as React from 'react';
 import { cva } from 'class-variance-authority';
+import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
+import { fieldVariants } from './control.variants';
+import { DateRangePicker, type DateRangePickerProps } from './date-picker.range';
+
+export type { DateRange, RangePreset } from '../lib/relative-range';
+export { parseRelativeRange, resolveDateRange } from '../lib/relative-range';
 
 export const datePickerTriggerVariants = cva(
   [
-    'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors',
-    'hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
+    fieldVariants({ size: null }),
+    'flex items-center gap-2 cursor-pointer hover:border-ring [&_svg]:size-4',
   ],
   {
     variants: {
+      /** md 30 px (default), sm 26 px. */
+      size: { sm: fieldVariants({ size: 'sm' }), md: fieldVariants({ size: 'md' }) },
       disabled: { true: 'opacity-50 cursor-not-allowed', false: '' },
       placeholder: { true: 'text-muted-foreground', false: '' },
       error: { true: 'border-destructive', false: '' },
     },
-    defaultVariants: { disabled: false, placeholder: false, error: false },
+    defaultVariants: { size: 'md', disabled: false, placeholder: false, error: false },
   }
 );
 
-export interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DatePickerProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'defaultValue'
+> {
+  mode?: 'single';
   value?: Date;
   onValueChange?: (date: Date) => void;
   placeholder?: string;
   disabled?: boolean;
   error?: boolean;
+  /** Trigger height: md 30 px (default), sm 26 px. */
+  size?: 'sm' | 'md';
+}
+
+export interface DatePickerRangeProps extends DateRangePickerProps {
+  /** A from and to range with presets and relative input; the trigger is a 28 px toolbar control. */
+  mode: 'range';
 }
 
 const CalendarIcon = (): React.JSX.Element => (
@@ -46,16 +65,22 @@ const CalendarIcon = (): React.JSX.Element => (
   </svg>
 );
 
-const toInputValue = (date: Date): string => date.toISOString().split('T')[0];
+// Local parts: toISOString is UTC and gives the previous day east of Greenwich.
+const toInputValue = (date: Date): string =>
+  `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
+const DAY_TEXT: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+
+const SingleDatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   (
     {
+      mode: _mode,
       value,
       onValueChange,
       placeholder = 'Pick a date',
       disabled = false,
       error = false,
+      size = 'md',
       className,
       ...props
     },
@@ -63,7 +88,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [open, setOpen] = React.useState(false);
-    const [internalValue, setInternalValue] = React.useState<string>(
+    const [internalValue, setInternalValue] = React.useState<string>(() =>
       value ? toInputValue(value) : ''
     );
     // Derived, so a controlled `value` always wins over the last locally picked date.
@@ -78,9 +103,15 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       }
     };
 
-    const displayValue = value
-      ? value.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-      : '';
+    const mounted = useMounted();
+    const shown = value ?? (internalValue ? new Date(internalValue + 'T00:00:00') : undefined);
+    // The locale text waits for mount: server and browser locales and zones differ.
+    const displayValue = !shown
+      ? ''
+      : mounted
+        ? shown.toLocaleDateString(undefined, DAY_TEXT)
+        : // Same width class as the final text, identical on server and client (fixed locale, UTC).
+          shown.toLocaleDateString('en-US', { ...DAY_TEXT, timeZone: 'UTC' });
 
     // showPicker throws outside a user gesture and is missing in Firefox/older Safari.
     const handleClick = (): void => {
@@ -106,10 +137,14 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-invalid={error || undefined}
-          className={cn(datePickerTriggerVariants({ disabled, placeholder: !displayValue, error }))}
+          className={cn(
+            datePickerTriggerVariants({ size, disabled, placeholder: !displayValue, error })
+          )}
         >
           <CalendarIcon />
-          <span className="flex-1 truncate text-left">{displayValue || placeholder}</span>
+          <span className={cn('flex-1 truncate text-left', shown && !mounted && 'invisible')}>
+            {displayValue || placeholder}
+          </span>
         </button>
         <input
           ref={inputRef}
@@ -127,5 +162,18 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       </div>
     );
   }
+);
+SingleDatePicker.displayName = 'SingleDatePicker';
+
+/** A day picker; `mode="range"` picks a from and to range with presets and relative input. */
+export const DatePicker = React.forwardRef<
+  HTMLButtonElement,
+  DatePickerProps | DatePickerRangeProps
+>((props, ref) =>
+  props.mode === 'range' ? (
+    <DateRangePicker ref={ref} {...props} />
+  ) : (
+    <SingleDatePicker ref={ref} {...props} />
+  )
 );
 DatePicker.displayName = 'DatePicker';

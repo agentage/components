@@ -8,7 +8,7 @@ export interface CommandContextValue {
   activeId: string | null;
   setActiveId: (id: string | null) => void;
   matchCount: number;
-  /** True once the root has collected its items — keeps the empty state from flashing. */
+  /** True once the root has collected its items - keeps the empty state from flashing. */
   ready: boolean;
   isMatch: (id: string) => boolean;
   register: (id: string, text: string) => () => void;

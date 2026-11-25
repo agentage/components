@@ -9,47 +9,47 @@ import {
   CommandSeparator,
   Kbd,
 } from '../../src';
-import { BotIcon, EditIcon, HomeIcon, PlayIcon, ServerIcon, UserIcon } from '../lib/icons';
+import { Block } from '../components/demo';
+import { UiIcon } from '../lib/ui-icons';
 
-export const Demo = () => {
-  const [cmdOpen, setCmdOpen] = useState(false);
-
+export const Example = () => {
+  const [open, setOpen] = useState(false);
+  const close = (): void => setOpen(false);
   return (
-    <>
-      <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={() => setCmdOpen(true)}>
-          Open Command <Kbd>⌘K</Kbd>
-        </Button>
-        <span className="text-sm text-muted-foreground">
-          Type to filter, <Kbd>↑</Kbd> <Kbd>↓</Kbd> to move, <Kbd>Enter</Kbd> to run.
-        </span>
-      </div>
-      <Command open={cmdOpen} onOpenChange={setCmdOpen}>
-        <CommandGroup heading="Navigation">
-          <CommandItem icon={<HomeIcon />} shortcut="⌘1" onClick={() => setCmdOpen(false)}>
+    <Block
+      caption={
+        <>
+          A palette over grouped items. Type to filter, <Kbd>↑</Kbd> <Kbd>↓</Kbd> to move,{' '}
+          <Kbd>Enter</Kbd> to choose.
+        </>
+      }
+    >
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open palette <Kbd>⌘K</Kbd>
+      </Button>
+      <Command open={open} onOpenChange={setOpen}>
+        <CommandGroup heading="Go to">
+          <CommandItem icon={<UiIcon name="monitor" />} shortcut="⌘1" onClick={close}>
             Dashboard
           </CommandItem>
-          <CommandItem icon={<BotIcon />} shortcut="⌘2" onClick={() => setCmdOpen(false)}>
-            Agents
+          <CommandItem icon={<UiIcon name="folder" />} shortcut="⌘2" onClick={close}>
+            Folders
           </CommandItem>
-          <CommandItem icon={<ServerIcon />} shortcut="⌘3" onClick={() => setCmdOpen(false)}>
-            Machines
-          </CommandItem>
-          <CommandItem icon={<PlayIcon />} shortcut="⌘4" onClick={() => setCmdOpen(false)}>
-            Runs
+          <CommandItem icon={<UiIcon name="cloud" />} shortcut="⌘3" onClick={close}>
+            Services
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Actions">
-          <CommandItem icon={<EditIcon />} onClick={() => setCmdOpen(false)}>
-            Create new run
+          <CommandItem icon={<UiIcon name="plus" />} onClick={close}>
+            New item
           </CommandItem>
-          <CommandItem icon={<UserIcon />} onClick={() => setCmdOpen(false)}>
+          <CommandItem icon={<UiIcon name="shield" />} onClick={close}>
             Settings
           </CommandItem>
         </CommandGroup>
         <CommandEmpty>No results found.</CommandEmpty>
       </Command>
-    </>
+    </Block>
   );
 };

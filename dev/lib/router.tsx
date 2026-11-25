@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { redirectedPath } from './redirects';
 
 /**
  * ~40-line History-API router. nginx and `vite preview` both fall back to
@@ -10,8 +11,14 @@ const RouteContext = createContext<{ path: string; navigate: (to: string) => voi
   navigate: () => undefined,
 });
 
-const currentPath = (): string =>
-  typeof window === 'undefined' ? '/' : window.location.pathname || '/';
+/** The address-bar path; an old route is replaced in place by the page that holds it now. */
+const currentPath = (): string => {
+  if (typeof window === 'undefined') return '/';
+  const path = window.location.pathname || '/';
+  const moved = redirectedPath(path);
+  if (moved !== path) window.history.replaceState(null, '', moved);
+  return moved;
+};
 
 export const RouterProvider = ({ children }: { children: ReactNode }) => {
   const [path, setPath] = useState(currentPath);
@@ -26,14 +33,15 @@ export const RouterProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const navigate = useCallback((to: string) => {
+  const navigate = useCallback((target: string) => {
+    const to = redirectedPath(target);
     if (to === currentPath()) return;
     window.history.pushState(null, '', to);
     setPath(to);
     window.scrollTo(0, 0);
   }, []);
 
-  // Design-system link components take a plain href, so intercept them here
+  // Library link components take a plain href, so intercept them here
   // rather than teaching every one of them about the router.
   useEffect(() => {
     const onClick = (e: MouseEvent): void => {

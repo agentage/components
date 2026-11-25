@@ -18,7 +18,7 @@ describe('Alert', () => {
   it('labels the dismiss button and gives it a focus ring', () => {
     render(<Alert onClose={vi.fn()}>Disk almost full</Alert>);
     const close = screen.getByRole('button', { name: 'Dismiss' });
-    expect(close.className).toContain('focus-visible:ring-2');
+    expect(close.className).toContain('focus-ring');
   });
 
   it('accepts a custom dismiss label', () => {
@@ -43,5 +43,24 @@ describe('Alert', () => {
     const ref = createRef<HTMLDivElement>();
     render(<Alert ref={ref}>Disk almost full</Alert>);
     expect(ref.current?.getAttribute('data-slot')).toBe('alert');
+  });
+});
+
+describe('Alert primary variant', () => {
+  it('renders the title and an actions row, compact by default', () => {
+    render(
+      <Alert
+        variant="primary"
+        title="Needs attention"
+        actions={<button type="button">Approve</button>}
+      >
+        Post the release notes?
+      </Alert>
+    );
+    const alert = screen.getByRole('alert');
+    expect(alert.className).toContain('border-primary/55');
+    expect(alert.className).toContain('p-3');
+    expect(screen.getByText('Needs attention').className).toContain('text-primary-emphasis');
+    expect(screen.getByRole('button', { name: 'Approve' })).toBeTruthy();
   });
 });

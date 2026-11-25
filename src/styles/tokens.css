@@ -1,5 +1,5 @@
 /* ============================================================================
- * Agentage Design System — Semantic Tokens
+ * Agentage Components - Semantic Tokens
  *
  * Tier 2: Purpose-based tokens that reference primitives.
  * Dark theme is the default. Light overrides below.
@@ -28,7 +28,7 @@
   --color-primary-emphasis: oklch(0.78 0.155 72);
   /* Hover fill of a primary surface (button): one step lighter on dark. */
   --color-primary-hover: oklch(0.83 0.15 72);
-  /* Soft amber wash — the reserved background for active/selected/pinned state. */
+  /* Soft amber wash - the reserved background for active/selected/pinned state. */
   --color-primary-soft: oklch(0.78 0.155 72 / 0.12);
 
   --color-secondary: oklch(0.17 0.018 277);
@@ -38,7 +38,7 @@
   --color-accent-foreground: oklch(0.97 0.003 277);
 
   --color-muted: oklch(0.17 0.018 277);
-  /* L 0.59 is the floor that clears 4.5:1 on the lightest surface it rests on (card/popover/muted, L 0.17) — 4.67:1. */
+  /* L 0.59 is the floor that clears 4.5:1 on the lightest surface it rests on (card/popover/muted, L 0.17) - 4.67:1. */
   --color-muted-foreground: oklch(0.59 0.014 256);
 
   --color-destructive: oklch(0.628 0.208 25.6);
@@ -52,14 +52,15 @@
   --color-warning: oklch(0.705 0.191 47.7);
   --color-warning-foreground: oklch(0.085 0.013 277);
 
-  --color-info: oklch(0.623 0.19 259.1);
-  --color-info-foreground: oklch(0.97 0.003 277);
+  /* 5.4:1 on the accent surface (selected and hovered rows), so tone text stays AA there. */
+  --color-info: oklch(0.7 0.16 259.1);
+  --color-info-foreground: oklch(0.085 0.013 277);
 
   /* Brighter than --color-muted-foreground (0.59) so the offline pill
    * passes WCAG-AA on bg-sidebar at text-xs. */
   --color-status-offline: oklch(0.7 0.014 256);
 
-  /* ---- Tag Colors (resource-class accents — agents/runs/schedules cards) ---- */
+  /* ---- Tag Colors (resource-class accents for card tags; the token names are public) ---- */
 
   --color-tag-agents: oklch(0.623 0.19 259.1);
   --color-tag-runs: oklch(0.705 0.191 47.7);
@@ -80,10 +81,11 @@
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Sub-xs steps for dense metric captions and chart axis labels. */
+  /* 11 px: the smallest step in the scale (section labels, axis labels, Kbd). 3xs stays for old markup. */
   --text-3xs: 0.5625rem;
-  --text-2xs: 0.625rem;
+  --text-2xs: 0.6875rem;
   --text-xs: 0.75rem;
+  --text-ui: 0.8125rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
@@ -108,16 +110,42 @@
   --shadow-sm: 0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+  /* Floating surfaces (menus, popovers, toasts): stays visible on the dark surfaces. */
+  --shadow-popover: 0 8px 24px -4px oklch(0 0 0 / 0.55), 0 2px 6px -2px oklch(0 0 0 / 0.45);
 
   /* ---- Animation ---- */
 
-  --duration-fast: 100ms;
-  --duration-normal: 200ms;
+  /* The two durations every component uses: hover/press feedback and open/collapse. */
+  --duration-fast: 140ms;
+  --duration-normal: 180ms;
   --duration-slow: 300ms;
+  --default-transition-duration: var(--duration-fast);
 
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Soft breathing glow for "live" status marks; never an on/off blink. */
+  --animate-breathe: breathe 2.4s ease-in-out infinite alternate;
+
+  @keyframes breathe {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.55;
+    }
+  }
+
+  /* Menu entrance: a short fade and a 4 px drop; transform only, so the page never shifts. */
+  --animate-menu-in: menu-in var(--duration-fast) ease-out;
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
 
   /* ---- Radius ---- */
 
@@ -165,7 +193,7 @@ html[data-theme='light'] {
   --color-primary: oklch(0.735 0.152 68);
   /* Near-black ink on the amber fill: white was 2.42:1, this is 7.77:1. */
   --color-primary-foreground: oklch(0.18 0.032 277);
-  /* Lightest amber that still clears 4.5:1 as text on bg-primary/10 over the sidebar — 4.61:1. */
+  /* Lightest amber that still clears 4.5:1 as text on bg-primary/10 over the sidebar - 4.61:1. */
   --color-primary-emphasis: oklch(0.505 0.11 68);
   /* Hover fill of a primary surface: one step darker on light; ink stays 6.5:1+. */
   --color-primary-hover: oklch(0.69 0.15 68);
@@ -178,7 +206,7 @@ html[data-theme='light'] {
   --color-accent-foreground: oklch(0.18 0.032 277);
 
   --color-muted: oklch(0.955 0.005 277);
-  /* L 0.53 is the ceiling that clears 4.5:1 on the darkest surface it rests on (sidebar/muted/secondary, L 0.955) — 4.64:1. */
+  /* L 0.53 is the ceiling that clears 4.5:1 on the darkest surface it rests on (sidebar/muted/secondary, L 0.955) - 4.64:1. */
   --color-muted-foreground: oklch(0.53 0.014 256);
 
   /* Status colors carry text on their own /10 tint (badge, chip, alert, toast), so each is
@@ -212,6 +240,7 @@ html[data-theme='light'] {
   --shadow-sm: 0 1px 3px 0 oklch(0 0 0 / 0.06), 0 1px 2px -1px oklch(0 0 0 / 0.06);
   --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.06), 0 2px 4px -2px oklch(0 0 0 / 0.06);
   --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.06), 0 4px 6px -4px oklch(0 0 0 / 0.06);
+  --shadow-popover: 0 8px 24px -6px oklch(0 0 0 / 0.16), 0 2px 6px -2px oklch(0 0 0 / 0.08);
 }
 
 /* System preference fallback */
@@ -233,7 +262,7 @@ html[data-theme='light'] {
     --color-sidebar-border: oklch(0.924 0.005 277);
 
     --color-primary: oklch(0.735 0.152 68);
-    /* Mirrors the html[data-theme='light'] values — see the notes there. */
+    /* Mirrors the html[data-theme='light'] values - see the notes there. */
     --color-primary-foreground: oklch(0.18 0.032 277);
     --color-primary-emphasis: oklch(0.505 0.11 68);
     --color-primary-hover: oklch(0.69 0.15 68);
@@ -245,10 +274,10 @@ html[data-theme='light'] {
     --color-accent-foreground: oklch(0.18 0.032 277);
 
     --color-muted: oklch(0.955 0.005 277);
-    /* Mirrors the html[data-theme='light'] value — see the note there. */
+    /* Mirrors the html[data-theme='light'] value - see the note there. */
     --color-muted-foreground: oklch(0.53 0.014 256);
 
-    /* Mirrors the html[data-theme='light'] values — see the notes there. */
+    /* Mirrors the html[data-theme='light'] values - see the notes there. */
     --color-destructive: oklch(0.515 0.208 25.6);
     --color-destructive-foreground: oklch(1 0 0);
     --color-destructive-solid: oklch(0.588 0.208 25.6);
@@ -278,5 +307,38 @@ html[data-theme='light'] {
     --shadow-sm: 0 1px 3px 0 oklch(0 0 0 / 0.06), 0 1px 2px -1px oklch(0 0 0 / 0.06);
     --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.06), 0 2px 4px -2px oklch(0 0 0 / 0.06);
     --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.06), 0 4px 6px -4px oklch(0 0 0 / 0.06);
+    --shadow-popover: 0 8px 24px -6px oklch(0 0 0 / 0.16), 0 2px 6px -2px oklch(0 0 0 / 0.08);
+  }
+}
+
+/* ============================================================================
+ * Shared utilities
+ * ========================================================================== */
+
+/* The one focus ring: an inset amber edge with a background hairline inside it,
+ * so it shows on filled amber controls and is never clipped by a scroller. */
+@utility focus-ring {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 3px var(--color-background);
+  }
+}
+
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-normal {
+  transition-duration: var(--duration-normal);
+}
+
+/* Same ring on a visual box whose focusable element is the `group` parent. */
+@utility group-focus-ring {
+  :where(.group):focus-visible & {
+    outline: 2px solid var(--color-ring);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 3px var(--color-background);
   }
 }

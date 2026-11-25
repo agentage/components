@@ -1,7 +1,7 @@
 {
-  "name": "@agentage/design-system",
-  "version": "0.20.2",
-  "description": "Agentage Design System - OKLCH design tokens and 60+ accessible React 19 components. RSC-safe (per-module \"use client\"), Tailwind CSS v4, tree-shakeable ESM with per-component subpath exports.",
+  "name": "@agentage/components",
+  "version": "0.21.0",
+  "description": "Agentage Components - OKLCH design tokens and accessible React 19 components. RSC-safe (per-module \"use client\"), Tailwind CSS v4, tree-shakeable ESM with per-component subpath exports.",
   "keywords": [
     "design-system",
     "react",
@@ -22,13 +22,13 @@
   ],
   "license": "MIT",
   "author": "Volodymyr Vreshch <vreshch@gmail.com>",
-  "homepage": "https://ds.agentage.io",
+  "homepage": "https://github.com/agentage/components#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/agentage/design-system.git"
+    "url": "git+https://github.com/agentage/components.git"
   },
   "bugs": {
-    "url": "https://github.com/agentage/design-system/issues"
+    "url": "https://github.com/agentage/components/issues"
   },
   "type": "module",
   "exports": {
@@ -44,21 +44,13 @@
       "types": "./dist/components/accordion.d.ts",
       "import": "./dist/components/accordion.js"
     },
-    "./accordion.context": {
-      "types": "./dist/components/accordion.context.d.ts",
-      "import": "./dist/components/accordion.context.js"
+    "./action-bar": {
+      "types": "./dist/components/action-bar.d.ts",
+      "import": "./dist/components/action-bar.js"
     },
     "./alert": {
       "types": "./dist/components/alert.d.ts",
       "import": "./dist/components/alert.js"
-    },
-    "./alert-dialog": {
-      "types": "./dist/components/alert-dialog.d.ts",
-      "import": "./dist/components/alert-dialog.js"
-    },
-    "./aria": {
-      "types": "./dist/lib/aria.d.ts",
-      "import": "./dist/lib/aria.js"
     },
     "./avatar": {
       "types": "./dist/components/avatar.d.ts",
@@ -76,21 +68,13 @@
       "types": "./dist/components/button.d.ts",
       "import": "./dist/components/button.js"
     },
-    "./button.variants": {
-      "types": "./dist/components/button.variants.d.ts",
-      "import": "./dist/components/button.variants.js"
-    },
     "./card": {
       "types": "./dist/components/card.d.ts",
       "import": "./dist/components/card.js"
     },
-    "./card-base": {
-      "types": "./dist/components/card-base.d.ts",
-      "import": "./dist/components/card-base.js"
-    },
-    "./card-patterns": {
-      "types": "./dist/components/card-patterns.d.ts",
-      "import": "./dist/components/card-patterns.js"
+    "./check-list": {
+      "types": "./dist/components/check-list.d.ts",
+      "import": "./dist/components/check-list.js"
     },
     "./checkbox": {
       "types": "./dist/components/checkbox.d.ts",
@@ -108,77 +92,61 @@
       "types": "./dist/components/collapsible.d.ts",
       "import": "./dist/components/collapsible.js"
     },
-    "./combobox": {
-      "types": "./dist/components/combobox.d.ts",
-      "import": "./dist/components/combobox.js"
-    },
-    "./combobox.variants": {
-      "types": "./dist/components/combobox.variants.d.ts",
-      "import": "./dist/components/combobox.variants.js"
-    },
     "./command": {
       "types": "./dist/components/command.d.ts",
       "import": "./dist/components/command.js"
     },
-    "./command.context": {
-      "types": "./dist/components/command.context.d.ts",
-      "import": "./dist/components/command.context.js"
+    "./content-block": {
+      "types": "./dist/components/content-block.d.ts",
+      "import": "./dist/components/content-block.js"
     },
-    "./command.parts": {
-      "types": "./dist/components/command.parts.d.ts",
-      "import": "./dist/components/command.parts.js"
-    },
-    "./command.variants": {
-      "types": "./dist/components/command.variants.d.ts",
-      "import": "./dist/components/command.variants.js"
-    },
-    "./confirm-by-typing": {
-      "types": "./dist/components/confirm-by-typing.d.ts",
-      "import": "./dist/components/confirm-by-typing.js"
-    },
-    "./context-menu": {
-      "types": "./dist/components/context-menu.d.ts",
-      "import": "./dist/components/context-menu.js"
+    "./content-blocks": {
+      "types": "./dist/components/content-blocks.d.ts",
+      "import": "./dist/components/content-blocks.js"
     },
     "./copy-button": {
       "types": "./dist/components/copy-button.d.ts",
       "import": "./dist/components/copy-button.js"
     },
-    "./danger-zone": {
-      "types": "./dist/components/danger-zone.d.ts",
-      "import": "./dist/components/danger-zone.js"
+    "./cron": {
+      "types": "./dist/lib/cron.d.ts",
+      "import": "./dist/lib/cron.js"
     },
-    "./data-table": {
-      "types": "./dist/components/data-table.d.ts",
-      "import": "./dist/components/data-table.js"
+    "./data-tree": {
+      "types": "./dist/components/data-tree.d.ts",
+      "import": "./dist/components/data-tree.js"
     },
-    "./data-table.parts": {
-      "types": "./dist/components/data-table.parts.d.ts",
-      "import": "./dist/components/data-table.parts.js"
-    },
-    "./data-table.variants": {
-      "types": "./dist/components/data-table.variants.d.ts",
-      "import": "./dist/components/data-table.variants.js"
+    "./data-view": {
+      "types": "./dist/components/data-view.d.ts",
+      "import": "./dist/components/data-view.js"
     },
     "./date-picker": {
       "types": "./dist/components/date-picker.d.ts",
       "import": "./dist/components/date-picker.js"
     },
-    "./doc-sidebar": {
-      "types": "./dist/components/doc-sidebar.d.ts",
-      "import": "./dist/components/doc-sidebar.js"
+    "./description-list": {
+      "types": "./dist/components/description-list.d.ts",
+      "import": "./dist/components/description-list.js"
     },
-    "./donut-card": {
-      "types": "./dist/components/donut-card.d.ts",
-      "import": "./dist/components/donut-card.js"
+    "./description-list.property": {
+      "types": "./dist/components/description-list.property.d.ts",
+      "import": "./dist/components/description-list.property.js"
+    },
+    "./dialog": {
+      "types": "./dist/components/dialog.d.ts",
+      "import": "./dist/components/dialog.js"
+    },
+    "./dirty-bar": {
+      "types": "./dist/components/dirty-bar.d.ts",
+      "import": "./dist/components/dirty-bar.js"
+    },
+    "./disclosure": {
+      "types": "./dist/components/disclosure.d.ts",
+      "import": "./dist/components/disclosure.js"
     },
     "./dropdown-menu": {
       "types": "./dist/components/dropdown-menu.d.ts",
       "import": "./dist/components/dropdown-menu.js"
-    },
-    "./dropdown-menu.variants": {
-      "types": "./dist/components/dropdown-menu.variants.d.ts",
-      "import": "./dist/components/dropdown-menu.variants.js"
     },
     "./empty-state": {
       "types": "./dist/components/empty-state.d.ts",
@@ -188,53 +156,21 @@
       "types": "./dist/components/entity-list.d.ts",
       "import": "./dist/components/entity-list.js"
     },
-    "./filter-bar": {
-      "types": "./dist/components/filter-bar.d.ts",
-      "import": "./dist/components/filter-bar.js"
-    },
-    "./filter-bar.parts": {
-      "types": "./dist/components/filter-bar.parts.d.ts",
-      "import": "./dist/components/filter-bar.parts.js"
-    },
-    "./filter-bar.variants": {
-      "types": "./dist/components/filter-bar.variants.d.ts",
-      "import": "./dist/components/filter-bar.variants.js"
-    },
-    "./footer": {
-      "types": "./dist/components/footer.d.ts",
-      "import": "./dist/components/footer.js"
-    },
     "./form-field": {
       "types": "./dist/components/form-field.d.ts",
       "import": "./dist/components/form-field.js"
     },
-    "./funnel-card": {
-      "types": "./dist/components/funnel-card.d.ts",
-      "import": "./dist/components/funnel-card.js"
-    },
-    "./gauge-card": {
-      "types": "./dist/components/gauge-card.d.ts",
-      "import": "./dist/components/gauge-card.js"
-    },
-    "./heading": {
-      "types": "./dist/components/heading.d.ts",
-      "import": "./dist/components/heading.js"
-    },
-    "./heatmap-card": {
-      "types": "./dist/components/heatmap-card.d.ts",
-      "import": "./dist/components/heatmap-card.js"
-    },
-    "./hover-card": {
-      "types": "./dist/components/hover-card.d.ts",
-      "import": "./dist/components/hover-card.js"
+    "./group-header": {
+      "types": "./dist/components/group-header.d.ts",
+      "import": "./dist/components/group-header.js"
     },
     "./icon-button": {
       "types": "./dist/components/icon-button.d.ts",
       "import": "./dist/components/icon-button.js"
     },
-    "./icon-container": {
-      "types": "./dist/components/icon-container.d.ts",
-      "import": "./dist/components/icon-container.js"
+    "./inline-edit": {
+      "types": "./dist/components/inline-edit.d.ts",
+      "import": "./dist/components/inline-edit.js"
     },
     "./input": {
       "types": "./dist/components/input.d.ts",
@@ -248,73 +184,69 @@
       "types": "./dist/components/label.d.ts",
       "import": "./dist/components/label.js"
     },
-    "./list-navigation": {
-      "types": "./dist/lib/list-navigation.d.ts",
-      "import": "./dist/lib/list-navigation.js"
+    "./list-controls": {
+      "types": "./dist/lib/list-controls.d.ts",
+      "import": "./dist/lib/list-controls.js"
     },
-    "./markdown": {
-      "types": "./dist/components/markdown.d.ts",
-      "import": "./dist/components/markdown.js"
+    "./list-toolbar": {
+      "types": "./dist/components/list-toolbar.d.ts",
+      "import": "./dist/components/list-toolbar.js"
     },
-    "./menu.parts": {
-      "types": "./dist/components/menu.parts.d.ts",
-      "import": "./dist/components/menu.parts.js"
+    "./log-view": {
+      "types": "./dist/components/log-view.d.ts",
+      "import": "./dist/components/log-view.js"
     },
-    "./menu.variants": {
-      "types": "./dist/components/menu.variants.d.ts",
-      "import": "./dist/components/menu.variants.js"
-    },
-    "./modal": {
-      "types": "./dist/components/modal.d.ts",
-      "import": "./dist/components/modal.js"
-    },
-    "./multi-stat-card": {
-      "types": "./dist/components/multi-stat-card.d.ts",
-      "import": "./dist/components/multi-stat-card.js"
-    },
-    "./nav-link": {
-      "types": "./dist/components/nav-link.d.ts",
-      "import": "./dist/components/nav-link.js"
+    "./nav-tree": {
+      "types": "./dist/components/nav-tree.d.ts",
+      "import": "./dist/components/nav-tree.js"
     },
     "./page-header": {
       "types": "./dist/components/page-header.d.ts",
       "import": "./dist/components/page-header.js"
     },
-    "./page-layout": {
-      "types": "./dist/components/page-layout.d.ts",
-      "import": "./dist/components/page-layout.js"
-    },
     "./pagination": {
       "types": "./dist/components/pagination.d.ts",
       "import": "./dist/components/pagination.js"
-    },
-    "./panel-sizes": {
-      "types": "./dist/lib/panel-sizes.d.ts",
-      "import": "./dist/lib/panel-sizes.js"
     },
     "./popover": {
       "types": "./dist/components/popover.d.ts",
       "import": "./dist/components/popover.js"
     },
+    "./priority-glyph": {
+      "types": "./dist/components/priority-glyph.d.ts",
+      "import": "./dist/components/priority-glyph.js"
+    },
     "./progress": {
       "types": "./dist/components/progress.d.ts",
       "import": "./dist/components/progress.js"
+    },
+    "./property-date": {
+      "types": "./dist/components/property-date.d.ts",
+      "import": "./dist/components/property-date.js"
+    },
+    "./property-date.format": {
+      "types": "./dist/components/property-date.format.d.ts",
+      "import": "./dist/components/property-date.format.js"
+    },
+    "./property-select": {
+      "types": "./dist/components/property-select.d.ts",
+      "import": "./dist/components/property-select.js"
     },
     "./prose": {
       "types": "./dist/components/prose.d.ts",
       "import": "./dist/components/prose.js"
     },
-    "./quota-banner": {
-      "types": "./dist/components/quota-banner.d.ts",
-      "import": "./dist/components/quota-banner.js"
-    },
     "./radio-group": {
       "types": "./dist/components/radio-group.d.ts",
       "import": "./dist/components/radio-group.js"
     },
-    "./ranked-list-card": {
-      "types": "./dist/components/ranked-list-card.d.ts",
-      "import": "./dist/components/ranked-list-card.js"
+    "./relative-time": {
+      "types": "./dist/components/relative-time.d.ts",
+      "import": "./dist/components/relative-time.js"
+    },
+    "./relative-time-format": {
+      "types": "./dist/lib/relative-time-format.d.ts",
+      "import": "./dist/lib/relative-time-format.js"
     },
     "./resizable": {
       "types": "./dist/components/resizable.d.ts",
@@ -328,37 +260,21 @@
       "types": "./dist/components/resizable-split-prepaint.d.ts",
       "import": "./dist/components/resizable-split-prepaint.js"
     },
-    "./resizable-split.context": {
-      "types": "./dist/components/resizable-split.context.d.ts",
-      "import": "./dist/components/resizable-split.context.js"
-    },
-    "./resizable.parts": {
-      "types": "./dist/components/resizable.parts.d.ts",
-      "import": "./dist/components/resizable.parts.js"
-    },
-    "./resizable.variants": {
-      "types": "./dist/components/resizable.variants.d.ts",
-      "import": "./dist/components/resizable.variants.js"
-    },
-    "./score-card": {
-      "types": "./dist/components/score-card.d.ts",
-      "import": "./dist/components/score-card.js"
-    },
-    "./scroll-area": {
-      "types": "./dist/components/scroll-area.d.ts",
-      "import": "./dist/components/scroll-area.js"
+    "./secret-input": {
+      "types": "./dist/components/secret-input.d.ts",
+      "import": "./dist/components/secret-input.js"
     },
     "./section": {
       "types": "./dist/components/section.d.ts",
       "import": "./dist/components/section.js"
     },
+    "./section-index": {
+      "types": "./dist/components/section-index.d.ts",
+      "import": "./dist/components/section-index.js"
+    },
     "./select": {
       "types": "./dist/components/select.d.ts",
       "import": "./dist/components/select.js"
-    },
-    "./separator": {
-      "types": "./dist/components/separator.d.ts",
-      "import": "./dist/components/separator.js"
     },
     "./sheet": {
       "types": "./dist/components/sheet.d.ts",
@@ -372,33 +288,29 @@
       "types": "./dist/components/skeleton.d.ts",
       "import": "./dist/components/skeleton.js"
     },
-    "./slider": {
-      "types": "./dist/components/slider.d.ts",
-      "import": "./dist/components/slider.js"
+    "./sparkline": {
+      "types": "./dist/components/sparkline.d.ts",
+      "import": "./dist/components/sparkline.js"
     },
     "./spinner": {
       "types": "./dist/components/spinner.d.ts",
       "import": "./dist/components/spinner.js"
     },
-    "./split-px": {
-      "types": "./dist/lib/split-px.d.ts",
-      "import": "./dist/lib/split-px.js"
-    },
     "./stat-card": {
       "types": "./dist/components/stat-card.d.ts",
       "import": "./dist/components/stat-card.js"
     },
-    "./stat-card-charts": {
-      "types": "./dist/components/stat-card-charts.d.ts",
-      "import": "./dist/components/stat-card-charts.js"
+    "./status-bar": {
+      "types": "./dist/components/status-bar.d.ts",
+      "import": "./dist/components/status-bar.js"
     },
-    "./stat-card-extensions": {
-      "types": "./dist/components/stat-card-extensions.d.ts",
-      "import": "./dist/components/stat-card-extensions.js"
+    "./status-glyph": {
+      "types": "./dist/components/status-glyph.d.ts",
+      "import": "./dist/components/status-glyph.js"
     },
-    "./status-dot": {
-      "types": "./dist/components/status-dot.d.ts",
-      "import": "./dist/components/status-dot.js"
+    "./step-list": {
+      "types": "./dist/components/step-list.d.ts",
+      "import": "./dist/components/step-list.js"
     },
     "./switch": {
       "types": "./dist/components/switch.d.ts",
@@ -408,17 +320,9 @@
       "types": "./dist/components/table.d.ts",
       "import": "./dist/components/table.js"
     },
-    "./table-sort": {
-      "types": "./dist/lib/table-sort.d.ts",
-      "import": "./dist/lib/table-sort.js"
-    },
     "./tabs": {
       "types": "./dist/components/tabs.d.ts",
       "import": "./dist/components/tabs.js"
-    },
-    "./tabs.variants": {
-      "types": "./dist/components/tabs.variants.d.ts",
-      "import": "./dist/components/tabs.variants.js"
     },
     "./toast": {
       "types": "./dist/components/toast.d.ts",
@@ -432,41 +336,29 @@
       "types": "./dist/components/tooltip.d.ts",
       "import": "./dist/components/tooltip.js"
     },
-    "./top-bar": {
-      "types": "./dist/components/top-bar.d.ts",
-      "import": "./dist/components/top-bar.js"
+    "./tree-select": {
+      "types": "./dist/components/tree-select.d.ts",
+      "import": "./dist/components/tree-select.js"
     },
-    "./usage-level": {
-      "types": "./dist/lib/usage-level.d.ts",
-      "import": "./dist/lib/usage-level.js"
+    "./truncate": {
+      "types": "./dist/components/truncate.d.ts",
+      "import": "./dist/components/truncate.js"
     },
-    "./usage-meter": {
-      "types": "./dist/components/usage-meter.d.ts",
-      "import": "./dist/components/usage-meter.js"
+    "./use-announce": {
+      "types": "./dist/lib/use-announce.d.ts",
+      "import": "./dist/lib/use-announce.js"
     },
-    "./use-anchor-position": {
-      "types": "./dist/lib/use-anchor-position.d.ts",
-      "import": "./dist/lib/use-anchor-position.js"
+    "./use-drag-reorder": {
+      "types": "./dist/lib/use-drag-reorder.d.ts",
+      "import": "./dist/lib/use-drag-reorder.js"
     },
-    "./use-focus-restore": {
-      "types": "./dist/lib/use-focus-restore.d.ts",
-      "import": "./dist/lib/use-focus-restore.js"
+    "./use-list-controls": {
+      "types": "./dist/lib/use-list-controls.d.ts",
+      "import": "./dist/lib/use-list-controls.js"
     },
-    "./use-focus-trap": {
-      "types": "./dist/lib/use-focus-trap.d.ts",
-      "import": "./dist/lib/use-focus-trap.js"
-    },
-    "./use-mounted": {
-      "types": "./dist/lib/use-mounted.d.ts",
-      "import": "./dist/lib/use-mounted.js"
-    },
-    "./use-scroll-lock": {
-      "types": "./dist/lib/use-scroll-lock.d.ts",
-      "import": "./dist/lib/use-scroll-lock.js"
-    },
-    "./use-split-state": {
-      "types": "./dist/components/use-split-state.d.ts",
-      "import": "./dist/components/use-split-state.js"
+    "./use-scroll-spy": {
+      "types": "./dist/lib/use-scroll-spy.d.ts",
+      "import": "./dist/lib/use-scroll-spy.js"
     },
     "./utils": {
       "types": "./dist/lib/utils.d.ts",
@@ -509,13 +401,9 @@
     "type-check:dev": "tsc --noEmit -p tsconfig.dev.json"
   },
   "dependencies": {
-    "@radix-ui/react-select": "^2.4.1",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "react-markdown": "^10.1.0",
-    "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.7.0"
   },
   "peerDependencies": {
@@ -553,6 +441,9 @@
     "prettier": "^3.10.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vite": "^8.3.7",

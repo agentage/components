@@ -4,13 +4,14 @@ import { expect, test, type Page } from '@playwright/test';
 /** Category slugs, mirroring dev/registry.tsx. Component pages are discovered at runtime. */
 const CATEGORIES = [
   'foundations',
-  'data-display',
-  'cards',
   'forms',
-  'feedback',
-  'layout',
   'navigation',
-  'site-docs',
+  'lists',
+  'display',
+  'overlays',
+  'feedback',
+  'patterns',
+  'review',
 ] as const;
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
@@ -21,7 +22,7 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
  */
 const EXCLUDED_RULES: { id: string; reason: string }[] = [];
 
-/** Both themes are gated — light was invisible to CI and carried its own contrast debt. */
+/** Both themes are gated - light was invisible to CI and carried its own contrast debt. */
 const THEMES = ['dark', 'light'] as const;
 
 const setTheme = async (page: Page, theme: string): Promise<void> => {
@@ -29,7 +30,7 @@ const setTheme = async (page: Page, theme: string): Promise<void> => {
   await page.locator('header').getByRole('radio', { name: 'Light', exact: true }).click();
 };
 
-/** Direct load — proves every route deep-links, not just that the SPA can reach it. */
+/** Direct load - proves every route deep-links, not just that the SPA can reach it. */
 const open = async (page: Page, path: string, theme: string = 'dark'): Promise<void> => {
   await page.goto(path);
   await setTheme(page, theme);
@@ -88,8 +89,8 @@ test.describe('toast contrast', () => {
   for (const theme of THEMES) {
     test(`${theme} / every toast variant passes WCAG AA with a description`, async ({ page }) => {
       await open(page, '/components/feedback/toast', theme);
-      const buttons = section(page, 'Toast').getByRole('button');
-      for (const name of ['Default', 'Success', 'Error', 'Warning', 'Info']) {
+      const buttons = section(page, 'Variants').getByRole('button');
+      for (const name of ['Default', 'Success', 'Destructive', 'Warning', 'Info']) {
         await buttons.filter({ hasText: new RegExp(`^${name}$`) }).click();
       }
       await expect(page.locator('[data-slot="toast"]')).toHaveCount(5);
@@ -109,31 +110,33 @@ const group = (page: Page, label: string) =>
 
 test.describe('docs navigation', () => {
   test('only the current route group is expanded on a deep link', async ({ page }) => {
-    await open(page, '/components/forms/slider');
+    await open(page, '/components/forms/tree-select');
     await expect(group(page, 'Forms')).toHaveAttribute('aria-expanded', 'true');
-    for (const other of ['Foundations', 'Cards', 'Layout', 'Site & Docs']) {
+    for (const other of ['Foundations', 'Display', 'Overlays', 'Feedback']) {
       await expect(group(page, other)).toHaveAttribute('aria-expanded', 'false');
     }
-    await expect(rail(page).getByRole('link', { name: 'Slider', exact: true })).toBeInViewport();
+    await expect(
+      rail(page).getByRole('link', { name: 'TreeSelect', exact: true })
+    ).toBeInViewport();
   });
 
   test('a group toggles from the keyboard and persists for the session', async ({ page }) => {
     await open(page, '/install');
-    await group(page, 'Cards').focus();
+    await group(page, 'Display').focus();
     await page.keyboard.press('Enter');
-    await expect(group(page, 'Cards')).toHaveAttribute('aria-expanded', 'true');
-    await expect(rail(page).getByRole('link', { name: 'GaugeCard', exact: true })).toBeVisible();
+    await expect(group(page, 'Display')).toHaveAttribute('aria-expanded', 'true');
+    await expect(rail(page).getByRole('link', { name: 'Sparkline', exact: true })).toBeVisible();
 
     await page.reload();
-    await expect(group(page, 'Cards')).toHaveAttribute('aria-expanded', 'true');
+    await expect(group(page, 'Display')).toHaveAttribute('aria-expanded', 'true');
 
-    await group(page, 'Cards').click();
-    await expect(group(page, 'Cards')).toHaveAttribute('aria-expanded', 'false');
-    await expect(rail(page).getByRole('link', { name: 'GaugeCard', exact: true })).toBeHidden();
+    await group(page, 'Display').click();
+    await expect(group(page, 'Display')).toHaveAttribute('aria-expanded', 'false');
+    await expect(rail(page).getByRole('link', { name: 'Sparkline', exact: true })).toBeHidden();
   });
 
   test('the rail is the only scroller in the aside', async ({ page }) => {
-    await open(page, '/components/forms/slider');
+    await open(page, '/components/forms/select');
     const nested = await rail(page).evaluate(
       (el) =>
         [...el.querySelectorAll('*')].filter(
@@ -154,21 +157,42 @@ test.describe('routing', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Button');
     await expect(
       section(page, 'Import').locator('.hljs-string', {
-        hasText: '@agentage/design-system/button',
+        hasText: '@agentage/components/button',
       })
     ).toBeVisible();
   });
 
   test('back and forward restore the previous route', async ({ page }) => {
     await open(page, '/components/forms');
-    await page.getByRole('link', { name: 'Slider', exact: true }).first().click();
-    await expect(page).toHaveURL('/components/forms/slider');
+    await page.getByRole('link', { name: 'Select', exact: true }).first().click();
+    await expect(page).toHaveURL('/components/forms/select');
 
     await page.goBack();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Forms');
 
     await page.goForward();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Slider');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Select');
+  });
+
+  test('old and merged routes land on the page that holds them now', async ({ page }) => {
+    const moved: [string, string, string][] = [
+      ['/components/feedback/modal', '/components/overlays/dialog', 'Dialog'],
+      ['/components/cards/gauge-card', '/components/display/stat-card', 'StatCard'],
+      ['/components/data-display/entity-card', '/components/display/card', 'Card'],
+      ['/components/patterns/secrets', '/components/patterns/settings-form', 'Settings form'],
+    ];
+    for (const [from, to, title] of moved) {
+      await page.goto(from);
+      await expect(page).toHaveURL(new RegExp(`${to}$`));
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
+    }
+  });
+
+  test('a pattern page links to the components it is built from', async ({ page }) => {
+    await open(page, '/components/patterns/card-grid');
+    const built = section(page, 'Built from');
+    await built.getByRole('link', { name: 'PageHeader' }).click();
+    await expect(page).toHaveURL(/\/components\/navigation\/page-header$/);
   });
 
   test('an unknown route renders the empty state', async ({ page }) => {
@@ -179,10 +203,10 @@ test.describe('routing', () => {
   test('the command palette jumps to a component', async ({ page }) => {
     await open(page, '/');
     await page.getByRole('button', { name: 'Search' }).click();
-    await page.getByRole('combobox').fill('conversion funnel');
-    await page.getByRole('option', { name: 'FunnelCard' }).click();
-    await expect(page).toHaveURL('/components/cards/funnel-card');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('FunnelCard');
+    await page.getByRole('combobox').fill('trend line');
+    await page.getByRole('option', { name: 'Sparkline' }).click();
+    await expect(page).toHaveURL('/components/display/sparkline');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sparkline');
   });
 });
 
@@ -208,12 +232,12 @@ test.describe('syntax highlighting', () => {
 
 test.describe('props tables', () => {
   test('render generated rows', async ({ page }) => {
-    await open(page, '/components/data-display/stat-card');
+    await open(page, '/components/display/stat-card');
     const props = section(page, 'Props');
     await expect(props.getByRole('cell', { name: /^title/ })).toBeVisible();
-    await expect(props.getByRole('cell', { name: 'progressLabel' })).toBeVisible();
+    await expect(props.getByRole('cell', { name: 'hint' })).toBeVisible();
     await expect(
-      props.getByText('Accessible name for the progress bar; defaults to the card title.')
+      props.getByText('The one muted line under the value: a description or the earlier figure.')
     ).toBeVisible();
   });
 });
@@ -229,65 +253,60 @@ test.describe('showcase visuals', () => {
     await expect(page).toHaveScreenshot('category-index.png', { fullPage: true });
   });
 
-  test('entity list', async ({ page }) => {
-    await open(page, '/components/data-display/entity-list');
-    await expect(section(page, 'EntityList')).toHaveScreenshot('entity-list.png');
+  test('list', async ({ page }) => {
+    await open(page, '/components/lists/list');
+    await expect(section(page, 'Example')).toHaveScreenshot('list.png');
   });
 
-  test('data table compact', async ({ page }) => {
-    await open(page, '/components/data-display/data-table');
-    const table = section(page, 'DataTable');
-    await table.getByRole('radio', { name: 'Compact', exact: true }).click();
-    await table.getByRole('button', { name: 'Agents' }).click();
-    await expect(table).toHaveScreenshot('data-table-compact.png');
+  test('data view', async ({ page }) => {
+    await open(page, '/components/lists/data-view');
+    await expect(section(page, 'Example')).toHaveScreenshot('data-view.png');
   });
 
-  test('context menu open', async ({ page }) => {
-    await open(page, '/components/feedback/context-menu');
-    await section(page, 'ContextMenu')
-      .getByRole('button', { name: 'roadmap.md' })
-      .click({ button: 'right' });
-    const menu = page.locator('[data-slot="context-menu-content"]');
+  test('dropdown menu open', async ({ page }) => {
+    await open(page, '/components/overlays/dropdown-menu');
+    await section(page, 'Example').getByRole('button').first().click();
+    const menu = page.locator('[data-slot="dropdown-menu-content"]');
     await expect(menu).toBeVisible();
-    await expect(menu).toHaveScreenshot('context-menu-open.png');
+    await expect(menu).toHaveScreenshot('dropdown-menu-open.png');
   });
 
-  test('usage meter', async ({ page }) => {
-    await open(page, '/components/data-display/usage-meter');
-    await expect(section(page, 'UsageMeter')).toHaveScreenshot('usage-meter.png');
+  test('stat card', async ({ page }) => {
+    await open(page, '/components/display/stat-card');
+    await expect(section(page, 'Example')).toHaveScreenshot('stat-card.png');
   });
 
   test('resizable panels', async ({ page }) => {
-    await open(page, '/components/layout/resizable');
-    await expect(section(page, 'Resizable panels')).toHaveScreenshot('resizable-panels.png');
+    await open(page, '/components/overlays/resizable');
+    await expect(section(page, 'Example')).toHaveScreenshot('resizable-panels.png');
   });
 
-  test('confirm by typing dialog', async ({ page }) => {
-    await open(page, '/components/feedback/danger-zone');
-    await section(page, 'DangerZone').getByRole('button', { name: 'Delete memory' }).click();
-    const dialog = page.locator('[data-slot="alert-dialog-content"]');
+  test('typed confirm dialog', async ({ page }) => {
+    await open(page, '/components/overlays/dialog');
+    await section(page, 'States').getByRole('button').first().click();
+    const dialog = page.locator('[data-slot="dialog-content"]');
     await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveScreenshot('confirm-by-typing.png');
+    await expect(dialog).toHaveScreenshot('dialog-confirm-text.png');
   });
 
   test('command palette open', async ({ page }) => {
-    await open(page, '/components/feedback/command');
-    await page.getByRole('button', { name: /Open Command/ }).click();
+    await open(page, '/components/overlays/command');
+    await section(page, 'Example').getByRole('button').first().click();
     const dialog = page.locator('[data-slot="command-content"]');
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveScreenshot('command-open.png');
   });
 
   test('sheet open', async ({ page }) => {
-    await open(page, '/components/feedback/sheet');
-    await page.getByRole('button', { name: 'Open Sheet' }).click();
+    await open(page, '/components/overlays/sheet');
+    await section(page, 'Example').getByRole('button').first().click();
     const sheet = page.locator('[data-slot="sheet-content"]');
     await expect(sheet).toBeVisible();
     await expect(sheet).toHaveScreenshot('sheet-open.png');
   });
 
-  test('tabs underline', async ({ page }) => {
+  test('tabs line', async ({ page }) => {
     await open(page, '/components/navigation/tabs');
-    await expect(section(page, 'Underline')).toHaveScreenshot('tabs-underline.png');
+    await expect(section(page, 'Example')).toHaveScreenshot('tabs-underline.png');
   });
 });

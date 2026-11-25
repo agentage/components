@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 export const chipVariants = cva(
-  'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors',
+  'inline-flex items-center gap-1 rounded-full text-xs font-medium transition-colors duration-fast',
   {
     variants: {
       variant: {
@@ -17,23 +17,43 @@ export const chipVariants = cva(
         destructive: 'bg-destructive/10 text-destructive border border-destructive/20',
         info: 'bg-info/10 text-info border border-info/20',
       },
+      size: {
+        /** 24 px chip. */
+        md: 'h-6 px-2.5',
+        /** 20 px chip: filters, toggles, active-filter pills. */
+        sm: 'h-5 px-2 font-normal',
+      },
+      pressed: {
+        true: 'border-primary text-primary-emphasis',
+        false: '',
+      },
       interactive: {
         // Ring lives on the wrapper but is driven by the inner body's focus.
-        true: 'cursor-pointer hover:bg-accent has-[[data-slot=chip-body]:focus-visible]:ring-2 has-[[data-slot=chip-body]:focus-visible]:ring-ring/50',
+        true: 'cursor-pointer hover:bg-accent has-[[data-slot=chip-body]:focus-visible]:outline-2 has-[[data-slot=chip-body]:focus-visible]:-outline-offset-2 has-[[data-slot=chip-body]:focus-visible]:outline-ring',
         false: '',
       },
     },
+    compoundVariants: [
+      { size: 'sm', variant: 'outline', pressed: false, class: 'text-muted-foreground' },
+      {
+        size: 'sm',
+        interactive: true,
+        pressed: false,
+        class: 'hover:bg-transparent hover:border-muted-foreground hover:text-foreground',
+      },
+    ],
     defaultVariants: {
       variant: 'outline',
+      size: 'md',
       interactive: false,
     },
   }
 );
 
-const XIcon = (): React.JSX.Element => (
+const XIcon = ({ size = 10 }: { size?: number }): React.JSX.Element => (
   <svg
-    width="10"
-    height="10"
+    width={size}
+    height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -48,7 +68,9 @@ const XIcon = (): React.JSX.Element => (
 export interface ChipProps
   extends
     Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick'>,
-    VariantProps<typeof chipVariants> {
+    Omit<VariantProps<typeof chipVariants>, 'pressed' | 'interactive'> {
+  /** Makes the chip a toggle button (`aria-pressed`), for example "Needs you". */
+  pressed?: boolean;
   onRemove?: () => void;
   onClick?: () => void;
   removeLabel?: string;
@@ -59,7 +81,8 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
     {
       className,
       variant,
-      interactive,
+      size,
+      pressed,
       children,
       onRemove,
       onClick,
@@ -69,7 +92,7 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
     },
     ref
   ) => {
-    const clickable = !!onClick || !!interactive;
+    const clickable = !!onClick;
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>): void => {
       onKeyDown?.(e);
@@ -84,7 +107,13 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
       <span
         ref={ref}
         className={cn(
-          chipVariants({ variant, interactive: clickable, className }),
+          chipVariants({
+            variant,
+            size,
+            pressed: pressed ?? false,
+            interactive: clickable,
+            className,
+          }),
           clickable && 'relative'
         )}
         onKeyDown={clickable ? undefined : onKeyDown}
@@ -97,6 +126,7 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
           data-slot="chip-body"
           role={clickable ? 'button' : undefined}
           tabIndex={clickable ? 0 : undefined}
+          aria-pressed={clickable && pressed !== undefined ? pressed : undefined}
           onClick={clickable ? onClick : undefined}
           onKeyDown={clickable ? handleKeyDown : undefined}
           className={clickable ? 'outline-none after:absolute after:inset-0' : undefined}
@@ -109,9 +139,12 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
             onClick={onRemove}
             aria-label={removeLabel}
             data-slot="chip-remove"
-            className="relative z-10 -mr-1 rounded-full p-0.5 transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            className={cn(
+              'relative z-10 -mr-1 rounded-full p-0.5 transition-colors duration-fast hover:bg-accent focus-ring',
+              size === 'sm' && '-mr-1.5 p-px opacity-70 hover:opacity-100'
+            )}
           >
-            <XIcon />
+            <XIcon size={size === 'sm' ? 12 : 10} />
           </button>
         )}
       </span>

@@ -15,7 +15,7 @@ describe('CodeBlock', () => {
   it('keeps the copy affordance labelled, focus-visible and reachable by keyboard', async () => {
     render(<CodeBlock code="npm i" />);
     const copy = screen.getByRole('button', { name: 'Copy code' });
-    expect(copy.className).toContain('focus-visible:ring-2');
+    expect(copy.className).toContain('focus-ring');
     expect(copy.className).toContain('focus:opacity-100');
 
     await userEvent.tab();
@@ -39,21 +39,20 @@ describe('CodeBlock', () => {
   });
 });
 
-// Frozen pre-CVA output of the copy button's `language && 'top-10'` conditional.
-const COPY_BASE =
-  'absolute right-2 top-2 rounded-md p-1.5 transition-colors text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
-
-describe('CodeBlock class parity', () => {
-  it('renders the copy button without a language header byte-identically', () => {
+describe('CodeBlock copy button position', () => {
+  it('sits at top-2 without a language header', () => {
     render(<CodeBlock code="x" />);
-    expect(screen.getByRole('button').className).toBe(COPY_BASE);
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('top-2');
+    expect(cls).not.toContain('top-10');
+    expect(cls).toContain('focus-ring');
   });
 
-  it('drops top-2 for top-10 when a language header is present', () => {
+  it('moves to top-10 when a language header is present', () => {
     render(<CodeBlock code="x" language="ts" />);
-    expect(screen.getByRole('button').className).toBe(
-      `${COPY_BASE.replace('right-2 top-2', 'right-2')} top-10`
-    );
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('top-10');
+    expect(cls).not.toContain('top-2');
   });
 
   it('merges className last on the root and spreads props', () => {

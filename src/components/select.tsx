@@ -1,196 +1,199 @@
 'use client';
 
 import * as React from 'react';
-import * as SelectPrimitive from '@radix-ui/react-select';
-import { cva } from 'class-variance-authority';
+import { OverlayLayerProvider, useOverlayLayer } from '../lib/overlay-layer';
+import { useAnchorPosition } from '../lib/use-anchor-position';
+import { useControlled } from '../lib/use-controlled';
 import { cn } from '../lib/utils';
+import { nextEnabled, useTypeAhead } from './select.keys';
+import { SelectList, SelectSearch } from './select.list';
+import { SelectTrigger, splitField } from './select.parts';
+import { selectTriggerVariants } from './select.variants';
 
-const POINTS = { down: '6 9 12 15 18 9', up: '18 15 12 9 6 15', check: '20 6 9 17 4 12' };
-
-type SelectIconProps = { points: string; className?: string };
-
-const SelectIcon = ({ points, className }: SelectIconProps): React.JSX.Element => (
-  <svg
-    width={14}
-    height={14}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className={className}
-  >
-    <polyline points={points} />
-  </svg>
-);
-
-export const selectTriggerVariants = cva(
-  [
-    'inline-flex w-full items-center justify-between gap-2 rounded-md border border-border',
-    'bg-background text-foreground transition-colors',
-    'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-    'data-[placeholder]:text-muted-foreground',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
-    '[&>span:first-child]:min-w-0 [&>span:first-child]:flex-1 [&>span:first-child]:truncate [&>span:first-child]:text-left',
-  ],
-  {
-    variants: {
-      compact: {
-        true: 'h-7 px-2 text-xs',
-        false: 'h-9 px-3 text-sm bg-muted/30 focus:bg-background',
-      },
-      error: { true: 'border-destructive', false: '' },
-    },
-    defaultVariants: { compact: false, error: false },
-  }
-);
-
-export const Select = SelectPrimitive.Root;
-export const SelectGroup = SelectPrimitive.Group;
-export const SelectValue = SelectPrimitive.Value;
-
-export interface SelectTriggerProps extends React.ComponentPropsWithoutRef<
-  typeof SelectPrimitive.Trigger
-> {
-  /** Compact height (h-7, text-xs) - for filter rows. Default false renders the form-input height. */
-  compact?: boolean;
-  error?: boolean;
+export interface SelectOption {
+  value: string;
+  label: string;
+  description?: string;
+  disabled?: boolean;
 }
 
-export const SelectTrigger = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Trigger>,
-  SelectTriggerProps
->(({ className, children, compact = false, error = false, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    data-slot="select-trigger"
-    data-compact={compact || undefined}
-    aria-invalid={error || undefined}
-    className={cn(selectTriggerVariants({ compact, error, className }))}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <SelectIcon points={POINTS.down} className="shrink-0 text-muted-foreground" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
-));
-SelectTrigger.displayName = 'SelectTrigger';
+export interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
+  options: SelectOption[];
+  value?: string;
+  /** Uncontrolled start value. */
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  placeholder?: string;
+  /** Adds a search box that filters the options by label. */
+  searchable?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+  /** Trigger height: `md` 30 px (default), `sm` 26 px. */
+  size?: 'sm' | 'md';
+  /** Texts for the search box placeholder and the empty message. */
+  labels?: { search?: string; empty?: string };
+}
 
-export const SelectScrollUpButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollUpButton
-    ref={ref}
-    className={cn(
-      'flex cursor-default items-center justify-center py-1 text-muted-foreground',
-      className
-    )}
-    {...props}
-  >
-    <SelectIcon points={POINTS.up} />
-  </SelectPrimitive.ScrollUpButton>
-));
-SelectScrollUpButton.displayName = 'SelectScrollUpButton';
+export const Select = React.forwardRef<HTMLButtonElement, SelectProps>((allProps, ref) => {
+  const {
+    options,
+    value: valueProp,
+    defaultValue,
+    onValueChange,
+    placeholder = 'Select...',
+    searchable = false,
+    disabled = false,
+    error = false,
+    size = 'md',
+    labels,
+    className,
+    ...rest
+  } = allProps;
+  const [field, props] = splitField(rest);
+  // `value={undefined}` from a form reset means empty, as in 0.20, not a switch to uncontrolled.
+  const controlled = Object.prototype.hasOwnProperty.call(allProps, 'value');
+  const [inner, setValue] = useControlled<string | undefined>(valueProp, defaultValue, (v) =>
+    v === undefined ? undefined : onValueChange?.(v)
+  );
+  const value = controlled ? valueProp : inner;
+  const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');
+  const [activeIndex, setActiveIndex] = React.useState(-1);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+  const surfaceRef = React.useRef<HTMLDivElement>(null);
+  const listId = React.useId();
+  const [width, setWidth] = React.useState<number>();
+  const { top, left } = useAnchorPosition(rootRef, surfaceRef, open, { align: 'start', offset: 4 });
+  React.useLayoutEffect(() => setWidth(rootRef.current?.offsetWidth), [open]);
 
-export const SelectScrollDownButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollDownButton
-    ref={ref}
-    className={cn(
-      'flex cursor-default items-center justify-center py-1 text-muted-foreground',
-      className
-    )}
-    {...props}
-  >
-    <SelectIcon points={POINTS.down} />
-  </SelectPrimitive.ScrollDownButton>
-));
-SelectScrollDownButton.displayName = 'SelectScrollDownButton';
+  const selectedOption = options.find((o) => o.value === value);
+  const filtered = options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()));
+  const optionId = (i: number): string => `${listId}-opt-${String(i)}`;
+  const typeAhead = useTypeAhead(filtered);
 
-export const SelectContent = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = 'popper', ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      position={position}
-      className={cn(
-        'relative z-50 max-h-96 min-w-[var(--radix-select-trigger-width)] overflow-hidden',
-        'rounded-md border border-border bg-popover text-popover-foreground shadow-lg',
-        position === 'popper' && 'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
-        className
-      )}
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  React.useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
+  const close = (restore: boolean): void => {
+    setOpen(false);
+    if (restore) triggerRef.current?.focus();
+  };
+  const layer = useOverlayLayer(open, {
+    refs: [rootRef],
+    onEscape: () => close(true),
+    onOutside: () => close(false),
+  });
+
+  React.useEffect(() => {
+    if (!open) return;
+    setSearch('');
+    setActiveIndex(searchable ? -1 : options.findIndex((o) => o.value === value));
+    const t = setTimeout(() => (searchable ? inputRef : listRef).current?.focus(), 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only the open edge resets the list
+  }, [open]);
+
+  React.useEffect(() => {
+    if (open && activeIndex >= 0)
+      document.getElementById(optionId(activeIndex))?.scrollIntoView?.({ block: 'nearest' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- optionId is derived from a stable id
+  }, [open, activeIndex]);
+
+  const select = (option: SelectOption): void => {
+    if (!option.disabled) setValue(option.value);
+    if (!option.disabled) close(true);
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>): void => {
+    if (e.key === 'Enter' || (e.key === ' ' && !searchable)) {
+      if (e.nativeEvent.isComposing || activeIndex < 0 || activeIndex >= filtered.length) return;
+      e.preventDefault();
+      select(filtered[activeIndex]);
+      return;
+    }
+    const next = nextEnabled(e.key, activeIndex, filtered);
+    if (next !== null) {
+      e.preventDefault();
+      setActiveIndex(next);
+    } else if (!searchable && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+      const hit = typeAhead(e.key, activeIndex);
+      if (hit >= 0) setActiveIndex(hit);
+    }
+  };
+
+  return (
+    <div
+      ref={rootRef}
+      className={cn('relative flex', className)}
+      data-slot="select"
       {...props}
+      onBlur={(e) => {
+        props.onBlur?.(e);
+        if (open && !rootRef.current?.contains(e.relatedTarget as Node | null)) close(false);
+      }}
     >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
-        className={cn(
-          'p-1',
-          position === 'popper' &&
-            'min-w-[var(--radix-select-trigger-width)] max-h-[var(--radix-select-content-available-height)]'
-        )}
+      <SelectTrigger
+        ref={triggerRef}
+        disabled={disabled}
+        onClick={() => setOpen(!open)}
+        onKeyDown={(e) => {
+          if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+          e.preventDefault();
+          setOpen(true);
+        }}
+        open={open}
+        listId={listId}
+        field={field}
+        invalid={error}
+        placeholder={placeholder}
+        empty={!selectedOption}
+        className={cn(selectTriggerVariants({ size, error }))}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-));
-SelectContent.displayName = 'SelectContent';
-
-export const SelectLabel = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label
-    ref={ref}
-    className={cn('px-2 py-1.5 text-xs font-semibold text-muted-foreground', className)}
-    {...props}
-  />
-));
-SelectLabel.displayName = 'SelectLabel';
-
-export const SelectItem = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Item
-    ref={ref}
-    className={cn(
-      'relative flex w-full cursor-pointer select-none items-center justify-start gap-2',
-      'rounded-sm px-2 py-1 text-left text-sm text-popover-foreground transition-colors outline-none',
-      'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
-      'data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:font-medium',
-      'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className
-    )}
-    {...props}
-  >
-    <SelectPrimitive.ItemText>
-      <span className="flex items-center gap-2 truncate text-left">{children}</span>
-    </SelectPrimitive.ItemText>
-    <SelectPrimitive.ItemIndicator className="ml-auto flex size-3.5 shrink-0 items-center justify-center">
-      <SelectIcon points={POINTS.check} className="text-primary-emphasis" />
-    </SelectPrimitive.ItemIndicator>
-  </SelectPrimitive.Item>
-));
-SelectItem.displayName = 'SelectItem';
-
-export const SelectSeparator = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Separator
-    ref={ref}
-    className={cn('-mx-1 my-1 h-px bg-border', className)}
-    {...props}
-  />
-));
-SelectSeparator.displayName = 'SelectSeparator';
+        {selectedOption?.label ?? placeholder}
+      </SelectTrigger>
+      {open && (
+        <OverlayLayerProvider layer={layer}>
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- keeps focus in the search field or list on a scrollbar or padding press */}
+          <div
+            ref={surfaceRef}
+            onMouseDown={(e) => {
+              if (e.target !== inputRef.current) e.preventDefault();
+            }}
+            style={{ position: 'fixed', top, left, width }}
+            className="z-[var(--z-dropdown,100)] rounded-lg border border-border bg-popover shadow-[var(--shadow-popover)] motion-safe:animate-menu-in"
+            data-slot="select-content"
+          >
+            {searchable && (
+              <SelectSearch
+                ref={inputRef}
+                value={search}
+                label={labels?.search ?? 'Search...'}
+                listId={listId}
+                activeId={activeIndex >= 0 ? optionId(activeIndex) : undefined}
+                onChange={(v) => {
+                  setSearch(v);
+                  setActiveIndex(-1);
+                }}
+                onKeyDown={handleKeyDown}
+              />
+            )}
+            <SelectList
+              ref={listRef}
+              id={listId}
+              options={filtered}
+              value={value}
+              activeIndex={activeIndex}
+              optionId={optionId}
+              emptyLabel={labels?.empty ?? 'No results found.'}
+              onPick={select}
+              focusable={!searchable}
+              label={field['aria-label'] ?? placeholder}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+        </OverlayLayerProvider>
+      )}
+    </div>
+  );
+});
+Select.displayName = 'Select';

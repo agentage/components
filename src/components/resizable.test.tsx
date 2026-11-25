@@ -138,3 +138,23 @@ describe('ResizablePanelGroup', () => {
     expect(basis('bottom')).toBe('50%');
   });
 });
+
+describe('ResizablePanelGroup conditional panels', () => {
+  it('reseeds when a panel is added, with no undefined or NaN values', () => {
+    const tree = (withAside: boolean) => (
+      <ResizablePanelGroup aria-label="Browser">
+        <ResizablePanel minSize={20}>main</ResizablePanel>
+        {withAside && <ResizableHandle />}
+        {withAside && <ResizablePanel minSize={10}>aside</ResizablePanel>}
+      </ResizablePanelGroup>
+    );
+    const { rerender } = render(tree(false));
+    rerender(tree(true));
+    expect(basis('main')).toBe('50%');
+    expect(basis('aside')).toBe('50%');
+    const sep = screen.getByRole('separator');
+    for (const attr of ['aria-valuenow', 'aria-valuemin', 'aria-valuemax']) {
+      expect(sep.getAttribute(attr)).not.toMatch(/NaN|undefined/);
+    }
+  });
+});

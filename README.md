@@ -1,16 +1,44 @@
-# @agentage/design-system
+# @agentage/components
 
-![Agentage Design System - OKLCH tokens + 60+ React components, ready to install](https://github.com/agentage/design-system/raw/master/docs/banner.svg)
+![Agentage Components - OKLCH tokens + React components, ready to install](https://github.com/agentage/components/raw/master/docs/banner.svg)
 
-OKLCH design tokens and 60+ accessible React 19 components in one package. Install it, import
-the theme, and you have a coherent dark/light UI kit - buttons through data tables, stat cards,
-command palettes and docs layouts.
+OKLCH design tokens and about 60 accessible React 19 components in one package. Install it, import
+the theme, and you have a coherent dark/light UI kit - buttons through data views, stat cards,
+dialogs and command palettes.
 
 Browse every component live at **[ds.agentage.io](https://ds.agentage.io)**.
 
+## Moving from `@agentage/design-system`
+
+`@agentage/design-system` is frozen at 0.20.2 for the apps that still use it. To move to
+`@agentage/components`:
+
+1. Swap the package: `npm uninstall @agentage/design-system && npm install @agentage/components`.
+2. Replace `@agentage/design-system` with `@agentage/components` in imports, in the CSS import
+   (`@agentage/components/theme.css`) and in the Tailwind `@source` glob
+   (`node_modules/@agentage/components/dist/**/*.js`). Subpaths keep their names.
+3. Expect the denser look: 28 px buttons, 30 px fields, 36 px rows, flat 12/14 px cards. The
+   "Catalog review" page in the showcase lists every visual change.
+4. The new package is smaller than 0.20.2: there are no deprecated names and no aliases. Replace
+   removed components as below; the "Catalog review" page lists every removed and renamed export.
+
+| 0.20.2                                                                                    | Use now                                                                                                                         |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `Modal`, `AlertDialog`, `ConfirmByTyping`, `DangerZone`                                   | `Dialog` (`onConfirm`, `tone="destructive"`, `confirmText`), in a `Card`                                                        |
+| `InspectorPanel`                                                                          | `<Sheet mode="docked">`                                                                                                         |
+| `Combobox`, the Radix `Select` parts                                                      | `Select` with `options` (`searchable` for the search box)                                                                       |
+| `DataTable`, `EntityCard`                                                                 | `DataView` (or `Table` parts); the Item card composition on the Card page                                                       |
+| `EntityList`                                                                              | `List`                                                                                                                          |
+| `StatCard` `period`, `comparison`, `chart`, `facts` and co.                               | `hint`, `trend`, and children: `Sparkline`, `DescriptionList variant="inline"`, `Progress`, `StatusBar`; `CardMeta` in `footer` |
+| `IconContainer`                                                                           | `<Avatar shape="square" icon tone>`                                                                                             |
+| Chart cards (Gauge, Donut, Score, Funnel, Heatmap and co.)                                | `StatCard` with `Sparkline` or `MiniBars`                                                                                       |
+| `FilterBar`, `NavLink`, `PageLayout`, `StatusDot`, `UsageMeter`                           | `ListToolbar`, `NavRow`, `PageHeader`, `StatusGlyph`, `Progress meter`                                                          |
+| `HoverCard`, `ContextMenu`, `Slider`, `QuotaBanner`, `ScrollArea`, `Separator`, `Heading` | `Popover`, `DropdownMenu`, `Input type="number"`, `Alert` with `Progress`, native overflow, a 1 px div, plain headings          |
+| `Footer`, `TopBar`, `DocSidebar`, `MarkdownRenderer`, the `./charts` and `./site` entries | removed (docs-site chrome); `CopyButton` stays                                                                                  |
+
 ## What is this?
 
-The design system behind the Agentage dashboard, admin console and public sites, published as a
+The component library behind the Agentage dashboard, admin console and public sites, published as a
 plain npm package so anything can use it.
 
 It is deliberately unopinionated about your framework. It ships **standard ESM with one file per
@@ -24,7 +52,7 @@ rather than hand-tuned, and contrast holds up under WCAG AA.
 ### 1. Install
 
 ```bash
-npm install @agentage/design-system
+npm install @agentage/components
 ```
 
 Peers: `react` and `react-dom` >= 19. `tailwindcss` >= 4 is an optional peer - the components
@@ -34,7 +62,7 @@ carry Tailwind utility classes, so you need it unless you ship your own compiled
 
 ```tsx
 // app/layout.tsx (or your root entry)
-import '@agentage/design-system/theme.css';
+import '@agentage/components/theme.css';
 ```
 
 ### 3. Point Tailwind at the shipped bundle
@@ -42,12 +70,12 @@ import '@agentage/design-system/theme.css';
 ```css
 /* globals.css - Tailwind v4, CSS-first config */
 @import 'tailwindcss';
-@import '@agentage/design-system/theme.css';
+@import '@agentage/components/theme.css';
 
-@source "../../node_modules/@agentage/design-system/dist/**/*.js";
+@source "../../node_modules/@agentage/components/dist/**/*.js";
 ```
 
-> Tailwind must scan the **shipped JS**, not the source, or every design-system class is
+> Tailwind must scan the **shipped JS**, not the source, or every component class is
 > tree-shaken out of your build. The glob has to resolve to wherever npm actually hoisted the
 > package - in a workspace that is the repo-root `node_modules`, not the package-local one. This
 > is the single most common cause of "the components render unstyled".
@@ -55,14 +83,14 @@ import '@agentage/design-system/theme.css';
 ### 4. Use it
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle, StatCard } from '@agentage/design-system';
+import { Button, Card, CardHeader, CardTitle, StatCard } from '@agentage/components';
 
 export const Panel = () => (
   <Card>
     <CardHeader>
-      <CardTitle>Memories</CardTitle>
+      <CardTitle>Storage</CardTitle>
     </CardHeader>
-    <StatCard title="Stored" value="12,480" progress={64} />
+    <StatCard title="Stored" value="12,480" hint="64% of the plan" />
     <Button>Open</Button>
   </Card>
 );
@@ -72,22 +100,24 @@ Full walkthrough: [ds.agentage.io/install](https://ds.agentage.io/install).
 
 ## What's in it
 
-62 documented component pages across eight areas, each with props generated from the source:
+59 documented component pages in seven categories plus 11 patterns, each with props generated from
+the source. The **Core** set (Button, Card, Input, Select, List, DataView, Dialog, Toast and more)
+sits at the top of the docs sidebar.
 
-| Area                                                                | What's there                                                                                                                 |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| [Foundations](https://ds.agentage.io/components/foundations) (6)    | Button, Badge, Card, Avatar, loading states, Separator                                                                       |
-| [Data Display](https://ds.agentage.io/components/data-display) (10) | Table, DataTable, EntityList, StatCard, Pagination, EmptyState, StatusDot, CodeBlock, Progress, UsageMeter                   |
-| [Cards](https://ds.agentage.io/components/cards) (7)                | Gauge, donut, score, funnel, heatmap, multi-stat and ranked-list cards                                                       |
-| [Forms](https://ds.agentage.io/components/forms) (8)                | Input, Label, Checkbox, RadioGroup, Slider, Combobox, DatePicker, ToggleGroup                                                |
-| [Feedback](https://ds.agentage.io/components/feedback) (13)         | Alert, Toast, Tooltip, Modal, AlertDialog, Sheet, DropdownMenu, ContextMenu, Popover, HoverCard, Command palette, DangerZone |
-| [Layout](https://ds.agentage.io/components/layout) (5)              | PageHeader, Section, Sidebar, Resizable panels, ScrollArea                                                                   |
-| [Navigation](https://ds.agentage.io/components/navigation) (7)      | Breadcrumb, Tabs, Heading, Prose, Kbd, Collapsible, Accordion                                                                |
-| [Site & Docs](https://ds.agentage.io/components/site-docs) (6)      | Markdown, CopyButton, Chip, Footer, TopBar, DocSidebar                                                                       |
+| Category                                                          | What's there                                                                                                                                                        |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Foundations](https://ds.agentage.io/components/foundations) (11) | Button, IconButton, Badge, Chip, Avatar, Kbd, Skeleton and Spinner, StatusGlyph and PriorityGlyph, Prose, CopyButton, hooks                                         |
+| [Forms](https://ds.agentage.io/components/forms) (11)             | Input and Textarea, SecretInput, Select, TreeSelect, DatePicker, Checkbox and Switch, RadioGroup, ToggleGroup, FormField and Label, Section, InlineEdit             |
+| [Navigation](https://ds.agentage.io/components/navigation) (7)    | NavRow and NavTree, Sidebar, Tabs, Breadcrumb, Pagination, SectionIndex, PageHeader                                                                                 |
+| [Lists and data](https://ds.agentage.io/components/lists) (6)     | List (with GroupHeader), Table, DataView, ListToolbar, LogView, DataTree                                                                                            |
+| [Display](https://ds.agentage.io/components/display) (13)         | Card, StatCard, Sparkline, DescriptionList, Progress, StatusBar, RelativeTime, CodeBlock, ContentBlocks, EmptyState, Collapsible, Accordion, StepList and CheckList |
+| [Overlays](https://ds.agentage.io/components/overlays) (7)        | Dialog, Sheet, Popover, Tooltip, DropdownMenu, Command palette, Resizable panels                                                                                    |
+| [Feedback](https://ds.agentage.io/components/feedback) (4)        | Alert, Toast, DirtyBar, ActionBar                                                                                                                                   |
+| [Patterns](https://ds.agentage.io/components/patterns) (11)       | List page, card grid, catalog with views, board, master and detail, detail view, history, settings form, logs explorer, file browser, monitoring                    |
 
-Those 62 pages cover 152 exported components once composable parts (`CardHeader`, `TableRow`,
-`CommandItem` and friends) are counted, plus focus-trap, scroll-lock and anchor-positioning hooks. Every one
-has a per-component subpath in the [exports map](./package.json).
+Beside the pages, composable parts (`CardHeader`, `TableRow`, `CommandItem` and friends) are
+exported too. Only the modules the barrel re-exports have a subpath in the
+[exports map](./package.json); parts files and helpers stay internal.
 
 ## Server components
 
@@ -96,8 +126,8 @@ preserves one output file per source module. So the barrel is safe to import fro
 Component - only the components you actually use that need the client runtime cross the boundary.
 
 ```tsx
-import { Card } from '@agentage/design-system/card'; // server-safe
-import { Modal } from '@agentage/design-system/modal'; // 'use client', already declared
+import { Card } from '@agentage/components/card'; // server-safe
+import { Dialog } from '@agentage/components/dialog'; // 'use client', already declared
 ```
 
 No server-safe module transitively imports a client module, so importing `Card` never drags a
@@ -108,11 +138,11 @@ that graph explicit; the barrel works too.
 
 Three tiers, composed by `theme.css`:
 
-| Layer            | Import                                   | What it holds                                       |
-| ---------------- | ---------------------------------------- | --------------------------------------------------- |
-| `primitives.css` | `@agentage/design-system/primitives.css` | Raw OKLCH scales - 11 stops each, theme-independent |
-| `tokens.css`     | via `theme.css`                          | Semantic tokens, typography, shadows                |
-| `base.css`       | via `theme.css`                          | Element resets                                      |
+| Layer            | Import                                | What it holds                                       |
+| ---------------- | ------------------------------------- | --------------------------------------------------- |
+| `primitives.css` | `@agentage/components/primitives.css` | Raw OKLCH scales - 11 stops each, theme-independent |
+| `tokens.css`     | via `theme.css`                       | Semantic tokens, typography, shadows                |
+| `base.css`       | via `theme.css`                       | Element resets                                      |
 
 Dark is the default. Switch with one attribute on `<html>`:
 
@@ -162,15 +192,15 @@ docker run --rm --ipc=host -v "$PWD":/work -w /work -u "$(id -u):$(id -g)" -e HO
 
 ## Release
 
-Publishing is release-gated (`.github/workflows/publish.yml`): bump `version` in `package.json`
-with a `chore(release): vX.Y.Z` commit (or run the workflow via **workflow_dispatch**). On merge
-to `master` the workflow runs `verify`, then `npm publish --access public --provenance`, and tags
-the release.
+`prepare-release.yml` (dispatched, or run by hand) opens a `chore(release): X.Y.Z` PR and arms
+auto-merge; on the merge `release.yml` runs `verify`, publishes with
+`npm publish --access public --provenance` through npm trusted publishing (OIDC, no token) and tags
+`vX.Y.Z`.
 
 ## Contributing
 
 Issues and PRs welcome at
-[github.com/agentage/design-system](https://github.com/agentage/design-system). Branch off
+[github.com/agentage/components](https://github.com/agentage/components). Branch off
 `master`, keep `npm run verify` green, and add a test when you change interactive behavior.
 
 ## License

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Command, CommandEmpty, CommandGroup, CommandItem, Kbd } from '../../src';
+import { Badge, Command, CommandEmpty, CommandGroup, CommandItem, Kbd } from '../../src';
+import { builtFrom } from '../lib/built-from';
 import { useRoute } from '../lib/router';
 import { ALL_COMPONENTS, CATEGORIES, componentPath } from '../registry';
 
@@ -10,7 +11,7 @@ const STATIC_PAGES = [
   { label: 'Theming', path: '/theming', keywords: 'tokens oklch dark light system data-theme' },
 ];
 
-/** ⌘K palette over the registry, built on the design system's own Command. */
+/** ⌘K palette over the registry, built on the library's own Command. */
 export const Search = () => {
   const [open, setOpen] = useState(false);
   const { navigate } = useRoute();
@@ -50,7 +51,7 @@ export const Search = () => {
         open={open}
         onOpenChange={setOpen}
         placeholder="Search components, pages, props..."
-        aria-label="Search the design system"
+        aria-label="Search the components"
       >
         <CommandGroup heading="Pages">
           {STATIC_PAGES.map((page) => (
@@ -81,13 +82,18 @@ export const Search = () => {
             <CommandItem
               key={`${category.slug}/${component.slug}`}
               // Name + description + exports + category, so the query matches on any of them.
-              value={`${component.name} ${component.description} ${component.exports.join(' ')} ${category.label}`}
+              value={`${component.name} ${component.description} ${[...component.exports, ...builtFrom(component).map((p) => p.component.name)].join(' ')} ${category.label}${component.core ? ' core' : ''}`}
               shortcut={category.label}
               onClick={() => {
                 go(componentPath(category.slug, component.slug));
               }}
             >
               {component.name}
+              {component.core && (
+                <Badge variant="outline-primary" className="ml-2">
+                  Core
+                </Badge>
+              )}
             </CommandItem>
           ))}
         </CommandGroup>

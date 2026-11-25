@@ -2,54 +2,167 @@ import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { CardMeta } from './card-state';
+import { Sparkline } from './sparkline';
 import { StatCard } from './stat-card';
+
+const card = () => document.querySelector('[data-slot="stat-card"]') as HTMLElement;
 
 describe('StatCard', () => {
   it('renders a div by default and forwards its ref', () => {
     const ref = createRef<HTMLDivElement>();
-    const { container } = render(<StatCard ref={ref} title="Memories" value={12} />);
-    const card = container.querySelector('[data-slot="stat-card"]') as HTMLElement;
-    expect(card.tagName).toBe('DIV');
-    expect(ref.current).toBe(card);
+    render(<StatCard ref={ref} title="Documents" value={12} />);
+    expect(card().tagName).toBe('DIV');
+    expect(ref.current).toBe(card());
   });
 
-  it('renders a Progress footer when progress is set', () => {
-    render(<StatCard title="Storage" value="4.2 GB" progress={42} />);
-    const bar = screen.getByRole('progressbar');
-    expect(bar.getAttribute('aria-valuenow')).toBe('42');
-    expect(bar.getAttribute('aria-label')).toBe('Storage');
+  it('keeps the minimal card markup: no container, hint or footer', () => {
+    render(<StatCard title="Documents" value={12} />);
+    expect(card().querySelector('.\\@container')).toBeNull();
+    expect(card().querySelector('[data-slot="stat-card-hint"]')).toBeNull();
+    expect(card().querySelector('[data-slot="stat-card-footer"]')).toBeNull();
   });
 
-  it('overrides the progress accessible name', () => {
-    render(<StatCard title="Storage" value="4.2 GB" progress={42} progressLabel="Quota used" />);
-    expect(screen.getByRole('progressbar').getAttribute('aria-label')).toBe('Quota used');
+  it('draws the trend arrow by direction and the colour by sentiment', () => {
+    const { rerender } = render(
+      <StatCard title="T" value={1} trend={{ value: '+5', direction: 'up' }} />
+    );
+    const trend = () => card().querySelector('[data-slot="stat-card-trend"]') as HTMLElement;
+    expect(trend().className).toContain('text-success');
+    expect(trend().textContent).toContain('Trending up');
+    rerender(
+      <StatCard
+        title="T"
+        value={1}
+        trend={{ value: '+5', direction: 'up', sentiment: 'down-is-good' }}
+      />
+    );
+    expect(trend().className).toContain('text-destructive');
+    rerender(
+      <StatCard
+        title="T"
+        value={1}
+        trend={{ value: '-5', direction: 'down', sentiment: 'neutral' }}
+      />
+    );
+    expect(trend().className).toContain('text-muted-foreground');
+    expect(trend().textContent).toContain('Trending down');
   });
 
-  it('omits the progress footer by default', () => {
-    render(<StatCard title="Storage" value="4.2 GB" />);
-    expect(screen.queryByRole('progressbar')).toBeNull();
+  it('puts children under the value in a size container', () => {
+    render(
+      <StatCard title="Requests" value="48k" hint="45k yesterday">
+        <Sparkline data={[1, 2, 3]} chartLabel="Rising" />
+      </StatCard>
+    );
+    expect(card().querySelector('.\\@container [data-slot="sparkline"]')).not.toBeNull();
+    expect(screen.getByRole('group', { name: 'Requests', description: '48k 45k yesterday' })).toBe(
+      card()
+    );
   });
 
-  it('renders button semantics when pressable', async () => {
+  it('wraps a plain footer in a row and keeps a CardMeta footer as is', () => {
+    const { rerender } = render(<StatCard title="T" value={1} footer={<a href="#r">All</a>} />);
+    expect(screen.getByRole('link', { name: 'All' }).parentElement?.className).toContain(
+      'justify-between'
+    );
+    rerender(<StatCard title="T" value={1} footer={<CardMeta source="Edge" />} />);
+    expect(card().querySelector('[data-slot="card-meta"]')?.textContent).toContain('Edge');
+  });
+
+  it('is pressable with onClick: the title is the one button', async () => {
     const onClick = vi.fn();
-    render(<StatCard title="Runs" value={3} pressable onClick={onClick} />);
+    render(<StatCard title="Reports" value={3} onClick={onClick} footer={<a href="#r">All</a>} />);
     const button = screen.getByRole('button');
     expect(button.getAttribute('type')).toBe('button');
-    expect(button.className).toContain('active:shadow-sm');
+    expect(button.textContent).toBe('Reports');
+    expect(screen.getByRole('link', { name: 'All' }).closest('button')).toBeNull();
     await userEvent.click(button);
-    expect(onClick).toHaveBeenCalledTimes(1);
+    button.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onClick).toHaveBeenCalledTimes(2);
+    expect(card().getAttribute('role')).toBeNull();
   });
 
-  it('activates a pressable card from the keyboard', async () => {
-    const onClick = vi.fn();
-    render(<StatCard title="Runs" value={3} pressable onClick={onClick} />);
-    screen.getByRole('button').focus();
-    await userEvent.keyboard('{Enter}');
-    expect(onClick).toHaveBeenCalledTimes(1);
+  it('names the pressable control by title, describes it by value and hint, and takes its ARIA props', () => {
+    render(
+      <StatCard
+        title="Reports"
+        value={3}
+        hint="This week"
+        onClick={vi.fn()}
+        aria-pressed
+        aria-controls="panel"
+        data-testid="card"
+      />
+    );
+    const button = screen.getByRole('button', { name: 'Reports', description: '3 This week' });
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(button.getAttribute('aria-controls')).toBe('panel');
+    expect(screen.getByTestId('card').getAttribute('aria-pressed')).toBeNull();
   });
 
   it('is not a button by default', () => {
-    render(<StatCard title="Runs" value={3} />);
+    render(<StatCard title="Reports" value={3} />);
     expect(screen.queryByRole('button')).toBeNull();
+  });
+});
+
+describe('StatCard states', () => {
+  it('covers the body with a skeleton and keeps the parts in flow', () => {
+    render(<StatCard title="T" value={12} hint="h" state="loading" />);
+    expect(card().getAttribute('aria-busy')).toBe('true');
+    expect(card().querySelector('[data-slot="stat-card-skeleton"]')).not.toBeNull();
+    expect(card().querySelector('.invisible [data-slot="stat-card-hint"]')).not.toBeNull();
+  });
+
+  it('takes a custom loading body', () => {
+    render(<StatCard title="T" value={1} state="loading" fallback={{ loading: <i>wait</i> }} />);
+    expect(screen.getByText('wait')).toBeTruthy();
+  });
+
+  it('shows a one-line empty body, default and custom', () => {
+    const { rerender } = render(<StatCard title="T" value={1} state="empty" />);
+    expect(screen.getByText('No data for this period.')).toBeTruthy();
+    rerender(<StatCard title="T" value={1} state="empty" fallback={{ empty: 'Nothing yet' }} />);
+    expect(screen.getByText('Nothing yet')).toBeTruthy();
+  });
+
+  it('shows an error with a reference and Retry', async () => {
+    const onRetry = vi.fn();
+    render(
+      <StatCard
+        title="T"
+        value={1}
+        state="error"
+        fallback={{ error: { message: 'Broke', reference: 'req-1' }, onRetry }}
+      />
+    );
+    expect(screen.getByText('Broke')).toBeTruthy();
+    expect(screen.getByText('req-1')).toBeTruthy();
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(onRetry).toHaveBeenCalled();
+  });
+
+  it('shows a plain error message by default', () => {
+    render(<StatCard title="T" value={1} state="error" />);
+    expect(screen.getByText('Could not load this data.')).toBeTruthy();
+  });
+
+  it('describes a covered card by its state body, not the hidden value', () => {
+    render(<StatCard title="Reqs" value={1} state="empty" />);
+    expect(
+      screen.getByRole('group', { name: 'Reqs', description: 'No data for this period.' })
+    ).toBe(card());
+  });
+
+  it('marks a CardMeta footer stale, else badges the header', () => {
+    const { rerender } = render(
+      <StatCard title="T" value={1} state="stale" footer={<CardMeta source="Edge" />} />
+    );
+    const badge = () => card().querySelector('[data-slot="card-stale"]') as HTMLElement;
+    expect(badge().closest('[data-slot="card-meta"]')).not.toBeNull();
+    rerender(<StatCard title="T" value={1} state="stale" />);
+    expect(badge().closest('[data-slot="card-meta"]')).toBeNull();
   });
 });

@@ -7,7 +7,7 @@
  *
  * Every exported component is resolved through the TypeScript checker: the
  * props type is the first parameter of its call signature, expanded to leaf
- * properties. Anything declared in node_modules (React's HTML/ARIA surface,
+ * properties. Only symbols exported from the barrel are documented. Anything declared in node_modules (React's HTML/ARIA surface,
  * `ref`, `key`) is dropped so the table only shows the component's own API.
  * react-docgen-typescript was tried first and mis-resolved 15 of 68
  * components (files that export several components alongside cva variants).
@@ -62,6 +62,14 @@ const defaultsOf = (declaration) => {
   return found;
 };
 
+/** JSDoc text, falling back to the `@deprecated` tag when the comment has only that tag. */
+const describe = (p) => {
+  const text = ts.displayPartsToString(p.getDocumentationComment(checker));
+  const tag = p.getJsDocTags(checker).find((t) => t.name === 'deprecated');
+  const note = tag ? `Deprecated: ${ts.displayPartsToString(tag.text ?? [])}`.trim() : '';
+  return (text || note).replace(/\s+/g, ' ').trim();
+};
+
 const shorten = (text) => (text.length > 120 ? `${text.slice(0, 117)}...` : text);
 
 /** Export name -> published subpath, taken from the barrel and the exports map. */
@@ -93,7 +101,7 @@ for (const file of files) {
 
   for (const exported of checker.getExportsOfModule(moduleSymbol)) {
     const name = exported.getName();
-    if (!/^[A-Z]/.test(name)) continue;
+    if (!/^[A-Z]/.test(name) || !(name in subpaths)) continue;
 
     const symbol =
       exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported;
@@ -110,8 +118,15 @@ for (const file of files) {
     const propsType = checker.getTypeOfSymbolAtLocation(parameter, declaration);
     const defaults = defaultsOf(declaration);
 
-    const props = propsType
-      .getProperties()
+    // A union of prop shapes (mode="single" | "range") lists only shared keys; list every member's.
+    const members = propsType.isUnion() ? propsType.types : [propsType];
+    const byName = new Map(propsType.getProperties().map((p) => [p.getName(), p]));
+    for (const member of members) {
+      for (const p of member.getProperties())
+        if (!byName.has(p.getName())) byName.set(p.getName(), p);
+    }
+
+    const props = [...byName.values()]
       .filter((p) => !IGNORED.has(p.getName()) && isLocal(p))
       .map((p) => {
         const at = p.getDeclarations()?.[0] ?? declaration;
@@ -120,10 +135,7 @@ for (const file of files) {
           type: shorten(checker.typeToString(checker.getTypeOfSymbolAtLocation(p, at))),
           required: (p.getFlags() & ts.SymbolFlags.Optional) === 0,
           defaultValue: defaults[p.getName()] ?? null,
-          description: ts
-            .displayPartsToString(p.getDocumentationComment(checker))
-            .replace(/\s+/g, ' ')
-            .trim(),
+          description: describe(p),
         };
       })
       .sort((a, b) => Number(b.required) - Number(a.required) || a.name.localeCompare(b.name));
@@ -153,7 +165,7 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
 ${body}
 };
 
-/** Export name -> the \`@agentage/design-system/<subpath>\` it ships under. */
+/** Export name -> the \`@agentage/components/<subpath>\` it ships under. */
 export const EXPORT_SUBPATH: Record<string, string> = {
 ${Object.keys(subpaths)
   .sort()

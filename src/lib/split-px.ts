@@ -1,4 +1,4 @@
-/** Pixel sizing + pre-paint restore for `ResizableSplit`. Server-safe: no React. */
+/** Pixel sizing + pre-paint restore for `ResizableSplit` and `ResizablePanelGroup`. Server-safe. */
 
 const MAX_STORED_PX = 8000;
 const KEY_PATTERN = /^[A-Za-z0-9._:-]{1,64}$/;
@@ -7,6 +7,9 @@ export type SplitOrientation = 'horizontal' | 'vertical';
 
 export const clampPx = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, Math.round(value)));
+
+export const isPrepaintKey = (storageKey: string | undefined): storageKey is string =>
+  storageKey !== undefined && KEY_PATTERN.test(storageKey);
 
 export const assertStorageKey = (storageKey: string): void => {
   if (!KEY_PATTERN.test(storageKey)) {
@@ -27,6 +30,10 @@ export const resizableSplitVar = (storageKey: string): string => `--split-${enco
 export const resizableSplitCollapsedVar = (storageKey: string): string =>
   `--splitc-${encodeKey(storageKey)}`;
 
+/** CSS custom property prefix of a `ResizablePanelGroup`'s stored sizes; `<count>-<index>` follows. */
+export const resizablePanelsVar = (storageKey: string): string =>
+  `--panels-${encodeKey(storageKey)}-`;
+
 export const collapsedStorageKey = (storageKey: string): string => `${storageKey}.collapsed`;
 
 export const escapeForScript = (json: string): string =>
@@ -38,7 +45,8 @@ export const escapeForScript = (json: string): string =>
 
 /**
  * Inline script for the document head: copies each stored size (and collapsed flag) onto
- * `<html>` as CSS variables, so the first paint already has the final layout.
+ * `<html>` as CSS variables, so the first paint already has the final layout. Takes the keys of
+ * `ResizableSplit`s (px) and `ResizablePanelGroup`s (a percent array) alike.
  */
 export const resizableSplitPrepaint = (storageKeys: string[]): string => {
   const entries = escapeForScript(
@@ -48,14 +56,18 @@ export const resizableSplitPrepaint = (storageKeys: string[]): string => {
         resizableSplitVar(key),
         collapsedStorageKey(key),
         resizableSplitCollapsedVar(key),
+        resizablePanelsVar(key),
       ])
     )
   );
   return (
-    `try{var d=document.documentElement,L=localStorage;${entries}.forEach(function(e){` +
-    `var n=parseInt(L.getItem(e[0]),10);` +
+    `try{var d=document.documentElement,L=localStorage;${entries}.forEach(function(e){try{` +
+    `var r=L.getItem(e[0]);if(r&&r.charAt(0)==='['){var a=JSON.parse(r),t=0;` +
+    `if(a.every(function(n){t+=n;return typeof n==='number'&&n>=0&&n<=100})&&Math.abs(t-100)<=1)` +
+    `a.forEach(function(n,i){d.style.setProperty(e[4]+a.length+'-'+i,n+'%')});return}` +
+    `var n=parseInt(r,10);` +
     `if(n>0&&n<${String(MAX_STORED_PX)})d.style.setProperty(e[1],n+'px');` +
-    `if(L.getItem(e[2])==='1')d.style.setProperty(e[3],'0px')})}catch(e){}`
+    `if(L.getItem(e[2])==='1')d.style.setProperty(e[3],'0px')}catch(x){}})}catch(e){}`
   );
 };
 

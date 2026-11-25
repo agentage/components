@@ -1,10 +1,10 @@
-# Design-system showcase, deployed as its own Swarm stack (agentage-ds) onto the
-# shared traefik-public network. Distinct router/middleware names (ds-*) so it
+# Components showcase, deployed as its own Swarm stack (agentage-components) onto the
+# shared traefik-public network. Distinct router/middleware names (components-*) so it
 # coexists with other stacks. Static SPA, env-agnostic - Traefik routes by host
 # (${SITE_FQDN} = ds.agentage.io in prod, dev.ds.agentage.io in dev).
 services:
   showcase:
-    image: ghcr.io/agentage/design-system/showcase:${IMAGE_TAG}
+    image: ghcr.io/agentage/components/showcase:${IMAGE_TAG}
     cap_drop:
       - ALL
     networks:
@@ -18,17 +18,17 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - traefik.http.routers.ds-https.rule=Host(`${SITE_FQDN}`)
-        - traefik.http.routers.ds-https.entrypoints=https
-        - traefik.http.routers.ds-https.tls=true
-        - traefik.http.routers.ds-https.tls.certresolver=letsencrypt
-        - traefik.http.routers.ds-https.middlewares=ds-secure-headers
-        - traefik.http.services.ds.loadbalancer.server.port=8080
-        - traefik.http.middlewares.ds-secure-headers.headers.stsSeconds=31536000
-        - traefik.http.middlewares.ds-secure-headers.headers.stsIncludeSubdomains=true
-        - traefik.http.middlewares.ds-secure-headers.headers.contentTypeNosniff=true
-        - traefik.http.middlewares.ds-secure-headers.headers.customFrameOptionsValue=SAMEORIGIN
-        - traefik.http.middlewares.ds-secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin
+        - traefik.http.routers.components-https.rule=Host(`${SITE_FQDN}`)
+        - traefik.http.routers.components-https.entrypoints=https
+        - traefik.http.routers.components-https.tls=true
+        - traefik.http.routers.components-https.tls.certresolver=letsencrypt
+        - traefik.http.routers.components-https.middlewares=components-secure-headers
+        - traefik.http.services.components.loadbalancer.server.port=8080
+        - traefik.http.middlewares.components-secure-headers.headers.stsSeconds=31536000
+        - traefik.http.middlewares.components-secure-headers.headers.stsIncludeSubdomains=true
+        - traefik.http.middlewares.components-secure-headers.headers.contentTypeNosniff=true
+        - traefik.http.middlewares.components-secure-headers.headers.customFrameOptionsValue=SAMEORIGIN
+        - traefik.http.middlewares.components-secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin
       resources:
         limits:
           cpus: '0.25'

@@ -2,8 +2,10 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
+const PILL = 'gap-1 rounded-full border bg-transparent px-2 font-normal';
+
 export const badgeVariants = cva(
-  'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium transition-colors',
+  'inline-flex h-5 items-center whitespace-nowrap rounded-md px-1.5 text-xs leading-none font-medium transition-colors',
   {
     variants: {
       variant: {
@@ -14,6 +16,16 @@ export const badgeVariants = cva(
         warning: 'bg-warning/10 text-warning border border-warning/20',
         info: 'bg-info/10 text-info border border-info/20',
         outline: 'border border-border text-foreground',
+        /** Loud count or state pill: solid accent, fully rounded, bold. */
+        solid:
+          'min-w-5 justify-center rounded-full border border-transparent bg-primary font-bold text-primary-foreground',
+        // Status pills: 20 px, px 8, fully rounded, tinted rule, tone text.
+        'outline-success': `${PILL} border-success/45 text-success`,
+        'outline-primary': `${PILL} border-primary/50 text-primary-emphasis`,
+        'outline-destructive': `${PILL} border-destructive/50 text-destructive`,
+        'outline-warning': `${PILL} border-warning/50 text-warning`,
+        'outline-info': `${PILL} border-info/50 text-info`,
+        'outline-muted': `${PILL} border-border text-muted-foreground`,
       },
     },
     defaultVariants: {
@@ -22,11 +34,30 @@ export const badgeVariants = cva(
   }
 );
 
-export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>;
+export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> &
+  VariantProps<typeof badgeVariants> & {
+    /** Count badge: renders the number (solid by default) and nothing at 0. */
+    count?: number;
+    /** Shows `max+` above this number; default 99. */
+    max?: number;
+  };
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, ...props }, ref) => (
-    <span ref={ref} className={cn(badgeVariants({ variant, className }))} {...props} />
-  )
+  ({ className, variant, count, max = 99, children, ...props }, ref) => {
+    if (count !== undefined && count <= 0) return null;
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          badgeVariants({ variant: variant ?? (count !== undefined ? 'solid' : undefined) }),
+          className
+        )}
+        data-slot="badge"
+        {...props}
+      >
+        {count === undefined ? children : count > max ? `${String(max)}+` : count}
+      </span>
+    );
+  }
 );
 Badge.displayName = 'Badge';

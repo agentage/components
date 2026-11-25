@@ -1,5 +1,6 @@
+import * as React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion';
 
 const setup = () =>
@@ -97,5 +98,92 @@ describe('Accordion pass-through', () => {
     expect((container.querySelector('[data-slot="accordion-item"]') as HTMLElement).dataset.x).toBe(
       'i'
     );
+  });
+});
+
+describe('Accordion headers and state', () => {
+  it('keeps every header a Tab stop', () => {
+    setup();
+    expect(trigger('One').tabIndex).toBe(0);
+    expect(trigger('Three').tabIndex).toBe(0);
+    expect(trigger('One').hasAttribute('tabindex')).toBe(false);
+  });
+
+  it('opens several items with type multiple', () => {
+    render(
+      <Accordion type="multiple">
+        <AccordionItem value="a">
+          <AccordionTrigger>One</AccordionTrigger>
+          <AccordionContent>Body A</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="b">
+          <AccordionTrigger>Two</AccordionTrigger>
+          <AccordionContent>Body B</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
+    fireEvent.click(trigger('One'));
+    fireEvent.click(trigger('Two'));
+    expect(trigger('One').getAttribute('aria-expanded')).toBe('true');
+    expect(trigger('Two').getAttribute('aria-expanded')).toBe('true');
+  });
+});
+
+describe('Accordion section variant', () => {
+  const sections = (key?: string) => (
+    <Accordion type="multiple" variant="section" level={3} storageKey={key} defaultValue={['api']}>
+      <AccordionItem value="api">
+        <AccordionTrigger icon={<svg data-testid="icon" />} summary="/api/root">
+          API
+        </AccordionTrigger>
+        <AccordionContent>routes</AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="store">
+        <AccordionTrigger summary="postgres">Store</AccordionTrigger>
+        <AccordionContent>tables</AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+  const named = (name: RegExp) => screen.getByRole('button', { name });
+
+  afterEach(() => localStorage.clear());
+
+  it('renders headings with a summary and several open sections', () => {
+    render(sections());
+    expect(screen.getByRole('heading', { level: 3, name: /API/ })).toBeTruthy();
+    expect(screen.getByText('/api/root')).toBeTruthy();
+    fireEvent.click(named(/Store/));
+    expect(named(/Store/).getAttribute('aria-expanded')).toBe('true');
+    expect(named(/API/).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('makes a closed body inert', () => {
+    render(sections());
+    const region = screen.getByRole('region', { name: /API/ });
+    fireEvent.click(named(/API/));
+    expect(region.hasAttribute('inert')).toBe(true);
+  });
+
+  it('ignores a stored value of another shape', () => {
+    localStorage.setItem('secs', JSON.stringify({ api: false }));
+    render(sections('secs'));
+    expect(named(/API/).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('ignores a stored array that holds other than strings', () => {
+    localStorage.setItem('secs', JSON.stringify([1, null]));
+    render(sections('secs'));
+    expect(named(/API/).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('persists the open sections under storageKey', () => {
+    const { unmount } = render(sections('secs'));
+    fireEvent.click(named(/API/));
+    fireEvent.click(named(/Store/));
+    expect(JSON.parse(localStorage.getItem('secs') ?? '[]')).toEqual(['store']);
+    unmount();
+    render(sections('secs'));
+    expect(named(/API/).getAttribute('aria-expanded')).toBe('false');
+    expect(named(/Store/).getAttribute('aria-expanded')).toBe('true');
   });
 });

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { withDescribedBy } from '../lib/aria';
+import { useOverlayLayer } from '../lib/overlay-layer';
 import { useAnchorPosition, type AnchorSide } from '../lib/use-anchor-position';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
@@ -47,16 +48,7 @@ export const Tooltip = ({
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') hide();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return (): void => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [open, hide]);
+  useOverlayLayer(showing, { refs: [anchorRef, surfaceRef], onEscape: () => hide() });
 
   return (
     <span
@@ -80,8 +72,8 @@ export const Tooltip = ({
             role="tooltip"
             style={{ position: 'fixed', top, left }}
             className={cn(
-              'z-[var(--z-overlay,50)] max-w-xs rounded-md bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md',
-              'animate-in fade-in-0 zoom-in-95',
+              'z-[var(--z-overlay,50)] max-w-xs rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-[var(--shadow-popover)]',
+              'motion-safe:animate-menu-in',
               className
             )}
             data-slot="tooltip-content"

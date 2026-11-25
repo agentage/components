@@ -14,15 +14,22 @@ const rank = (value: SortableValue): number | null => {
   return null;
 };
 
-/** Nullish sorts last in both directions; dates/numbers/booleans numerically, the rest by locale. */
-export const compareValues = (a: SortableValue, b: SortableValue): number => {
+/** Empty sorts last in both directions; dates, numbers and booleans numerically, the rest by locale. */
+export const compareValues = (
+  a: SortableValue,
+  b: SortableValue,
+  direction: SortDirection = 'asc'
+): number => {
   const aEmpty = a === null || a === undefined || a === '';
   const bEmpty = b === null || b === undefined || b === '';
   if (aEmpty || bEmpty) return aEmpty && bEmpty ? 0 : aEmpty ? 1 : -1;
 
+  const sign = direction === 'asc' ? 1 : -1;
   const [ra, rb] = [rank(a), rank(b)];
-  if (ra !== null && rb !== null) return ra - rb;
-  return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+  if (ra !== null && rb !== null) return sign * (ra - rb);
+  return (
+    sign * String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
+  );
 };
 
 /** Header clicks cycle the column through unsorted -> ascending -> descending -> unsorted. */

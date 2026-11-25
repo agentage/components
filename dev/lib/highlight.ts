@@ -4,7 +4,7 @@ import css from 'highlight.js/lib/languages/css';
 import typescript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 
-// Only the four languages the docs actually write — the full bundle is ~1 MB.
+// Only the four languages the docs actually write - the full bundle is ~1 MB.
 hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('css', css);
 hljs.registerLanguage('typescript', typescript);

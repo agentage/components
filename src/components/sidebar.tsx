@@ -29,7 +29,10 @@ export const SidebarHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center gap-2 px-4 py-4 border-b border-sidebar-border', className)}
+      className={cn(
+        'flex min-h-12 shrink-0 items-center gap-2 border-b border-sidebar-border px-4 py-2',
+        className
+      )}
       data-slot="sidebar-header"
       {...props}
     />
@@ -43,7 +46,7 @@ export const SidebarContent = React.forwardRef<HTMLElement, SidebarContentProps>
   ({ className, ...props }, ref) => (
     <nav
       ref={ref}
-      className={cn('flex-1 overflow-y-auto py-2', className)}
+      className={cn('flex-1 overflow-y-auto py-1', className)}
       data-slot="sidebar-content"
       {...props}
     />
@@ -55,7 +58,7 @@ export const SidebarFooter = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('border-t border-sidebar-border px-4 py-3', className)}
+      className={cn('border-t border-sidebar-border px-3 py-2.5', className)}
       data-slot="sidebar-footer"
       {...props}
     />
@@ -65,7 +68,12 @@ SidebarFooter.displayName = 'SidebarFooter';
 
 export const SidebarGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('px-2 py-2', className)} data-slot="sidebar-group" {...props} />
+    <div
+      ref={ref}
+      className={cn('flex flex-col gap-px px-1.5 py-1', className)}
+      data-slot="sidebar-group"
+      {...props}
+    />
   )
 );
 SidebarGroup.displayName = 'SidebarGroup';
@@ -77,7 +85,7 @@ export const SidebarGroupLabel = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'px-2 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider',
+      'px-2 pt-2 pb-1 text-xs font-medium uppercase tracking-[0.06em] text-muted-foreground',
       className
     )}
     data-slot="sidebar-group-label"

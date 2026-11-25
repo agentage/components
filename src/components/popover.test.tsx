@@ -14,8 +14,8 @@ const Harness = (): React.JSX.Element => {
           </button>
         }
         content={<button type="button">Edit</button>}
-        isOpen={open}
-        onClose={() => setOpen(false)}
+        open={open}
+        onOpenChange={() => setOpen(false)}
       />
     </div>
   );
@@ -28,8 +28,8 @@ describe('Popover', () => {
         <Popover
           trigger={<button type="button">Details</button>}
           content="Machine info"
-          isOpen
-          onClose={vi.fn()}
+          open
+          onOpenChange={vi.fn()}
         />
       </div>
     );
@@ -45,8 +45,8 @@ describe('Popover', () => {
       <Popover
         trigger={<button type="button">Details</button>}
         content="Machine info"
-        isOpen
-        onClose={onClose}
+        open
+        onOpenChange={onClose}
       />
     );
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -73,8 +73,8 @@ describe('Popover', () => {
         <Popover
           trigger={<button type="button">Details</button>}
           content="Machine info"
-          isOpen
-          onClose={onClose}
+          open
+          onOpenChange={onClose}
         />
         <button type="button">Elsewhere</button>
       </>
@@ -93,22 +93,41 @@ describe('Popover surface props', () => {
       <Popover
         trigger={<span>t</span>}
         content="c"
-        isOpen
-        onClose={vi.fn()}
+        open
+        onOpenChange={vi.fn()}
         className="mt-4"
         id="pop"
         data-testid="pop"
       />
     );
     const content = document.body.querySelector('[data-slot="popover-content"]');
-    expect(content?.className).toBe(
-      'z-[var(--z-overlay,50)] min-w-[300px] rounded-lg border border-border bg-popover p-4 shadow-lg mt-4'
-    );
+    expect(content?.className.split(' ').at(-1)).toBe('mt-4');
     expect(content?.id).toBe('pop');
   });
 
   it('accepts the canonical start/end align aliases', () => {
-    render(<Popover trigger={<span>t</span>} content="c" isOpen onClose={vi.fn()} align="end" />);
+    render(
+      <Popover trigger={<span>t</span>} content="c" open onOpenChange={vi.fn()} align="end" />
+    );
     expect(document.body.querySelector('[data-slot="popover-content"]')).not.toBeNull();
+  });
+});
+
+describe('Popover side', () => {
+  it('opens on the given side as a named dialog and closes on Escape', () => {
+    const close = vi.fn();
+    render(
+      <Popover
+        open
+        side="bottom"
+        onOpenChange={close}
+        aria-label="Pick"
+        trigger={<button>t</button>}
+        content="c"
+      />
+    );
+    expect(screen.getByRole('dialog', { name: 'Pick' })).toBeTruthy();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(close).toHaveBeenCalled();
   });
 });

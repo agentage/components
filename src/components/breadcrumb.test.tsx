@@ -6,6 +6,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from './breadcrumb';
 
 const setup = () =>
@@ -40,8 +41,25 @@ describe('Breadcrumb', () => {
 
   it('gives breadcrumb links a focus-visible ring', () => {
     setup();
-    expect(screen.getByRole('link', { name: 'Home' }).className).toContain(
-      'focus-visible:ring-ring/50'
+    expect(screen.getByRole('link', { name: 'Home' }).className).toContain('focus-ring');
+  });
+
+  it('renders the path variant with slash separators on the nav', () => {
+    render(
+      <Breadcrumb variant="path">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">services</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>notes.md</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     );
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(nav.dataset.variant).toBe('path');
+    expect(nav.textContent).toContain('/');
   });
 });

@@ -1,22 +1,17 @@
 'use client';
-import { Separator } from '../../src';
 
-export const Demo = () => (
+export const Example = () => (
   <>
     <div className="space-y-3">
       <div className="grid grid-cols-[100px_1fr] gap-2 items-baseline">
         <span className="text-xs text-muted-foreground font-mono">font-sans</span>
-        <p className="font-sans text-base">
-          system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto
-        </p>
+        <p className="font-sans text-base">The system UI sans stack</p>
       </div>
       <div className="grid grid-cols-[100px_1fr] gap-2 items-baseline">
         <span className="text-xs text-muted-foreground font-mono">font-mono</span>
-        <p className="font-mono text-base">
-          ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas
-        </p>
+        <p className="font-mono text-base">The system monospace stack</p>
       </div>
-      <Separator />
+      <div role="none" className="h-px w-full bg-border" />
       <div className="space-y-2">
         {(
           [
@@ -38,7 +33,7 @@ export const Demo = () => (
           </div>
         ))}
       </div>
-      <Separator />
+      <div role="none" className="h-px w-full bg-border" />
       <div className="flex gap-6">
         {['font-normal', 'font-medium', 'font-semibold', 'font-bold'].map((w) => (
           <div key={w} className="text-center">
