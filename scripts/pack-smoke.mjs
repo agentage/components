@@ -35,13 +35,15 @@ process.on('exit', cleanup);
 // --- pack and "install" into a consumer outside the repo tree -------------------------------
 const packDir = join(work, 'pack');
 mkdirSync(packDir);
-const packed = JSON.parse(
+const packOutput = JSON.parse(
   execFileSync('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', packDir], {
     cwd: root,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'inherit'],
   })
-)[0];
+);
+// npm 10 prints an array, npm 12 an object keyed by package name.
+const packed = Array.isArray(packOutput) ? packOutput[0] : Object.values(packOutput)[0];
 const tarball = join(packDir, packed.filename);
 const files = packed.files.map((f) => f.path);
 
