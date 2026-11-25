@@ -12,4 +12,4 @@ export const sections = (mod: Record<string, unknown>): DemoEntry[] =>
 
 /** A second component's sections on the same page, each title prefixed with its name. */
 export const more = (name: string, mod: Record<string, unknown>): DemoEntry[] =>
-  sections(mod).map((d) => ({ ...d, title: `${name}: ${d.title ?? ''}` }));
+  sections(mod).map((d) => ({ ...d, title: `${name}: ${d.title ?? ''}`, group: name }));

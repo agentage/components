@@ -3,7 +3,6 @@ import { sections } from './sections';
 import * as Breadcrumb from '../demos/breadcrumb';
 import * as NavRow from '../demos/nav-row';
 import * as PageHeader from '../demos/page-header';
-import * as Pagination from '../demos/pagination';
 import * as SectionIndex from '../demos/section-index';
 import * as Sidebar from '../demos/sidebar';
 import * as Tabs from '../demos/tabs';
@@ -63,19 +62,11 @@ export const NAVIGATION: CategoryEntry = {
       demos: sections(Breadcrumb),
     },
     {
-      slug: 'pagination',
-      name: 'Pagination',
-      description: 'Page buttons with previous and next.',
-      exports: ['Pagination'],
-      parts: [],
-      demos: sections(Pagination),
-    },
-    {
       slug: 'section-index',
       name: 'SectionIndex',
       description: 'An on-page index that follows the scroll position.',
-      exports: ['SectionIndex'],
-      parts: ['useScrollSpy'],
+      exports: ['SectionIndex', 'useScrollSpy'],
+      parts: [],
       demos: sections(SectionIndex),
     },
     {

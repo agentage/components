@@ -72,6 +72,7 @@ export const itemColumns = (): DataViewColumn<DemoItem>[] => [
   },
   {
     key: 'labels',
+    searchable: true,
     cardSlot: 'chip',
     header: 'Labels',
     className: 'min-w-36',
@@ -103,6 +104,20 @@ export const itemColumns = (): DataViewColumn<DemoItem>[] => [
         {GROUPS.find((p) => p.k === t.group)?.n}
       </Badge>
     ),
+  },
+  {
+    key: 'groupName',
+    header: 'Group name',
+    visibility: 'none',
+    searchable: true,
+    value: (t) => GROUPS.find((p) => p.k === t.group)?.n ?? t.group,
+  },
+  {
+    key: 'assigneeName',
+    header: 'Assignee name',
+    visibility: 'none',
+    searchable: true,
+    value: (t) => personName(t.assignee),
   },
   {
     key: 'due',

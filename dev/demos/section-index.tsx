@@ -25,7 +25,7 @@ export const Example = () => {
   };
 
   return (
-    <Block caption="Scroll the panel and the marker follows the section in view. Click an item to jump.">
+    <Block caption="Scroll the panel and the marker follows the section in view; the useScrollSpy hook returns its id. Click an item to jump.">
       <div className="grid grid-cols-[172px_minmax(0,1fr)] gap-6 rounded-lg border border-border p-4">
         <SectionIndex
           sections={SECTIONS}

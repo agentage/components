@@ -149,7 +149,7 @@ export const Example = () => {
             cells={checkCells(90)}
             summary="Last 90 checks"
           />
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] items-stretch gap-3">
             <StatCard
               title="Uptime"
               value="99.98%"

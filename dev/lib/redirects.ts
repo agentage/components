@@ -92,6 +92,9 @@ const PAGES: Record<string, string> = {
   'patterns/detail-pane': 'patterns/detail',
   'patterns/incident-timeline': 'patterns/detail',
   'patterns/page-header-progress': 'patterns/detail',
+  'foundations/hooks': 'display/card#useannounce-example',
+  'navigation/pagination': 'lists/table#pagination-example',
+  'display/collapsible': 'display/accordion#collapsible-example',
 };
 
 const CATEGORIES: Record<string, string> = {
@@ -105,19 +108,20 @@ const CATEGORIES: Record<string, string> = {
   site: 'foundations',
 };
 
-const once = (path: string): string => {
+const once = (full: string): string => {
+  const [path = ''] = full.split('#');
   const [, root, category, page, ...rest] = path.replace(/\/+$/, '').split('/');
-  if (root !== 'components' || !category || rest.length) return path;
+  if (root !== 'components' || !category || rest.length) return full;
   const moved = page ? PAGES[`${category}/${page}`] : undefined;
   if (moved) return `/components/${moved}`;
   const renamed = CATEGORIES[category];
-  return renamed ? `/components/${[renamed, page].filter(Boolean).join('/')}` : path;
+  return renamed ? `/components/${[renamed, page].filter(Boolean).join('/')}` : full;
 };
 
-/** The current path for a possibly old one, or the same path when nothing moved; moves chain. */
+/** The current path (with a `#section` when a page was folded in) for a possibly old one; moves chain. */
 export const redirectedPath = (path: string): string => {
   let current = path;
-  for (let i = 0; i < 4; i += 1) {
+  for (let i = 0; i < 6; i += 1) {
     const next = once(current);
     if (next === current) break;
     current = next;

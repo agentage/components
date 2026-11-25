@@ -127,7 +127,7 @@ export const NOTES_RENAMED: Note[] = [
   ],
   [
     'DataView',
-    'See the DataView row under Removed: the state, selection and action props are now `state`, `defaultState` and `actions`.',
+    'See the DataView row under Removed: the state, selection and action props are now `state`, `defaultState` (with its `storageKey` field) and `actions`.',
   ],
   ['DirtyBar, TreeSelect', 'The per-button label props are one `labels` object.'],
   [

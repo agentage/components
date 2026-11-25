@@ -15,6 +15,9 @@ export interface DataViewState extends ListControlsState {
   rowsBy: string | null;
 }
 
+/** The start state, plus an optional `storageKey` that keeps the controls and collapsed groups in localStorage; a stored value wins. */
+export type DataViewDefault = Partial<DataViewState> & { storageKey?: string };
+
 /** What the user can do with rows. Each one is optional. */
 export interface DataViewActions<T> {
   /** Click or Enter on a row or card. The opened row stays current unless `bulk` is set. */
@@ -40,10 +43,8 @@ export interface DataViewProps<T> {
   state?: Partial<DataViewState>;
   /** Reports the whole state after every change. */
   onStateChange?: (state: DataViewState) => void;
-  /** Start state of the uncontrolled keys, for example `{ groupBy: 'status' }`. */
-  defaultState?: Partial<DataViewState>;
-  /** Persist the controls and the collapsed groups in localStorage under this key. */
-  storageKey?: string;
+  /** Start state of the uncontrolled keys, for example `{ groupBy: 'status' }`; see `DataViewDefault`. */
+  defaultState?: DataViewDefault;
   actions?: DataViewActions<T>;
   /** Card of the cards and board views; an item card built from the columns by default. */
   renderCard?: (row: T) => React.ReactNode;

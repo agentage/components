@@ -65,8 +65,7 @@ describe('DataView selection and groups', () => {
     const { unmount } = render(
       <DataView
         {...base}
-        defaultState={{ groupBy: 'status' }}
-        storageKey="dv-test"
+        defaultState={{ groupBy: 'status', storageKey: 'dv-test' }}
         actions={{ add }}
       />
     );
@@ -78,7 +77,7 @@ describe('DataView selection and groups', () => {
     fireEvent.click(toggles()[0]);
     expect(localStorage.getItem('dv-test.collapsed.status')).toBe('["todo"]');
     unmount();
-    render(<DataView {...base} defaultState={{ groupBy: 'status' }} storageKey="dv-test" />);
+    render(<DataView {...base} defaultState={{ groupBy: 'status', storageKey: 'dv-test' }} />);
     expect(toggles().map((t) => t.getAttribute('aria-expanded'))).toEqual(['false', 'true']);
   });
 });

@@ -26,6 +26,7 @@ import { DataViewToolbar } from './data-view.toolbar';
 export type { DataViewColumn, DataViewValue } from './data-view.config';
 export type {
   DataViewActions,
+  DataViewDefault,
   DataViewKind,
   DataViewProps,
   DataViewState,

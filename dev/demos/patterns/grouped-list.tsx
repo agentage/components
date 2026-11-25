@@ -81,6 +81,8 @@ const COLUMNS: DataViewColumn<DemoEvent>[] = [
   },
   {
     key: 'outcome',
+    searchable: true,
+    value: (e) => (e.outcome ? OUTCOME_LABEL[e.outcome] : ''),
     header: '',
     label: 'Outcome',
     className: 'min-w-34',

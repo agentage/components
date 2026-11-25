@@ -100,20 +100,20 @@ Full walkthrough: [ds.agentage.io/install](https://ds.agentage.io/install).
 
 ## What's in it
 
-59 documented component pages in seven categories plus 11 patterns, each with props generated from
+56 documented component pages in seven categories plus 11 patterns, each with props generated from
 the source. The **Core** set (Button, Card, Input, Select, List, DataView, Dialog, Toast and more)
 sits at the top of the docs sidebar.
 
-| Category                                                          | What's there                                                                                                                                                        |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Foundations](https://ds.agentage.io/components/foundations) (11) | Button, IconButton, Badge, Chip, Avatar, Kbd, Skeleton and Spinner, StatusGlyph and PriorityGlyph, Prose, CopyButton, hooks                                         |
-| [Forms](https://ds.agentage.io/components/forms) (11)             | Input and Textarea, SecretInput, Select, TreeSelect, DatePicker, Checkbox and Switch, RadioGroup, ToggleGroup, FormField and Label, Section, InlineEdit             |
-| [Navigation](https://ds.agentage.io/components/navigation) (7)    | NavRow and NavTree, Sidebar, Tabs, Breadcrumb, Pagination, SectionIndex, PageHeader                                                                                 |
-| [Lists and data](https://ds.agentage.io/components/lists) (6)     | List (with GroupHeader), Table, DataView, ListToolbar, LogView, DataTree                                                                                            |
-| [Display](https://ds.agentage.io/components/display) (13)         | Card, StatCard, Sparkline, DescriptionList, Progress, StatusBar, RelativeTime, CodeBlock, ContentBlocks, EmptyState, Collapsible, Accordion, StepList and CheckList |
-| [Overlays](https://ds.agentage.io/components/overlays) (7)        | Dialog, Sheet, Popover, Tooltip, DropdownMenu, Command palette, Resizable panels                                                                                    |
-| [Feedback](https://ds.agentage.io/components/feedback) (4)        | Alert, Toast, DirtyBar, ActionBar                                                                                                                                   |
-| [Patterns](https://ds.agentage.io/components/patterns) (11)       | List page, card grid, catalog with views, board, master and detail, detail view, history, settings form, logs explorer, file browser, monitoring                    |
+| Category                                                          | What's there                                                                                                                                                           |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Foundations](https://ds.agentage.io/components/foundations) (10) | Button, IconButton, Badge, Chip, Avatar, Kbd, Skeleton and Spinner, StatusGlyph and PriorityGlyph, Prose, CopyButton                                                   |
+| [Forms](https://ds.agentage.io/components/forms) (11)             | Input and Textarea, SecretInput, Select, TreeSelect, DatePicker, Checkbox and Switch, RadioGroup, ToggleGroup, FormField and Label, Section, InlineEdit                |
+| [Navigation](https://ds.agentage.io/components/navigation) (6)    | NavRow and NavTree, Sidebar, Tabs, Breadcrumb, SectionIndex, PageHeader                                                                                                |
+| [Lists and data](https://ds.agentage.io/components/lists) (6)     | List (with GroupHeader), Table and Pagination, DataView, ListToolbar, LogView, DataTree                                                                                |
+| [Display](https://ds.agentage.io/components/display) (12)         | Card, StatCard, Sparkline, DescriptionList, Progress, StatusBar, RelativeTime, CodeBlock, ContentBlocks, EmptyState, Accordion and Collapsible, StepList and CheckList |
+| [Overlays](https://ds.agentage.io/components/overlays) (7)        | Dialog, Sheet, Popover, Tooltip, DropdownMenu, Command palette, Resizable panels                                                                                       |
+| [Feedback](https://ds.agentage.io/components/feedback) (4)        | Alert, Toast, DirtyBar, ActionBar                                                                                                                                      |
+| [Patterns](https://ds.agentage.io/components/patterns) (11)       | List page, card grid, catalog with views, board, master and detail, detail view, history, settings form, logs explorer, file browser, monitoring                       |
 
 Beside the pages, composable parts (`CardHeader`, `TableRow`, `CommandItem` and friends) are
 exported too. Only the modules the barrel re-exports have a subpath in the

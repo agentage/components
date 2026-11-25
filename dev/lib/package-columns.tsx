@@ -27,6 +27,8 @@ export const packageColumns = (
       </span>
     ),
   },
+  { key: 'id', header: 'Id', visibility: 'none', searchable: true },
+  { key: 'description', header: 'Description', visibility: 'none', searchable: true },
   {
     key: 'host',
     header: 'Host',
@@ -46,6 +48,7 @@ export const packageColumns = (
   {
     key: 'state',
     header: 'State',
+    searchable: true,
     className: 'min-w-24',
     filter: 'multi',
     sortable: true,

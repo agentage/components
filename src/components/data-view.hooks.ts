@@ -5,15 +5,14 @@ import { EMPTY_LIST_CONTROLS, type ListControlsState } from '../lib/list-control
 import { readListControls, writeListControls } from '../lib/list-controls-storage';
 import { useListControls, type ListControls } from '../lib/use-list-controls';
 import { readPersisted, useRestoring, writePersisted } from '../lib/use-persisted-state';
-import type { DataViewState } from './data-view.types';
+import type { DataViewDefault, DataViewState } from './data-view.types';
 
 export interface StateSeed {
   views: string[];
   columns: { key: string; groupable?: boolean; sortable?: boolean }[];
   state?: Partial<DataViewState>;
-  defaultState?: Partial<DataViewState>;
+  defaultState?: DataViewDefault;
   onStateChange?: (state: DataViewState) => void;
-  storageKey?: string;
 }
 
 const LIST_KEYS = ['query', 'filters', 'view', 'sort', 'groupBy', 'flags'] as const;
@@ -34,7 +33,8 @@ const useListPart = (seed: StateSeed, report: (list: ListControlsState) => void)
   }));
   const [inner, setInner] = React.useState(initial);
   const [restoring, setRestoring] = useRestoring();
-  const { storageKey, columns } = seed;
+  const { columns } = seed;
+  const storageKey = seed.defaultState?.storageKey;
   React.useLayoutEffect(() => {
     if (!storageKey) return;
     const stored = readListControls(storageKey);
@@ -115,7 +115,7 @@ export const useDataViewState = (seed: StateSeed): DataViewControls => {
   };
   const [c, listRestoring] = useListPart(seed, (list) => report(list));
   const [collapsedOwn, setCollapsedOwn, collapseRestoring] = useCollapsedGroups(
-    seed.storageKey,
+    seed.defaultState?.storageKey,
     c.state.groupBy
   );
   const sel = own.selection ?? selection;

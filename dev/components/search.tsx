@@ -3,7 +3,20 @@ import { useEffect, useState } from 'react';
 import { Badge, Command, CommandEmpty, CommandGroup, CommandItem, Kbd } from '../../src';
 import { builtFrom } from '../lib/built-from';
 import { useRoute } from '../lib/router';
+import { sectionId } from '../lib/section-id';
 import { ALL_COMPONENTS, CATEGORIES, componentPath } from '../registry';
+
+/** Components folded onto another page: one palette entry each, landing on their first section. */
+const FOLDED = ALL_COMPONENTS.flatMap(({ category, component }) => {
+  const first = new Map<string, string>();
+  for (const d of component.demos)
+    if (d.group && !first.has(d.group)) first.set(d.group, d.title ?? '');
+  return [...first].map(([name, title]) => ({
+    name,
+    host: component.name,
+    path: `${componentPath(category.slug, component.slug)}#${sectionId(title)}`,
+  }));
+});
 
 const STATIC_PAGES = [
   { label: 'Home', path: '/', keywords: 'overview index' },
@@ -94,6 +107,20 @@ export const Search = () => {
                   Core
                 </Badge>
               )}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+        <CommandGroup heading="Sections">
+          {FOLDED.map((f) => (
+            <CommandItem
+              key={f.path}
+              value={`${f.name} ${f.host}`}
+              shortcut={f.host}
+              onClick={() => {
+                go(f.path);
+              }}
+            >
+              {f.name}
             </CommandItem>
           ))}
         </CommandGroup>

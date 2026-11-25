@@ -100,7 +100,6 @@ const COLUMNS: DataViewColumn<Doc>[] = [
   {
     key: 'title',
     header: 'Title',
-    searchable: true,
     sortable: true,
     grow: true,
     cell: (d) => <span className="truncate font-medium">{d.title}</span>,
@@ -108,7 +107,6 @@ const COLUMNS: DataViewColumn<Doc>[] = [
   {
     key: 'id',
     header: 'ID',
-    searchable: true,
     nowrap: true,
     hideBelow: 640,
     cell: (d) => <span className="font-mono text-xs text-muted-foreground">{d.id}</span>,
@@ -184,7 +182,7 @@ export const Example = () => (
 
 export const Variants = () => (
   <Block
-    caption="Views add a switch between table, cards and board; the choice persists in this browser."
+    caption="Views add a switch between table, cards and board; the choice persists in this browser through the storageKey field of defaultState."
     className={FRAME}
   >
     <DataView
@@ -194,8 +192,7 @@ export const Variants = () => (
       columns={COLUMNS}
       getRowId={(d) => d.id}
       views={['table', 'cards', 'board']}
-      defaultState={{ groupBy: 'state' }}
-      storageKey="ds-docs-data-view"
+      defaultState={{ groupBy: 'state', storageKey: 'ds-docs-data-view' }}
       actions={{ menu }}
       empty={empty}
     />
