@@ -8,8 +8,6 @@ import { Kbd } from './kbd';
 import { CommandContext } from './command.context';
 import { commandContentVariants } from './command.variants';
 
-export { commandContentVariants, commandItemVariants } from './command.variants';
-
 const SearchIcon = (): React.JSX.Element => (
   <svg
     width="16"

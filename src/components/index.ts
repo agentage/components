@@ -298,7 +298,12 @@ export type {
   ResizablePanelProps,
   ResizeDirection,
 } from './resizable';
-export { ResizableSplit, useResizableSplit } from './resizable-split';
+export {
+  ResizableSplit,
+  resizableSplitCollapsedVar,
+  resizableSplitVar,
+  useResizableSplit,
+} from './resizable-split';
 export type { ResizableSplitApi, ResizableSplitProps } from './resizable-split';
 export { ResizableSplitPrepaint, resizableSplitPrepaint } from './resizable-split-prepaint';
 export type { ResizableSplitPrepaintProps } from './resizable-split-prepaint';

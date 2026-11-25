@@ -9,7 +9,7 @@ import { listToolbarVariants } from './list-toolbar.variants';
 export { ToolbarSearch } from './list-toolbar.search';
 export type { ToolbarSearchProps } from './list-toolbar.search';
 
-export { DisplayMenu, FilterMenu, ListToolbarIcons } from './list-toolbar.menus';
+export { DisplayMenu, FilterMenu } from './list-toolbar.menus';
 import { useRovingFocus } from '../lib/use-roving-focus';
 export { ActiveFilters, ViewSwitch } from './list-toolbar.parts';
 export type { ActiveFiltersProps, ViewSwitchOption, ViewSwitchProps } from './list-toolbar.parts';

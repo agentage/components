@@ -11,8 +11,6 @@ import { cn } from '../lib/utils';
 import { dropdownMenuContentVariants } from './dropdown-menu.variants';
 import { focusMenuItem, handleMenuKeyDown, MenuCloseContext } from './menu.parts';
 
-export { dropdownMenuContentVariants, dropdownMenuItemVariants } from './dropdown-menu.variants';
-
 /** Components are assumed to render their own control; intrinsic tags must be a button or link. */
 const isInteractive = (element: React.ReactElement): boolean =>
   typeof element.type !== 'string' || element.type === 'button' || element.type === 'a';

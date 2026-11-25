@@ -21,9 +21,6 @@ const CollapsibleContext = createContext<CollapsibleContextValue>({
   contentId: '',
 });
 
-/** State and ids of the nearest Collapsible, for a custom trigger. */
-export const useCollapsible = (): CollapsibleContextValue => useContext(CollapsibleContext);
-
 export interface CollapsibleProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   open?: boolean;
   defaultOpen?: boolean;

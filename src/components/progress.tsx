@@ -4,7 +4,6 @@ import { cn } from '../lib/utils';
 import { LevelCue, progressLevel, ProgressTop } from './progress.meter';
 import { ProgressSegments, type ProgressSegment } from './progress.segments';
 
-export { segmentVariants } from './progress.segments';
 export type { ProgressSegment, ProgressSegmentTone } from './progress.segments';
 
 export const progressVariants = cva('h-full rounded-full transition-all duration-300', {
