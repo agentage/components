@@ -10,7 +10,6 @@ import {
   type ToggleGroupColumns,
 } from './toggle-group.variants';
 
-export { toggleButtonVariants, toggleGroupVariants } from './toggle-group.variants';
 export type { ToggleGroupColumns } from './toggle-group.variants';
 
 const isGridColumns = (n: number): n is ToggleGroupColumns =>

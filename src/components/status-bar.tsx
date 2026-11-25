@@ -7,8 +7,6 @@ import { useRovingFocus } from '../lib/use-roving-focus';
 import { cn } from '../lib/utils';
 import { statusBarTickVariants, statusBarTrackVariants } from './status-bar.variants';
 
-export { statusBarTickVariants } from './status-bar.variants';
-
 export type StatusBarTone =
   'success' | 'destructive' | 'warning' | 'info' | 'primary' | 'muted' | 'pending' | 'empty';
 

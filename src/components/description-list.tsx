@@ -7,8 +7,6 @@ import { CopyButton } from './copy-button';
 
 import { DESCRIPTION_LIST_INLINE, descriptionListVariants } from './description-list.variants';
 
-export { descriptionListVariants } from './description-list.variants';
-
 export interface DescriptionListProps
   extends React.HTMLAttributes<HTMLDListElement>, VariantProps<typeof descriptionListVariants> {}
 

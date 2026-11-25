@@ -26,11 +26,6 @@ import { resizablePanelGroupVariants } from './resizable.variants';
 
 export { ResizableHandle, ResizablePanel } from './resizable.parts';
 export type { ResizableHandleProps, ResizablePanelProps, ResizeDirection } from './resizable.parts';
-export {
-  resizableHandleVariants,
-  resizablePanelGroupVariants,
-  resizablePanelVariants,
-} from './resizable.variants';
 
 export interface ResizablePanelGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   direction?: ResizeDirection;

@@ -393,12 +393,13 @@
     "clean": "rm -rf dist",
     "exports:generate": "node scripts/generate-exports.mjs",
     "exports:check": "node scripts/generate-exports.mjs --check",
-    "verify": "npm run type-check && npm run type-check:dev && npm run type-check:e2e && npm run lint && npm run format:check && npm run exports:check && npm run test:coverage && npm run build",
+    "verify": "npm run type-check && npm run type-check:dev && npm run type-check:e2e && npm run lint && npm run format:check && npm run exports:check && npm run test:coverage && npm run build && npm run pack:smoke",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "type-check:e2e": "tsc --noEmit -p tsconfig.e2e.json",
     "props:generate": "node scripts/generate-props.mjs && prettier --write dev/generated/props.ts",
-    "type-check:dev": "tsc --noEmit -p tsconfig.dev.json"
+    "type-check:dev": "tsc --noEmit -p tsconfig.dev.json",
+    "pack:smoke": "node scripts/pack-smoke.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
