@@ -75,6 +75,9 @@ jobs:
           [ "$got" = "$GITHUB_SHA" ] \
             || { echo "::error::/health commit '$got' != '$GITHUB_SHA'"; exit 1; }
           echo "PASS image /health reports $got"
+          curl -fsS http://localhost:8080/.well-known/agentage-host.json | grep -q '"host":"components"' \
+            || { echo "::error::host contract route does not name the host"; exit 1; }
+          echo "PASS image names its host"
         env:
           GITHUB_SHA: ${{ github.sha }}
 
