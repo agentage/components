@@ -3450,7 +3450,7 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
       required: false,
       defaultValue: null,
       description:
-        'M in "Step N of M": the planned number of steps. Default: the number of calls so far.',
+        'M in "Step N of M": the planned number of steps. Default: the number of calls so far. N counts the direct `ToolCall` children only; calls nested inside a wrapper element are not counted.',
     },
   ],
   ToolbarSearch: [

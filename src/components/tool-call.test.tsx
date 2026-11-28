@@ -58,6 +58,21 @@ describe('ToolCall', () => {
   });
 });
 
+describe('ToolCall payloads that JSON cannot print', () => {
+  it('renders a circular object and a BigInt without throwing', () => {
+    const circular: Record<string, unknown> = { name: 'loop' };
+    circular.self = circular;
+    const { container } = render(
+      <>
+        <ToolCall name="a.circular" status="succeeded" input={circular} defaultOpen />
+        <ToolCall name="b.bigint" status="succeeded" output={BigInt(42)} defaultOpen />
+      </>
+    );
+    const pres = [...container.querySelectorAll('pre')].map((p) => p.textContent);
+    expect(pres).toEqual(['[object Object]', '42']);
+  });
+});
+
 describe('ToolGroup', () => {
   const calls = [
     <ToolCall key="a" name="memory.search" status="succeeded" />,

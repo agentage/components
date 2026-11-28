@@ -62,4 +62,15 @@ describe('Markdown', () => {
     expect(container.querySelector('[data-slot="code-block"]')).toBe(block);
     expect(container.textContent).toContain('Second paragraph grows');
   });
+
+  it('renders a fence tagged with a prototype name as plain code', () => {
+    for (const tag of ['constructor', '__proto__']) {
+      const { container, unmount } = render(
+        <Markdown>{`\`\`\`${tag}\nconst a = 1;\n\`\`\``}</Markdown>
+      );
+      expect(container.querySelector('pre')?.textContent).toBe('const a = 1;');
+      expect(container.querySelector('.hljs')).toBeNull();
+      unmount();
+    }
+  });
 });

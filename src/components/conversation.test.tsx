@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Conversation } from './conversation';
 
 let resize: (() => void) | undefined;
+const observed: Element[] = [];
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -11,7 +12,9 @@ beforeEach(() => {
       constructor(cb: () => void) {
         resize = cb;
       }
-      observe() {}
+      observe(el: Element) {
+        observed.push(el);
+      }
       disconnect() {}
     }
   );
@@ -29,8 +32,11 @@ const metrics = (el: HTMLElement, height: number) => {
 
 describe('Conversation', () => {
   it('is a named, keyboard-reachable log', () => {
+    observed.length = 0;
     render(<Conversation label="Chat">hi</Conversation>);
     const log = screen.getByRole('log', { name: 'Chat' });
+    expect(observed).toContain(log);
+    expect(observed).toHaveLength(2);
     expect(log.getAttribute('tabindex')).toBe('0');
   });
 

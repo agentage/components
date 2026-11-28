@@ -60,7 +60,8 @@ export const PromptInput = React.forwardRef<HTMLFormElement, PromptInputProps>(
     };
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
-      if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+      // keyCode 229: Safari confirms an IME composition with an Enter that is not marked composing.
+      if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing || e.keyCode === 229) return;
       e.preventDefault();
       send();
     };

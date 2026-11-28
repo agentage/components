@@ -31,6 +31,16 @@ const LANGUAGES = {
   dockerfile,
 };
 
+const ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+};
+
+const escapeHtml = (text: string): string => text.replace(/[&<>"']/g, (c) => ESCAPES[c] ?? c);
+
 const ALIASES: Record<string, keyof typeof LANGUAGES> = {
   ts: 'typescript',
   tsx: 'typescript',
@@ -55,17 +65,22 @@ const register = (): void => {
 export const codeLanguage = (language?: string): string | undefined => {
   const key = language?.trim().toLowerCase();
   if (!key) return undefined;
-  if (key in LANGUAGES) return key;
-  return ALIASES[key];
+  if (Object.hasOwn(LANGUAGES, key)) return key;
+  return Object.hasOwn(ALIASES, key) ? ALIASES[key] : undefined;
 };
 
 /**
  * Highlighted HTML for `code`, or null for an unknown language. The output is escaped by
- * highlight.js (only its own `hljs-*` spans are markup), so it is safe as inner HTML.
+ * highlight.js (only its own `hljs-*` spans are markup), so it is safe as inner HTML. It never
+ * throws: if highlighting fails, the escaped plain text comes back.
  */
 export const highlightCode = (code: string, language?: string): string | null => {
   const lang = codeLanguage(language);
   if (!lang) return null;
-  register();
-  return hljs.highlight(code, { language: lang, ignoreIllegals: true }).value;
+  try {
+    register();
+    return hljs.highlight(code, { language: lang, ignoreIllegals: true }).value;
+  } catch {
+    return escapeHtml(code);
+  }
 };

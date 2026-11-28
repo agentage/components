@@ -91,8 +91,23 @@ export const StatusMark = ({ status }: { status: ToolCallStatus }) => (
   <StatusGlyph {...TOOL_GLYPH[status]} />
 );
 
-const asText = (value: unknown): string =>
-  typeof value === 'string' ? value : (JSON.stringify(value, null, 2) ?? String(value));
+const plain = (value: unknown): string => {
+  try {
+    return String(value);
+  } catch {
+    return '[unprintable value]';
+  }
+};
+
+// Circular objects and BigInt make JSON.stringify throw; render must not.
+const asText = (value: unknown): string => {
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value, null, 2) ?? plain(value);
+  } catch {
+    return plain(value);
+  }
+};
 
 /** One labelled payload (Input, Output or Error): JSON highlighted, errors in the danger tone. */
 export const Payload = ({
@@ -104,8 +119,8 @@ export const Payload = ({
   value: unknown;
   error?: boolean;
 }) => {
-  const text = asText(value);
-  const html = error ? null : highlightCode(text, 'json');
+  const text = React.useMemo(() => asText(value), [value]);
+  const html = React.useMemo(() => (error ? null : highlightCode(text, 'json')), [text, error]);
   return (
     <div className="flex min-w-0 flex-col gap-1">
       <span className="flex h-5 items-center text-2xs uppercase tracking-[0.08em] text-muted-foreground">

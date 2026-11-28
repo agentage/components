@@ -51,6 +51,7 @@ export const Conversation = React.forwardRef<HTMLDivElement, ConversationProps>(
         else if (scroller.current) setAway(!atEnd(scroller.current));
       });
       ro.observe(col);
+      if (scroller.current) ro.observe(scroller.current);
       return () => ro.disconnect();
     }, [toEnd]);
 

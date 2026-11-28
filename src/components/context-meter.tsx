@@ -21,7 +21,8 @@ export const meterTone = (percent: number): string =>
 /** A ring that fills with use, for example the model context window. */
 export const ContextMeter = React.forwardRef<HTMLSpanElement, ContextMeterProps>(
   ({ value, max = 100, size = 'sm', label = 'Context window', className, ...props }, ref) => {
-    const percent = Math.round((Math.min(Math.max(value, 0), max) / (max || 1)) * 100);
+    const safe = Number.isFinite(value) ? value : 0;
+    const percent = Math.round((Math.min(Math.max(safe, 0), max) / (max || 1)) * 100);
     const { box, stroke, inset } = GEOMETRY[size];
     const c = box / 2;
     const r = c - inset;

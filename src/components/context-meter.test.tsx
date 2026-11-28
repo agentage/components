@@ -26,4 +26,10 @@ describe('ContextMeter', () => {
       'text-destructive'
     );
   });
+
+  it('counts a non-finite value as zero', () => {
+    render(<ContextMeter value={Number.NaN} />);
+    const meter = screen.getByRole('meter', { name: 'Context window 0%' });
+    expect(meter.getAttribute('aria-valuenow')).toBe('0');
+  });
 });

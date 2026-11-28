@@ -9,7 +9,10 @@ import { StatusMark, ToolGroupContext, ToolRow } from './tool-call.parts';
 export interface ToolGroupProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /** `running` reads "Step N of M", `succeeded` "Completed N steps", `failed` "Stopped at step N". */
   status: 'running' | 'succeeded' | 'failed';
-  /** M in "Step N of M": the planned number of steps. Default: the number of calls so far. */
+  /**
+   * M in "Step N of M": the planned number of steps. Default: the number of calls so far. N counts
+   * the direct `ToolCall` children only; calls nested inside a wrapper element are not counted.
+   */
   total?: number;
   /** For example "3.1 s". */
   duration?: React.ReactNode;

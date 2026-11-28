@@ -68,4 +68,14 @@ describe('PromptInput', () => {
     expect((box as HTMLTextAreaElement).value).toBe('hi');
     expect(screen.getByRole('button', { name: 'Attach' })).toBeTruthy();
   });
+
+  it('ignores the Enter that confirms an IME composition (keyCode 229)', () => {
+    const onSubmit = vi.fn();
+    render(<PromptInput onSubmit={onSubmit} defaultValue="にほん" />);
+    const box = screen.getByRole('textbox');
+    fireEvent.keyDown(box, { key: 'Enter', keyCode: 229 });
+    expect(onSubmit).not.toHaveBeenCalled();
+    fireEvent.keyDown(box, { key: 'Enter', keyCode: 13 });
+    expect(onSubmit).toHaveBeenCalledWith('にほん');
+  });
 });
