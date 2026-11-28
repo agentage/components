@@ -20,6 +20,27 @@ updates:
         patterns:
           - '*'
 
+  - package-ecosystem: npm
+    directory: /extensions/components
+    # Not chore(deps): prepare-release.yml counts that as a library patch.
+    commit-message:
+      prefix: 'chore(extension)'
+    schedule:
+      interval: weekly
+      day: friday
+      time: '16:07'
+      timezone: 'Etc/UTC'
+    assignees:
+      - vreshch
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+    groups:
+      extension-npm:
+        patterns:
+          - '*'
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

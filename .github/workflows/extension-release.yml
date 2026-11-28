@@ -1,0 +1,56 @@
+name: Extension release
+
+# A merge is the release of the components extension (extensions/components): agentage extension
+# release --changed gives it, when its folder differs from its last components@* tag, a date version
+# YYYY.MDD.N, the tag components@<version>, the image ghcr.io/agentage/components-pages and the
+# record on the GitHub release. site.hash puts every docs site change (dev/, src/) in the folder.
+# The package is private: nothing goes to npm. The library has its own release.yml.
+on:
+  push:
+    branches: [master]
+    # The site inputs and the folder; the cli still compares with the last tag, so nothing is missed.
+    paths:
+      - 'dev/**'
+      - 'src/**'
+      - 'extensions/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/extension-release.yml'
+
+concurrency:
+  group: extension-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    name: Image and record of the components extension
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            extensions/components/package-lock.json
+      - run: npm ci
+      - run: npm ci --ignore-scripts && npm run verify
+        working-directory: extensions/components
+      - name: The build left the tree clean (the release refuses a dirty one)
+        run: git status --porcelain && test -z "$(git status --porcelain)"
+      - env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USER: ${{ github.actor }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # The lockfile cli (0.76.0), never a fresh resolve; --changed reads extensions/* from the root.
+        run: extensions/components/node_modules/.bin/agentage extension release --changed

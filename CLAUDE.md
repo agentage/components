@@ -39,6 +39,12 @@ Single source of truth for Agentage Components (OKLCH tokens + React components)
 - Container healthcheck must probe `127.0.0.1`, not `localhost` - nginx binds IPv4 only; busybox wget picks `::1`.
 - Post-deploy verification lives in `scripts/verify-deploy.sh` (estate standard, same shape as auth/dashboard): it asserts `https://${SITE_FQDN}/health` reports **this** commit before checking that the page renders. A content grep alone is fail-open - on a failed rollout Swarm keeps the old task serving and the grep still matches.
 
+## Extension (docs site → components.next.agentage.io)
+
+- `extensions/components/` is the agentage extension `components` (private package, one `pages` part); its README has the build, the SPA routes and the release. Its own `package.json` and lock; the root `verify`, exports map and library release do not read it.
+- `.github/workflows/extension-ci.yml` and `extension-release.yml` (a merge releases `components@YYYY.MDD.N` and `ghcr.io/agentage/components-pages`; `release.yml` stays the npm publish).
+- After a change in `dev/` or `src/`, run `npm run site:hash` in `extensions/components` and commit `site.hash`, or the extension CI is red: the cli releases only on a change inside that folder. A change only in `extensions/` takes a `chore(extension):` title: `prepare-release.yml` counts every subject except `docs`, `ci` and `chore` (but it counts `chore(deps)`) as a library bump.
+
 ## Conventions
 
 - Node 22+, TS strict, ESM, React 19 peer. Prettier (single quotes, 100 cols). No `any`.

@@ -5,3 +5,6 @@ package-lock.json
 *.snap
 dist-showcase
 e2e/**/*-snapshots
+extensions/*/.agentage
+extensions/*/dist
+extensions/*/coverage

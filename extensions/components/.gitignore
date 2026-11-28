@@ -1,0 +1,5 @@
+dist.next/
+dist.prev/
+.agentage/
+.kit/
+*.tgz
