@@ -1,0 +1,66 @@
+name: Extension CI
+
+# The components extension (extensions/components): the docs site as one pages part.
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+concurrency:
+  group: extension-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: extensions/components
+
+jobs:
+  verify:
+    name: Extension verify and check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            extensions/components/package-lock.json
+      # The build runs npm run build:showcase at the repo root.
+      - run: npm ci
+        working-directory: .
+      - run: npm ci
+      - run: npm run verify
+      - name: The build left the tree clean (the release refuses a dirty one)
+        run: git status --porcelain && test -z "$(git status --porcelain)"
+      - name: Conformance (the kit's six rules)
+        run: node_modules/.bin/agentage extension check
+
+  local:
+    name: Extension up --docker and smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            extensions/components/package-lock.json
+      - run: npm ci
+        working-directory: .
+      - run: npm ci
+      - name: agentage extension up --docker (the release recipe and the gateway on 4280)
+        run: node_modules/.bin/agentage extension up --docker
+      - name: Smoke through the gateway
+        run: node scripts/smoke.mjs http://127.0.0.1:4280
+      - name: Logs on failure
+        if: failure() || cancelled()
+        run: docker compose -f .agentage/compose.json logs --no-color --tail 80 || true

@@ -1,0 +1,60 @@
+{
+  "name": "@agentage/extension-components",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The docs site of @agentage/components as the components extension: one pages part",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agentage/components.git",
+    "directory": "extensions/components"
+  },
+  "homepage": "https://github.com/agentage/components#readme",
+  "bugs": {
+    "url": "https://github.com/agentage/components/issues"
+  },
+  "engines": {
+    "node": ">=22",
+    "agentage": "^0.25"
+  },
+  "agentage": {
+    "id": "components",
+    "parts": {
+      "pages": true
+    },
+    "settings": {},
+    "secrets": []
+  },
+  "exports": {
+    "./agentage-extension.json": "./dist/agentage-extension.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/export-site.mjs",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "site:hash": "node scripts/site-hash.mjs --write",
+    "site:hash:check": "node scripts/site-hash.mjs",
+    "verify": "npm run type-check && npm run site:hash:check && npm run build && npm run test:coverage"
+  },
+  "dependencies": {
+    "@agentage/extension": "^0.25.0"
+  },
+  "devDependencies": {
+    "@agentage/cli": "^0.76.0",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.0",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  },
+  "keywords": [
+    "agentage",
+    "agentage-extension"
+  ]
+}
