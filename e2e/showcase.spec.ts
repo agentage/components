@@ -10,6 +10,7 @@ const CATEGORIES = [
   'display',
   'overlays',
   'feedback',
+  'chat',
   'patterns',
   'review',
 ] as const;
@@ -261,6 +262,49 @@ test.describe('syntax highlighting', () => {
   });
 });
 
+test.describe('chat', () => {
+  test('the approval bar keeps every button inside and Skip never alone, 300 to 470 px', async ({
+    page,
+  }) => {
+    await open(page, '/components/chat/approval-bar');
+    const bad = await page.evaluate(() => {
+      const bar = document.querySelector('[data-section="Sizes"] [data-slot="approval-bar"]');
+      const box = bar?.parentElement as HTMLElement;
+      box.style.maxWidth = 'none';
+      const out: number[] = [];
+      for (let w = 300; w <= 470; w += 2) {
+        box.style.width = `${String(w)}px`;
+        const group = box.querySelector('[role=group]') as HTMLElement;
+        const g = group.getBoundingClientRect();
+        const b = [...group.querySelectorAll('button')].map((x) => x.getBoundingClientRect());
+        const rowOf = (r: DOMRect) => Math.round(r.top);
+        const skipAlone = b.filter((r) => rowOf(r) === rowOf(b[3] as DOMRect)).length === 1;
+        const outside = b.some((r) => r.right > g.right + 0.5 || r.left < g.left - 0.5);
+        if (outside || (skipAlone && new Set(b.map(rowOf)).size > 1)) out.push(w);
+      }
+      return out;
+    });
+    expect(bad).toEqual([]);
+  });
+
+  test('the conversation follows new turns, holds after a scroll up and jumps back', async ({
+    page,
+  }) => {
+    await open(page, '/components/chat/conversation');
+    const demo = section(page, 'Example');
+    const log = demo.getByRole('log');
+    const add = demo.getByRole('button', { name: 'Add a turn' });
+    const gap = () => log.evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight);
+    for (let i = 0; i < 4; i++) await add.click();
+    await expect.poll(gap).toBeLessThanOrEqual(1);
+    await log.evaluate((el) => el.scrollTo(0, 0));
+    await add.click();
+    await expect.poll(() => log.evaluate((el) => el.scrollTop)).toBe(0);
+    await demo.getByRole('button', { name: 'Scroll to the latest message' }).click();
+    await expect.poll(gap).toBeLessThanOrEqual(1);
+  });
+});
+
 test.describe('props tables', () => {
   test('render generated rows', async ({ page }) => {
     await open(page, '/components/display/stat-card');
@@ -334,6 +378,14 @@ test.describe('showcase visuals', () => {
     const sheet = page.locator('[data-slot="sheet-content"]');
     await expect(sheet).toBeVisible();
     await expect(sheet).toHaveScreenshot('sheet-open.png');
+  });
+
+  test('chat tool call waiting for approval', async ({ page }) => {
+    await open(page, '/components/patterns/chat');
+    const run = section(page, 'A run and an approval');
+    const waiting = run.locator('[data-slot="tool-call"][data-status="waiting"]');
+    await expect(waiting.getByRole('group', { name: 'Approve this call' })).toBeVisible();
+    await expect(waiting).toHaveScreenshot('chat-approval.png');
   });
 
   test('tabs line', async ({ page }) => {

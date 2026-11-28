@@ -2,6 +2,10 @@ import type { ComponentType } from 'react';
 import type { CategoryEntry, DemoEntry } from '../registry';
 import * as Board from '../demos/patterns/board';
 import * as CardGrid from '../demos/patterns/card-grid';
+import * as Chat from '../demos/patterns/chat';
+import * as ChatExpanded from '../demos/patterns/chat-expanded';
+import * as ChatOutcome from '../demos/patterns/chat-outcome';
+import * as ChatRun from '../demos/patterns/chat-run';
 import * as Catalog from '../demos/patterns/catalog';
 import * as DashboardGrid from '../demos/patterns/dashboard-grid';
 import * as DetailPane from '../demos/patterns/detail-pane';
@@ -29,6 +33,29 @@ export const PATTERNS: CategoryEntry = {
   description: 'Composed screens built only from catalog components.',
   bare: true,
   components: [
+    {
+      slug: 'chat',
+      name: 'Chat',
+      description:
+        'A docked chat with preset context, a run with tool calls and an approval, the outcome, and the expanded layout with its support panel.',
+      exports: [],
+      sources: [
+        'chat',
+        'chat-run',
+        'chat-outcome',
+        'chat-expanded',
+        'chat.parts',
+        'chat.run',
+        'chat.context',
+        'chat.session',
+      ],
+      demos: parts(
+        ['Example', Chat],
+        ['A run and an approval', ChatRun],
+        ['Outcome and the compact strip', ChatOutcome],
+        ['Expanded with the support panel', ChatExpanded]
+      ),
+    },
     {
       slug: 'list-page',
       name: 'List page',
