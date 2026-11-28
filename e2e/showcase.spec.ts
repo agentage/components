@@ -110,6 +110,31 @@ const group = (page: Page, label: string) =>
   rail(page).getByRole('button', { name: label, exact: true });
 
 test.describe('docs navigation', () => {
+  test('the rail background covers the whole list on a short viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 600 });
+    await open(page, '/components/patterns/chat');
+    for (const label of ['Foundations', 'Forms', 'Navigation', 'Display', 'Overlays']) {
+      const g = group(page, label);
+      if ((await g.getAttribute('aria-expanded')) === 'false') await g.click();
+    }
+    await page.waitForTimeout(500); // the groups finish their open animation
+    const box = await rail(page).evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+      const inner = el.querySelector('[data-slot="doc-sidebar"]') as HTMLElement;
+      return {
+        bg: getComputedStyle(el).backgroundColor,
+        scrolls: el.scrollHeight > el.clientHeight,
+        railBottom: el.getBoundingClientRect().bottom,
+        innerHeight: inner.getBoundingClientRect().height,
+        listHeight: el.scrollHeight - 24, // minus the rail's vertical padding
+      };
+    });
+    expect(box.scrolls).toBe(true);
+    expect(box.bg).not.toBe('rgba(0, 0, 0, 0)');
+    expect(box.railBottom).toBeGreaterThanOrEqual(599);
+    expect(box.innerHeight).toBeGreaterThanOrEqual(box.listHeight - 1);
+  });
+
   test('only the current route group is expanded on a deep link', async ({ page }) => {
     await open(page, '/components/forms/tree-select');
     await expect(group(page, 'Forms')).toHaveAttribute('aria-expanded', 'true');

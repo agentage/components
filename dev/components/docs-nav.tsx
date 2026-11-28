@@ -84,9 +84,9 @@ export const DocsNav = () => {
   return (
     <aside
       ref={railRef}
-      className="docs-rail rail-scroll sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 overflow-y-auto py-6 lg:block"
+      className="docs-rail rail-scroll sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 overflow-y-auto bg-sidebar py-3 lg:block"
     >
-      <DocSidebar className="h-full border-r-0" width="w-64">
+      <DocSidebar className="border-r-0 bg-transparent" width="w-64">
         <Collapsible
           open={open.includes(CORE)}
           onOpenChange={() => {
