@@ -82,69 +82,16 @@ html.theme-app[data-theme] {
   --color-status-offline: oklch(0.7 0.014 256);
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
-}
-
-/* ── highlight.js theme ───────────────────────────────────────────────────
- * Semantic DS tokens only; every one clears 4.5:1 on --color-card (the
- * CodeBlock surface) in both themes, which the axe sweep gates. */
-.hljs {
-  color: var(--color-foreground);
-  background: transparent;
-}
-
-.hljs-comment,
-.hljs-quote,
-.hljs-meta {
-  color: var(--color-muted-foreground);
-}
-
-.hljs-keyword,
-.hljs-built_in,
-.hljs-literal,
-.hljs-type,
-.hljs-meta .hljs-keyword {
-  color: var(--color-primary-emphasis);
-}
-
-.hljs-string,
-.hljs-regexp,
-.hljs-addition,
-.hljs-char.escape_,
-.hljs-meta .hljs-string {
-  color: var(--color-success);
-}
-
-.hljs-number,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-selector-attr,
-.hljs-selector-pseudo {
-  color: var(--color-warning);
-}
-
-.hljs-attr,
-.hljs-attribute,
-.hljs-name,
-.hljs-property,
-.hljs-section,
-.hljs-selector-class,
-.hljs-selector-id,
-.hljs-selector-tag,
-.hljs-tag,
-.hljs-title {
-  color: var(--color-info);
-}
-
-.hljs-deletion,
-.hljs-template-variable,
-.hljs-variable {
-  color: var(--color-destructive);
-}
-
-.hljs-emphasis {
-  font-style: italic;
-}
-
-.hljs-strong {
-  font-weight: 600;
+  /* Dark syntax colours even when the light radio is on (this theme is always dark). */
+  --syntax-text: #d4d4d4;
+  --syntax-comment: #6a9955;
+  --syntax-keyword: #569cd6;
+  --syntax-string: #ce9178;
+  --syntax-number: #b5cea8;
+  --syntax-property: #9cdcfe;
+  --syntax-function: #dcdcaa;
+  --syntax-type: #4ec9b0;
+  --syntax-selector: #d7ba7d;
+  --syntax-regexp: #d16969;
+  --syntax-bullet: #6796e6;
 }

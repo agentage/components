@@ -6,5 +6,8 @@
 /* Semantic tokens, typography, shadows, animation - theme-dependent */
 @import './tokens.css';
 
+/* highlight.js classes on the --syntax-* tokens */
+@import './syntax.css';
+
 /* Base element styles - resets, scrollbar, body defaults */
 @import './base.css';

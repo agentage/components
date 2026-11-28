@@ -1,0 +1,92 @@
+/* ============================================================================
+ * Agentage Components - Syntax colours
+ *
+ * highlight.js classes mapped to the --syntax-* tokens (tokens.css), so every
+ * highlighted block in both themes uses one palette.
+ * ============================================================================ */
+
+.hljs {
+  color: var(--syntax-text);
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--syntax-comment);
+}
+
+.hljs-keyword,
+.hljs-literal,
+.hljs-meta,
+.hljs-name,
+.hljs-section,
+.hljs-strong,
+.hljs-meta .hljs-keyword {
+  color: var(--syntax-keyword);
+}
+
+.hljs-built_in,
+.hljs-type,
+.hljs-title.class_ {
+  color: var(--syntax-type);
+}
+
+.hljs-title,
+.hljs-title.function_ {
+  color: var(--syntax-function);
+}
+
+.hljs-string,
+.hljs-code,
+.hljs-link,
+.hljs-deletion,
+.hljs-meta .hljs-string {
+  color: var(--syntax-string);
+}
+
+.hljs-regexp {
+  color: var(--syntax-regexp);
+}
+
+.hljs-char.escape_,
+.hljs-selector-tag,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--syntax-selector);
+}
+
+.hljs-number,
+.hljs-addition {
+  color: var(--syntax-number);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-property,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-params,
+.hljs-symbol {
+  color: var(--syntax-property);
+}
+
+.hljs-bullet {
+  color: var(--syntax-bullet);
+}
+
+.hljs-tag,
+.hljs-punctuation,
+.hljs-operator {
+  color: var(--syntax-text);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-section,
+.hljs-strong {
+  font-weight: 600;
+}

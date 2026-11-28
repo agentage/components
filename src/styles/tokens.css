@@ -171,6 +171,25 @@
 }
 
 /* ============================================================================
+ * Syntax colours (code blocks): the editor dark palette, light values below.
+ * Plain vars, not @theme: they colour highlight.js spans in syntax.css only.
+ * ============================================================================ */
+
+:root {
+  --syntax-text: #d4d4d4;
+  --syntax-comment: #6a9955;
+  --syntax-keyword: #569cd6;
+  --syntax-string: #ce9178;
+  --syntax-number: #b5cea8;
+  --syntax-property: #9cdcfe;
+  --syntax-function: #dcdcaa;
+  --syntax-type: #4ec9b0;
+  --syntax-selector: #d7ba7d;
+  --syntax-regexp: #d16969;
+  --syntax-bullet: #6796e6;
+}
+
+/* ============================================================================
  * Light Theme Overrides
  * ============================================================================ */
 
@@ -241,6 +260,19 @@ html[data-theme='light'] {
   --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.06), 0 2px 4px -2px oklch(0 0 0 / 0.06);
   --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.06), 0 4px 6px -4px oklch(0 0 0 / 0.06);
   --shadow-popover: 0 8px 24px -6px oklch(0 0 0 / 0.16), 0 2px 6px -2px oklch(0 0 0 / 0.08);
+
+  /* Editor light palette; number and type are one step darker so they clear 4.5:1 on the card. */
+  --syntax-text: #1f1f1f;
+  --syntax-comment: #008000;
+  --syntax-keyword: #0000ff;
+  --syntax-string: #a31515;
+  --syntax-number: #07754d;
+  --syntax-property: #001080;
+  --syntax-function: #795e26;
+  --syntax-type: #1f6f84;
+  --syntax-selector: #800000;
+  --syntax-regexp: #811f3f;
+  --syntax-bullet: #0451a5;
 }
 
 /* System preference fallback */
@@ -308,6 +340,19 @@ html[data-theme='light'] {
     --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.06), 0 2px 4px -2px oklch(0 0 0 / 0.06);
     --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.06), 0 4px 6px -4px oklch(0 0 0 / 0.06);
     --shadow-popover: 0 8px 24px -6px oklch(0 0 0 / 0.16), 0 2px 6px -2px oklch(0 0 0 / 0.08);
+
+    /* Mirrors the html[data-theme='light'] syntax values. */
+    --syntax-text: #1f1f1f;
+    --syntax-comment: #008000;
+    --syntax-keyword: #0000ff;
+    --syntax-string: #a31515;
+    --syntax-number: #07754d;
+    --syntax-property: #001080;
+    --syntax-function: #795e26;
+    --syntax-type: #1f6f84;
+    --syntax-selector: #800000;
+    --syntax-regexp: #811f3f;
+    --syntax-bullet: #0451a5;
   }
 }
 

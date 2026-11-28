@@ -322,3 +322,24 @@ export type { AlertProps } from './alert';
 export { DirtyBar } from './dirty-bar';
 export type { DirtyBarLabels, DirtyBarProps } from './dirty-bar';
 export { ToastProvider, useToast } from './toast';
+
+// Chat: the conversation, messages, markdown answers, tool calls and the composer.
+
+export { ApprovalBar } from './approval-bar';
+export type { ApprovalBarProps, ApprovalDecision } from './approval-bar';
+export { ContextMeter, meterTone } from './context-meter';
+export type { ContextMeterProps } from './context-meter';
+export { Conversation } from './conversation';
+export type { ConversationProps } from './conversation';
+export { Markdown } from './markdown';
+export type { MarkdownProps } from './markdown';
+export { Message } from './message';
+export type { MessageProps } from './message';
+export { PromptInput } from './prompt-input';
+export type { PromptInputProps } from './prompt-input';
+export { Reasoning } from './reasoning';
+export type { ReasoningProps } from './reasoning';
+export { ToolCall } from './tool-call';
+export type { ToolCallProps, ToolCallStatus } from './tool-call';
+export { ToolGroup } from './tool-group';
+export type { ToolGroupProps } from './tool-group';

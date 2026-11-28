@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+import { CodeBody } from './code-block.body';
 
 export const codeBlockCopyVariants = cva(
   [
@@ -28,9 +29,13 @@ export const codeBlockCopyVariants = cva(
 
 export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   code: string;
+  /**
+   * Language label in the header. A known language (typescript, bash, json, yaml, diff and more)
+   * is also highlighted at runtime; an unknown one shows plain text.
+   */
   language?: string;
   showCopy?: boolean;
-  /** Pre-tokenized markup (highlight.js / shiki) rendered instead of the raw `code` text. */
+  /** Pre-tokenized markup rendered instead of the raw `code` text; skips runtime highlighting. */
   children?: React.ReactNode;
 }
 
@@ -78,28 +83,39 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
     return (
       <div
         ref={ref}
-        className={cn('relative group rounded-lg border border-border bg-card', className)}
+        className={cn(
+          'relative group min-w-0 rounded-lg border border-border bg-background',
+          className
+        )}
         data-slot="code-block"
         {...props}
       >
         {language && (
-          <div className="flex h-8 items-center justify-between border-b border-border px-3">
+          <div className="flex h-8 items-center justify-between rounded-t-lg border-b border-border bg-card px-3">
             <span className="text-xs text-muted-foreground font-mono">{language}</span>
           </div>
         )}
-        <pre className="overflow-x-auto px-3 py-2.5 text-xs leading-relaxed">
-          {children ?? <code className="font-mono text-foreground">{code}</code>}
-        </pre>
         {showCopy && (
           <button
             type="button"
             onClick={() => void handleCopy()}
-            className={cn(codeBlockCopyVariants({ withHeader: !!language }))}
+            className={cn(codeBlockCopyVariants({ withHeader: !!language }), 'z-10')}
             aria-label={copied ? 'Copied' : 'Copy code'}
           >
             {copied ? <CheckIcon /> : <CopyIcon />}
           </button>
         )}
+        {/* Focusable: long lines and the 320 px cap scroll inside, and keys must reach them. */}
+        <pre
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          className={cn(
+            'm-0 max-h-80 overflow-auto rounded-b-lg py-2.5 text-xs leading-relaxed focus-ring',
+            children !== undefined && 'px-3'
+          )}
+        >
+          {children ?? <CodeBody code={code} language={language} />}
+        </pre>
       </div>
     );
   }

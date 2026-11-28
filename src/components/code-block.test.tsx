@@ -58,7 +58,9 @@ describe('CodeBlock copy button position', () => {
   it('merges className last on the root and spreads props', () => {
     const { container } = render(<CodeBlock code="x" className="mt-4" id="cb" />);
     const root = container.querySelector('[data-slot="code-block"]');
-    expect(root?.className).toBe('relative group rounded-lg border border-border bg-card mt-4');
+    expect(root?.className).toBe(
+      'relative group min-w-0 rounded-lg border border-border bg-background mt-4'
+    );
     expect(root?.id).toBe('cb');
   });
 });
@@ -88,5 +90,50 @@ describe('CodeBlock highlighted slot', () => {
     await waitFor(() => {
       expect(writeText).toHaveBeenCalledWith('const a = 1;');
     });
+  });
+});
+
+describe('CodeBlock runtime highlighting', () => {
+  it('highlights a known language and resolves aliases', () => {
+    const { container } = render(<CodeBlock code="const a = 1;" language="ts" />);
+    const code = container.querySelector('code.hljs');
+    expect(code?.getAttribute('data-language')).toBe('typescript');
+    expect(code?.querySelector('.hljs-keyword')?.textContent).toBe('const');
+  });
+
+  it('shows an unknown language as plain escaped text', () => {
+    const { container } = render(<CodeBlock code="<b>x</b>" language="brainfork" />);
+    expect(container.querySelector('.hljs')).toBeNull();
+    expect(container.querySelector('b')).toBeNull();
+    expect(container.querySelector('code')?.textContent).toBe('<b>x</b>');
+  });
+
+  it('never renders markup from the code itself', () => {
+    const src = '<script>alert(1)</script><img src=x onerror="alert(1)">';
+    for (const language of ['html', 'typescript', 'json', undefined]) {
+      const { container, unmount } = render(<CodeBlock code={src} language={language} />);
+      expect(container.querySelector('script')).toBeNull();
+      expect(container.querySelector('img')).toBeNull();
+      expect(container.querySelector('pre')?.textContent).toBe(src);
+      unmount();
+    }
+  });
+
+  it('gives diff lines a tone per added, removed and context line', () => {
+    const { container } = render(
+      <CodeBlock code={'@@ -1 +1 @@\n-old\n+new\n same'} language="diff" />
+    );
+    const lines = [...container.querySelectorAll('code[data-language="diff"] > span')];
+    expect(lines).toHaveLength(4);
+    expect(lines[1]?.className).toContain('bg-destructive/10');
+    expect(lines[2]?.className).toContain('bg-success/10');
+    expect(lines[3]?.className).not.toContain('bg-');
+  });
+
+  it('caps the height and keeps the scroller reachable by keyboard', () => {
+    const { container } = render(<CodeBlock code="x" />);
+    const pre = container.querySelector('pre');
+    expect(pre?.className).toContain('max-h-80');
+    expect(pre?.getAttribute('tabindex')).toBe('0');
   });
 });

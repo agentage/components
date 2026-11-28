@@ -52,6 +52,10 @@
       "types": "./dist/components/alert.d.ts",
       "import": "./dist/components/alert.js"
     },
+    "./approval-bar": {
+      "types": "./dist/components/approval-bar.d.ts",
+      "import": "./dist/components/approval-bar.js"
+    },
     "./avatar": {
       "types": "./dist/components/avatar.d.ts",
       "import": "./dist/components/avatar.js"
@@ -103,6 +107,14 @@
     "./content-blocks": {
       "types": "./dist/components/content-blocks.d.ts",
       "import": "./dist/components/content-blocks.js"
+    },
+    "./context-meter": {
+      "types": "./dist/components/context-meter.d.ts",
+      "import": "./dist/components/context-meter.js"
+    },
+    "./conversation": {
+      "types": "./dist/components/conversation.d.ts",
+      "import": "./dist/components/conversation.js"
     },
     "./copy-button": {
       "types": "./dist/components/copy-button.d.ts",
@@ -196,6 +208,14 @@
       "types": "./dist/components/log-view.d.ts",
       "import": "./dist/components/log-view.js"
     },
+    "./markdown": {
+      "types": "./dist/components/markdown.d.ts",
+      "import": "./dist/components/markdown.js"
+    },
+    "./message": {
+      "types": "./dist/components/message.d.ts",
+      "import": "./dist/components/message.js"
+    },
     "./nav-tree": {
       "types": "./dist/components/nav-tree.d.ts",
       "import": "./dist/components/nav-tree.js"
@@ -220,6 +240,10 @@
       "types": "./dist/components/progress.d.ts",
       "import": "./dist/components/progress.js"
     },
+    "./prompt-input": {
+      "types": "./dist/components/prompt-input.d.ts",
+      "import": "./dist/components/prompt-input.js"
+    },
     "./property-date": {
       "types": "./dist/components/property-date.d.ts",
       "import": "./dist/components/property-date.js"
@@ -239,6 +263,10 @@
     "./radio-group": {
       "types": "./dist/components/radio-group.d.ts",
       "import": "./dist/components/radio-group.js"
+    },
+    "./reasoning": {
+      "types": "./dist/components/reasoning.d.ts",
+      "import": "./dist/components/reasoning.js"
     },
     "./relative-time": {
       "types": "./dist/components/relative-time.d.ts",
@@ -332,6 +360,14 @@
       "types": "./dist/components/toggle-group.d.ts",
       "import": "./dist/components/toggle-group.js"
     },
+    "./tool-call": {
+      "types": "./dist/components/tool-call.d.ts",
+      "import": "./dist/components/tool-call.js"
+    },
+    "./tool-group": {
+      "types": "./dist/components/tool-group.d.ts",
+      "import": "./dist/components/tool-group.js"
+    },
     "./tooltip": {
       "types": "./dist/components/tooltip.d.ts",
       "import": "./dist/components/tooltip.js"
@@ -405,6 +441,9 @@
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "highlight.js": "^11.12.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.7.0"
   },
   "peerDependencies": {
@@ -436,15 +475,12 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.5.7",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "highlight.js": "^11.12.0",
     "jsdom": "^31.0.1",
     "postcss": "^8.5.33",
     "prettier": "^3.10.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vite": "^8.3.7",

@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 
+import { CHAT } from './registry/chat';
 import { DISPLAY } from './registry/display';
 import { FEEDBACK } from './registry/feedback';
 import { FORMS } from './registry/forms';
@@ -51,6 +52,7 @@ export const CATEGORIES: CategoryEntry[] = [
   DISPLAY,
   OVERLAYS,
   FEEDBACK,
+  CHAT,
   PATTERNS,
   REVIEW,
 ];
