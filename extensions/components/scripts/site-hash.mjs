@@ -9,11 +9,8 @@ const INPUTS = ['dev', 'src'];
 const FILE = 'site.hash';
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
-const files = execFileSync(
-  'git',
-  ['ls-files', '-z', '-co', '--exclude-standard', '--', ...INPUTS],
-  { cwd: root }
-)
+// Tracked files only: an untracked scratch file never changes the hash.
+const files = execFileSync('git', ['ls-files', '-z', '--', ...INPUTS], { cwd: root })
   .toString('utf8')
   .split('\0')
   .filter((file) => file && existsSync(join(root, file)))
@@ -23,7 +20,7 @@ const hash = createHash('sha256');
 for (const file of files)
   hash
     .update(`${file}\0`)
-    .update(readFileSync(join(root, file)))
+    .update(readFileSync(join(root, file)).toString('latin1').replaceAll('\r\n', '\n'), 'latin1')
     .update('\0');
 const line = `${hash.digest('hex')}  ${INPUTS.join(' ')} (${files.length} files)\n`;
 
@@ -31,7 +28,9 @@ if (process.argv.includes('--write')) {
   writeFileSync(FILE, line);
   console.log(`site.hash: ${line.trim()}`);
 } else if ((existsSync(FILE) ? readFileSync(FILE, 'utf8') : '') !== line) {
-  console.error('site.hash is stale: the docs site changed. Run npm run site:hash and commit it.');
+  console.error(
+    'site.hash is stale: the docs site changed. Run: cd extensions/components && npm run site:hash, then commit site.hash.'
+  );
   process.exit(1);
 } else {
   console.log('site.hash: up to date');

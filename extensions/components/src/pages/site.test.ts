@@ -19,6 +19,13 @@ describe('pages', () => {
     expect(site['/robots.txt']).toBe('User-agent: *\nDisallow: /\n');
   });
 
+  it('marks a head with attributes noindex too', () => {
+    const page = siteOf({ '/': '<html><head lang="en"><title>t</title></head></html>' })['/'];
+    expect(page).toBe(
+      '<html><head lang="en">\n    <meta name="robots" content="noindex" /><title>t</title></head></html>'
+    );
+  });
+
   it('refuses a site without index.html', () => {
     expect(() => siteOf({})).toThrow(/index\.html is missing/);
   });

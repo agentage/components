@@ -8,7 +8,8 @@ const ROUTES = ['/install', '/theming', '/components', '/components/*'];
 const NOINDEX = '<meta name="robots" content="noindex" />';
 
 // A copy of ds.agentage.io: closed to crawlers.
-const noindex = (html: string): string => html.replace('<head>', `<head>\n    ${NOINDEX}`);
+const noindex = (html: string): string =>
+  html.replace(/<head(\s[^>]*)?>/i, (head) => `${head}\n    ${NOINDEX}`);
 
 const htmlOf = (entry: PagesEntry | undefined): string => {
   if (typeof entry !== 'string')

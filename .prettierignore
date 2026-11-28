@@ -6,3 +6,5 @@ package-lock.json
 dist-showcase
 e2e/**/*-snapshots
 extensions/*/.agentage
+extensions/*/dist
+extensions/*/coverage
